@@ -1,6 +1,8 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import type { ReactNode } from 'react';
 import { storage } from '../utils/storage';
-import { login as loginService, register as registerService, logout as logoutService, getCurrentUser, LoginCredentials, RegisterCredentials, AuthResponse } from '../services/authService';
+import { login as loginService, register as registerService, logout as logoutService, getCurrentUser } from '../services/authService';
+import type { LoginCredentials, RegisterCredentials, AuthResponse } from '../services/authService';
 
 interface User {
   id: number;
@@ -77,7 +79,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(response.user);
       setIsAuthenticated(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur d\'inscription');
+      setError(err instanceof Error ? err.message : "Erreur d'inscription");
       throw err;
     } finally {
       setIsLoading(false);
