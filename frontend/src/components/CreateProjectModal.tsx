@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export interface CreateProjectData {
+export interface ModalCreateProjectData {
   name: string;
   description: string;
   contributorIds: number[];
@@ -8,12 +8,12 @@ export interface CreateProjectData {
 
 interface CreateProjectModalProps {
   onClose: () => void;
-  onSubmit: (data: CreateProjectData) => void;
+  onSubmit: (data: ModalCreateProjectData) => void;
   users: { id: number; name: string; role?: string }[];
 }
 
 export default function CreateProjectModal({ onClose, onSubmit, users }: CreateProjectModalProps) {
-  const [newProject, setNewProject] = useState<CreateProjectData>({
+  const [newProject, setNewProject] = useState<ModalCreateProjectData>({
     name: '',
     description: '',
     contributorIds: [],
@@ -21,7 +21,7 @@ export default function CreateProjectModal({ onClose, onSubmit, users }: CreateP
 
   const [selectedContributors, setSelectedContributors] = useState<string[]>([]);
 
-  const handleChange = (field: keyof Omit<CreateProjectData, 'contributorIds'>, value: string) => {
+  const handleChange = (field: keyof Omit<ModalCreateProjectData, 'contributorIds'>, value: string) => {
     setNewProject(prev => ({ ...prev, [field]: value }));
   };
 

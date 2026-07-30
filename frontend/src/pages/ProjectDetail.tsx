@@ -5,6 +5,8 @@ import { storage } from '../utils/storage';
 import { getProjectById, type Project } from '../services/projectService';
 import { getProjectTasks, updateTask, createTask, type Task, type CreateTaskData } from '../services/taskService';
 import AITaskListModal from '../components/AITaskListModal';
+import EditProjectModal from '../components/EditProjectModal';
+import EditTaskModal from '../components/EditTaskModal';
 
 // Couleurs des statuts
 const statusColors: Record<string, { bg: string; color: string }> = {
@@ -59,7 +61,7 @@ export default function ProjectDetail() {
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [activeView, setActiveView] = useState<'list' | 'calendar'>('list');
-  const [activeFilter, setActiveFilter] = useState<string>('all');
+  const [activeFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,6 +69,10 @@ export default function ProjectDetail() {
   // Modale de création de tâche
   const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
   const [isAITaskModalOpen, setIsAITaskModalOpen] = useState(false);
+  const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
+  const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<{ id: number; name: string; description: string; dueDate: string; assigneeIds: number[]; status: 'À faire' | 'En cours' | 'Terminé' } | null>(null);
+  const [editingProject, setEditingProject] = useState<{ id: number; name: string; description: string; contributorIds: number[] } | null>(null);
   const [newTask, setNewTask] = useState<Omit<CreateTaskData, 'projectId'>>({
     name: '',
     description: '',
@@ -280,7 +286,15 @@ export default function ProjectDetail() {
               {project.name}
             </h1>
             <button
-              onClick={() => navigate(`/projects/${project.id}/edit`)}
+              onClick={() => {
+              setEditingProject({
+              id: project.id,
+              name: project.name,
+              description: project.description || '',
+              contributorIds: contributors.map(c => c.id)
+            });
+              setIsEditProjectModalOpen(true);
+          }}
               style={{
                 color: '#D3590B',
                 fontSize: 14,
@@ -492,6 +506,17 @@ export default function ProjectDetail() {
                   onStatusChange={(newStatus) => handleStatusChange(task.id, newStatus)}
                   showBorder={index < filteredTasks.length - 1}
                   getInitials={getInitials}
+                  onEdit={() => {
+                    setEditingTask({
+                      id: task.id,
+                      name: task.name,
+                      description: task.description || '',
+                      dueDate: task.dueDate,
+                      assigneeIds: [task.assignees],
+                      status: task.status
+                    });
+                    setIsEditTaskModalOpen(true);
+                  }}
                 />
               ))
             )}
@@ -660,16 +685,30 @@ export default function ProjectDetail() {
       {/* Modale liste de tâches IA */}
       {isAITaskModalOpen && (
         <AITaskListModal onClose={() => setIsAITaskModalOpen(false)} />
+      )}
+
+      {/* Modale Modifier Projet */}
+      {isEditProjectModalOpen && editingProject && (
+        <EditProjectModal
+          project={editingProject}
+          onClose={() => setIsEditProjectModalOpen(false)}
+          onSave={(updated) => {
+            setProject(prev => prev ? { ...prev, ...updated } : null);
+            setIsEditProjectModalOpen(false);
+          }}
+          users={users}
+        />
       )}  </div>
   );
 }
 
 // Composant TaskCard
-function TaskCard({ task, onStatusChange, showBorder, getInitials }: {
+function TaskCard({ task, onStatusChange, showBorder, getInitials, onEdit }: {
   task: Task;
   onStatusChange: (status: string) => void;
   showBorder: boolean;
   getInitials: (name: string) => string;
+  onEdit?: () => void;
 }) {
   const colors = statusColors[task.status] || { bg: '#E5E7EB', color: '#6B7280' };
   

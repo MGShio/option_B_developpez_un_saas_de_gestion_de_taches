@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { storage } from '../utils/storage';
 import { getAssignedTasks, searchTasks, type Task } from '../services/taskService';
-import { getProjects, createProject, type Project, type CreateProjectData } from '../services/projectService';
+import { getProjects, createProject, type Project } from '../services/projectService';
+import CreateProjectModal, { type ModalCreateProjectData } from '../components/CreateProjectModal';
 
 // Couleurs des statuts
 const statusColors: Record<string, { bg: string; color: string }> = {
@@ -32,14 +33,13 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [users] = useState<{ id: number; name: string; role?: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   // Modale de création de projet
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [newProject, setNewProject] = useState<CreateProjectData>({ name: '', description: '' });
-  const [isCreating, setIsCreating] = useState(false);
-
+  const [newProject, setNewProject] = useState<ModalCreateProjectData>({ name: '', description: '', contributorIds: [] });
   // Récupérer les données
   const fetchData = useCallback(async () => {
     if (!user) return;
@@ -103,7 +103,7 @@ export default function Dashboard() {
       return;
     }
     
-    setIsCreating(true);
+    
     setError(null);
     
     try {
@@ -116,12 +116,12 @@ export default function Dashboard() {
       const createdProject = await createProject(token, newProject);
       setProjects(prev => [...prev, createdProject]);
       setIsCreateModalOpen(false);
-      setNewProject({ name: '', description: '' });
+      setNewProject({ name: '', description: '', contributorIds: [] });
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la création du projet');
     } finally {
-      setIsCreating(false);
+      
     }
   };
 
@@ -376,179 +376,17 @@ export default function Dashboard() {
         }}
       >
         + Créer un projet
-      </button>
-
-      {/* Modale de création de projet */}
+      </button>{/* Modale de création de projet */}
       {isCreateModalOpen && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 1000,
-        }}>
-          <div style={{
-            background: 'white',
-            borderRadius: 16,
-            padding: 40,
-            width: 500,
-            maxWidth: '90%',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-          }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 24,
-            }}>
-              <h2 style={{
-                color: '#1F1F1F',
-                fontSize: 20,
-                fontFamily: 'Manrope',
-                fontWeight: 600,
-              }}>
-                Créer un nouveau projet
-              </h2>
-              <button
-                onClick={() => {
-                  setIsCreateModalOpen(false);
-                  setNewProject({ name: '', description: '' });
-                  setError(null);
-                }}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: 24,
-                  color: '#6B7280',
-                }}
-              >
-                ×
-              </button>
-            </div>
-
-            <form onSubmit={(e) => { e.preventDefault(); handleCreateProject(); }}>
-              <div style={{ marginBottom: 20 }}>
-                <label style={{
-                  display: 'block',
-                  color: '#1F1F1F',
-                  fontSize: 14,
-                  fontFamily: 'Inter',
-                  fontWeight: 500,
-                  marginBottom: 8,
-                }}>
-                  Nom du projet *
-                </label>
-                <input
-                  type="text"
-                  value={newProject.name}
-                  onChange={(e) => setNewProject(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Ex: Application E-commerce"
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    border: error && !newProject.name.trim() ? '1px solid #EF4444' : '1px solid #E5E7EB',
-                    borderRadius: 8,
-                    fontSize: 14,
-                    fontFamily: 'Inter',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-
-              <div style={{ marginBottom: 24 }}>
-                <label style={{
-                  display: 'block',
-                  color: '#1F1F1F',
-                  fontSize: 14,
-                  fontFamily: 'Inter',
-                  fontWeight: 500,
-                  marginBottom: 8,
-                }}>
-                  Description
-                </label>
-                <textarea
-                  value={newProject.description}
-                  onChange={(e) => setNewProject(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Description du projet (optionnel)"
-                  rows={4}
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    border: '1px solid #E5E7EB',
-                    borderRadius: 8,
-                    fontSize: 14,
-                    fontFamily: 'Inter',
-                    outline: 'none',
-                    resize: 'vertical',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-
-              {error && (
-                <div style={{ 
-                  color: '#EF4444', 
-                  fontSize: 14, 
-                  marginBottom: 16,
-                }}>
-                  {error}
-                </div>
-              )}
-
-              <div style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                gap: 12,
-              }}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsCreateModalOpen(false);
-                    setNewProject({ name: '', description: '' });
-                    setError(null);
-                  }}
-                  style={{
-                    padding: '12px 24px',
-                    background: 'white',
-                    color: '#6B7280',
-                    border: '1px solid #E5E7EB',
-                    borderRadius: 8,
-                    fontSize: 14,
-                    fontFamily: 'Inter',
-                    fontWeight: 500,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Annuler
-                </button>
-                <button
-                  type="submit"
-                  disabled={isCreating || !newProject.name.trim()}
-                  style={{
-                    padding: '12px 24px',
-                    background: isCreating ? '#9CA3AF' : '#1F1F1F',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 8,
-                    fontSize: 14,
-                    fontFamily: 'Inter',
-                    fontWeight: 500,
-                    cursor: isCreating ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  {isCreating ? 'Création...' : 'Créer le projet'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <CreateProjectModal
+          onClose={() => {
+            setIsCreateModalOpen(false);
+            setNewProject({ name: '', description: '', contributorIds: [] });
+            setError(null);
+          }}
+          onSubmit={handleCreateProject}
+          users={users}
+        />
       )}
     </div>
   );
@@ -719,9 +557,7 @@ function TaskCard({ task, projectName, onView }: {
 }
 
 // Composant KanbanView
-function KanbanView({ tasks, getProjectName }: { 
-  tasks: Task[],
-  getProjectName: (projectId: number) => string,\n}) {
+function KanbanView({ tasks, getProjectName }: { tasks: Task[]; getProjectName: (projectId: number) => string }) {
   const navigate = useNavigate();
   // Regrouper les tâches par statut
   const tasksByStatus: Record<string, Task[]> = {
