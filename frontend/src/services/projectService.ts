@@ -1,18 +1,110 @@
 const API_BASE_URL = 'http://localhost:8000';
 
+// Helper to convert backend string ID to frontend number ID
+function convertBackendIdToNumber(backendId: string): number {
+  const num = parseInt(backendId, 10);
+  if (!isNaN(num)) return num;
+  let hash = 0;
+  for (let i = 0; i < backendId.length; i++) {
+    hash = (hash << 5) - hash + backendId.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+// Backend response types
+interface BackendUser {
+  id: string;
+  email: string;
+  name: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface BackendProjectMember {
+  id: string;
+  role: string;
+  user?: BackendUser;
+  joinedAt?: string;
+}
+
+interface BackendProject {
+  id: string;
+  name: string;
+  description: string;
+  ownerId: string;
+  owner?: BackendUser;
+  members?: BackendProjectMember[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Convert backend project to frontend project
+export function formatProjectFromBackend(backendProject: BackendProject): Project {
+  return {
+    id: convertBackendIdToNumber(backendProject.id),
+    name: backendProject.name,
+    description: backendProject.description || '',
+    ownerId: convertBackendIdToNumber(backendProject.ownerId),
+    owner: backendProject.owner ? {
+      id: convertBackendIdToNumber(backendProject.owner.id),
+      email: backendProject.owner.email,
+      name: backendProject.owner.name,
+      createdAt: backendProject.owner.createdAt,
+      updatedAt: backendProject.owner.updatedAt,
+    } : undefined,
+    members: backendProject.members?.map((m) => ({
+      id: convertBackendIdToNumber(m.id),
+      role: m.role,
+      user: m.user ? {
+        id: convertBackendIdToNumber(m.user.id),
+        email: m.user.email,
+        name: m.user.name,
+        createdAt: m.user.createdAt,
+        updatedAt: m.user.updatedAt,
+      } : { id: 0, email: '', name: 'Inconnu', createdAt: '', updatedAt: '' },
+      joinedAt: m.joinedAt,
+    })) || [],
+    createdAt: backendProject.createdAt,
+    updatedAt: backendProject.updatedAt,
+  };
+}
+
+// Generic function to extract projects from backend response
+function extractProjectsFromResponse(data: any): BackendProject[] {
+  if (data?.data?.projects) {
+    return data.data.projects;
+  }
+  if (data?.data && Array.isArray(data.data)) {
+    return data.data;
+  }
+  if (Array.isArray(data)) {
+    return data;
+  }
+  return [];
+}
+
+// Generic function to extract single project from backend response
+function extractProjectFromResponse(data: any): BackendProject {
+  if (data?.data) {
+    return data.data;
+  }
+  return data;
+}
+
 export interface User {
   id: number;
   email: string;
   name: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ProjectMember {
   id: number;
   role: string;
   user: User;
-  joinedAt: string;
+  joinedAt?: string;
 }
 
 export interface Project {
@@ -43,6 +135,7 @@ export interface ApiError {
 }
 
 // Récupérer tous les projets de l'utilisateur
+// GET /projects
 export async function getProjects(token: string): Promise<Project[]> {
   const response = await fetch(`${API_BASE_URL}/projects`, {
     method: 'GET',
@@ -52,29 +145,17 @@ export async function getProjects(token: string): Promise<Project[]> {
   });
 
   if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Erreur lors de la récupération des projets');
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la récupération des projets');
   }
 
   const data = await response.json();
-  // Format projects from backend
-  const projects = (data.data || data || []).map((p: any) => ({
-    ...p,
-    id: parseInt(p.id) || p.id,
-    ownerId: parseInt(p.ownerId) || p.ownerId,
-    owner: p.owner ? {
-      id: parseInt(p.owner.id) || p.owner.id,
-      email: p.owner.email,
-      name: p.owner.name,
-      createdAt: p.owner.createdAt,
-      updatedAt: p.owner.updatedAt,
-    } : undefined,
-    members: p.members || [],
-  }));
-  return projects;
+  const backendProjects = extractProjectsFromResponse(data);
+  return backendProjects.map(formatProjectFromBackend);
 }
 
 // Récupérer un projet par ID
+// GET /projects/{projectId}
 export async function getProjectById(token: string, projectId: number): Promise<Project> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
     method: 'GET',
@@ -84,28 +165,17 @@ export async function getProjectById(token: string, projectId: number): Promise<
   });
 
   if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Projet non trouvé');
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Projet non trouvé');
   }
 
   const data = await response.json();
-  const p = data.data || data;
-  return {
-    ...p,
-    id: parseInt(p.id) || p.id,
-    ownerId: parseInt(p.ownerId) || p.ownerId,
-    owner: p.owner ? {
-      id: parseInt(p.owner.id) || p.owner.id,
-      email: p.owner.email,
-      name: p.owner.name,
-      createdAt: p.owner.createdAt,
-      updatedAt: p.owner.updatedAt,
-    } : undefined,
-    members: p.members || [],
-  };
+  const backendProject = extractProjectFromResponse(data);
+  return formatProjectFromBackend(backendProject);
 }
 
 // Créer un nouveau projet
+// POST /projects
 export async function createProject(token: string, projectData: CreateProjectData): Promise<Project> {
   const response = await fetch(`${API_BASE_URL}/projects`, {
     method: 'POST',
@@ -117,28 +187,17 @@ export async function createProject(token: string, projectData: CreateProjectDat
   });
 
   if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Erreur lors de la création du projet');
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la création du projet');
   }
 
   const data = await response.json();
-  const p = data.data || data;
-  return {
-    ...p,
-    id: parseInt(p.id) || p.id,
-    ownerId: parseInt(p.ownerId) || p.ownerId,
-    owner: p.owner ? {
-      id: parseInt(p.owner.id) || p.owner.id,
-      email: p.owner.email,
-      name: p.owner.name,
-      createdAt: p.owner.createdAt,
-      updatedAt: p.owner.updatedAt,
-    } : undefined,
-    members: p.members || [],
-  };
+  const backendProject = extractProjectFromResponse(data);
+  return formatProjectFromBackend(backendProject);
 }
 
 // Mettre à jour un projet
+// PATCH /projects/{projectId}
 export async function updateProject(token: string, projectId: number, projectData: UpdateProjectData): Promise<Project> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
     method: 'PATCH',
@@ -150,28 +209,17 @@ export async function updateProject(token: string, projectId: number, projectDat
   });
 
   if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Erreur lors de la mise à jour du projet');
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la mise à jour du projet');
   }
 
   const data = await response.json();
-  const p = data.data || data;
-  return {
-    ...p,
-    id: parseInt(p.id) || p.id,
-    ownerId: parseInt(p.ownerId) || p.ownerId,
-    owner: p.owner ? {
-      id: parseInt(p.owner.id) || p.owner.id,
-      email: p.owner.email,
-      name: p.owner.name,
-      createdAt: p.owner.createdAt,
-      updatedAt: p.owner.updatedAt,
-    } : undefined,
-    members: p.members || [],
-  };
+  const backendProject = extractProjectFromResponse(data);
+  return formatProjectFromBackend(backendProject);
 }
 
 // Supprimer un projet
+// DELETE /projects/{projectId}
 export async function deleteProject(token: string, projectId: number): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
     method: 'DELETE',
@@ -181,12 +229,13 @@ export async function deleteProject(token: string, projectId: number): Promise<v
   });
 
   if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Erreur lors de la suppression du projet');
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la suppression du projet');
   }
 }
 
 // Rechercher des projets
+// GET /projects/search?q={query}
 export async function searchProjects(token: string, query: string): Promise<Project[]> {
   const response = await fetch(`${API_BASE_URL}/projects/search?q=${encodeURIComponent(query)}`, {
     method: 'GET',
@@ -196,27 +245,17 @@ export async function searchProjects(token: string, query: string): Promise<Proj
   });
 
   if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Erreur lors de la recherche');
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la recherche');
   }
 
   const data = await response.json();
-  return (data.data || data || []).map((p: any) => ({
-    ...p,
-    id: parseInt(p.id) || p.id,
-    ownerId: parseInt(p.ownerId) || p.ownerId,
-    owner: p.owner ? {
-      id: parseInt(p.owner.id) || p.owner.id,
-      email: p.owner.email,
-      name: p.owner.name,
-      createdAt: p.owner.createdAt,
-      updatedAt: p.owner.updatedAt,
-    } : undefined,
-    members: p.members || [],
-  }));
+  const backendProjects = extractProjectsFromResponse(data);
+  return backendProjects.map(formatProjectFromBackend);
 }
 
 // Ajouter un contributeur à un projet
+// POST /projects/{projectId}/contributors
 export async function addContributor(token: string, projectId: number, userId: number): Promise<ProjectMember> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/contributors`, {
     method: 'POST',
@@ -224,12 +263,12 @@ export async function addContributor(token: string, projectId: number, userId: n
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     },
-    body: JSON.stringify({ userId }),
+    body: JSON.stringify({ userId: String(userId) }),
   });
 
   if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Erreur lors de l\'ajout du contributeur');
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || "Erreur lors de l'ajout du contributeur");
   }
 
   const data = await response.json();
@@ -237,6 +276,7 @@ export async function addContributor(token: string, projectId: number, userId: n
 }
 
 // Supprimer un contributeur d'un projet
+// DELETE /projects/{projectId}/contributors/{userId}
 export async function removeContributor(token: string, projectId: number, userId: number): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/contributors/${userId}`, {
     method: 'DELETE',
@@ -246,8 +286,7 @@ export async function removeContributor(token: string, projectId: number, userId
   });
 
   if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Erreur lors de la suppression du contributeur');
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la suppression du contributeur');
   }
 }
-

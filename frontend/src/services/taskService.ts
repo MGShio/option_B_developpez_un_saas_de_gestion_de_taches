@@ -1,11 +1,23 @@
 const API_BASE_URL = 'http://localhost:8000';
 
+// Helper to convert backend string ID to frontend number ID
+function convertBackendIdToNumber(backendId: string): number {
+  const num = parseInt(backendId, 10);
+  if (!isNaN(num)) return num;
+  let hash = 0;
+  for (let i = 0; i < backendId.length; i++) {
+    hash = (hash << 5) - hash + backendId.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
 export interface User {
   id: number;
   email: string;
   name: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface TaskAssignee {
@@ -13,7 +25,7 @@ export interface TaskAssignee {
   userId: number;
   taskId: number;
   user: User;
-  assignedAt: string;
+  assignedAt?: string;
 }
 
 export interface Comment {
@@ -24,6 +36,11 @@ export interface Comment {
   author: User;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ProjectSummary {
+  id: number;
+  title: string;
 }
 
 // Mapping des statuts et priorités entre frontend (FR) et backend (EN)
@@ -65,20 +82,68 @@ export function toFrontendPriority(priority: string): string {
   return PRIORITY_MAP[priority] || priority;
 }
 
+// Backend response types
+interface BackendTaskAssignee {
+  id: string;
+  userId: string;
+  taskId: string;
+  user?: {
+    id: string;
+    email: string;
+    name: string;
+    createdAt?: string;
+    updatedAt?: string;
+  };
+  assignedAt?: string;
+}
+
+interface BackendTask {
+  id: string;
+  title: string;
+  description: string;
+  projectId: string;
+  project?: {
+    id: string;
+    name: string;
+    title?: string;
+  };
+  dueDate: string;
+  status: string;
+  priority: string;
+  assignees?: BackendTaskAssignee[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Function to convert task data from backend format to frontend format
-export function formatTaskFromBackend(backendTask: any): Task {
+export function formatTaskFromBackend(backendTask: BackendTask): Task {
   return {
-    ...backendTask,
-    id: parseInt(backendTask.id) || backendTask.id,
-    projectId: parseInt(backendTask.projectId) || backendTask.projectId,
+    id: convertBackendIdToNumber(backendTask.id),
+    title: backendTask.title,
+    description: backendTask.description || '',
+    projectId: convertBackendIdToNumber(backendTask.projectId),
+    project: backendTask.project ? {
+      id: convertBackendIdToNumber(backendTask.project.id),
+      title: backendTask.project.name || backendTask.project.title || '',
+    } : undefined,
+    dueDate: backendTask.dueDate,
     status: toFrontendStatus(backendTask.status) as Task['status'],
     priority: toFrontendPriority(backendTask.priority) as Task['priority'],
-    // Convert assignees if needed
-    assignees: backendTask.assignees || [],
-    project: backendTask.project ? {
-      id: parseInt(backendTask.project.id) || backendTask.project.id,
-      title: backendTask.project.name || backendTask.project.title,
-    } : undefined,
+    assignees: backendTask.assignees?.map((a) => ({
+      id: convertBackendIdToNumber(a.id),
+      userId: convertBackendIdToNumber(a.userId),
+      taskId: convertBackendIdToNumber(a.taskId),
+      user: a.user ? {
+        id: convertBackendIdToNumber(a.user.id),
+        email: a.user.email,
+        name: a.user.name,
+        createdAt: a.user.createdAt,
+        updatedAt: a.user.updatedAt,
+      } : { id: 0, email: '', name: 'Inconnu', createdAt: '', updatedAt: '' },
+      assignedAt: a.assignedAt,
+    })) || [],
+    createdAt: backendTask.createdAt,
+    updatedAt: backendTask.updatedAt,
   };
 }
 
@@ -94,7 +159,7 @@ export function formatTaskToBackend(frontendTask: Partial<CreateTaskData>): any 
     result.priority = toBackendPriority(result.priority);
   }
   
-  // Remove id from create/update data (backend uses different ID format)
+  // Remove id if present (backend generates its own)
   delete result.id;
   
   return result;
@@ -105,7 +170,7 @@ export interface Task {
   title: string;
   description: string;
   projectId: number;
-  project?: { id: number; title: string };
+  project?: ProjectSummary;
   dueDate: string;
   status: 'À faire' | 'En cours' | 'Terminé';
   priority: 'Faible' | 'Moyenne' | 'Haute';
@@ -131,9 +196,32 @@ export interface ApiError {
   statusCode: number;
 }
 
-// Récupérer toutes les tâches de l'utilisateur
-// Uses dashboard endpoint for assigned tasks
-export async function getTasks(token: string): Promise<Task[]> {
+// Generic function to extract tasks from backend response
+function extractTasksFromResponse(data: any): BackendTask[] {
+  // Backend wraps in { success: true, message: '...', data: { tasks: [...] } } or { success: true, message: '...', data: [...] }
+  if (data?.data?.tasks) {
+    return data.data.tasks;
+  }
+  if (data?.data && Array.isArray(data.data)) {
+    return data.data;
+  }
+  if (Array.isArray(data)) {
+    return data;
+  }
+  return [];
+}
+
+// Generic function to extract single task from backend response
+function extractTaskFromResponse(data: any): BackendTask {
+  if (data?.data) {
+    return data.data;
+  }
+  return data;
+}
+
+// Récupérer toutes les tâches assignées à l'utilisateur
+// GET /dashboard/assigned-tasks
+export async function getAssignedTasks(token: string): Promise<Task[]> {
   const response = await fetch(`${API_BASE_URL}/dashboard/assigned-tasks`, {
     method: 'GET',
     headers: {
@@ -142,24 +230,22 @@ export async function getTasks(token: string): Promise<Task[]> {
   });
 
   if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Erreur lors de la récupération des tâches');
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la récupération des tâches');
   }
 
   const data = await response.json();
-  // Map tasks from backend format to frontend format
-  const tasks = (data.data?.tasks || data.tasks || []).map(formatTaskFromBackend);
-  return tasks;
+  const backendTasks = extractTasksFromResponse(data);
+  return backendTasks.map(formatTaskFromBackend);
 }
 
-// Récupérer les tâches assignées à l'utilisateur
-// Same as getTasks - uses dashboard endpoint
-export async function getAssignedTasks(token: string): Promise<Task[]> {
-  return getTasks(token);
+// Alias for getAssignedTasks
+export async function getTasks(token: string): Promise<Task[]> {
+  return getAssignedTasks(token);
 }
 
 // Récupérer une tâche par ID
-// Tasks are nested under projects: /projects/{projectId}/tasks/{taskId}
+// GET /projects/{projectId}/tasks/{taskId}
 export async function getTaskById(token: string, projectId: number, taskId: number): Promise<Task> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}`, {
     method: 'GET',
@@ -169,15 +255,17 @@ export async function getTaskById(token: string, projectId: number, taskId: numb
   });
 
   if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Tâche non trouvée');
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Tâche non trouvée');
   }
 
   const data = await response.json();
-  return formatTaskFromBackend(data.data || data);
+  const backendTask = extractTaskFromResponse(data);
+  return formatTaskFromBackend(backendTask);
 }
 
 // Créer une nouvelle tâche
+// POST /projects/{projectId}/tasks
 export async function createTask(token: string, taskData: CreateTaskData): Promise<Task> {
   const response = await fetch(`${API_BASE_URL}/projects/${taskData.projectId}/tasks`, {
     method: 'POST',
@@ -189,15 +277,17 @@ export async function createTask(token: string, taskData: CreateTaskData): Promi
   });
 
   if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Erreur lors de la création de la tâche');
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la création de la tâche');
   }
 
   const data = await response.json();
-  return formatTaskFromBackend(data.data || data);
+  const backendTask = extractTaskFromResponse(data);
+  return formatTaskFromBackend(backendTask);
 }
 
 // Mettre à jour une tâche
+// PATCH /projects/{projectId}/tasks/{taskId}
 export async function updateTask(token: string, projectId: number, taskId: number, taskData: UpdateTaskData): Promise<Task> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}`, {
     method: 'PATCH',
@@ -209,15 +299,17 @@ export async function updateTask(token: string, projectId: number, taskId: numbe
   });
 
   if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Erreur lors de la mise à jour de la tâche');
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la mise à jour de la tâche');
   }
 
   const data = await response.json();
-  return formatTaskFromBackend(data.data || data);
+  const backendTask = extractTaskFromResponse(data);
+  return formatTaskFromBackend(backendTask);
 }
 
 // Supprimer une tâche
+// DELETE /projects/{projectId}/tasks/{taskId}
 export async function deleteTask(token: string, projectId: number, taskId: number): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}`, {
     method: 'DELETE',
@@ -227,12 +319,13 @@ export async function deleteTask(token: string, projectId: number, taskId: numbe
   });
 
   if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Erreur lors de la suppression de la tâche');
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la suppression de la tâche');
   }
 }
 
 // Rechercher des tâches
+// GET /dashboard/assigned-tasks/search?q={query}
 export async function searchTasks(token: string, query: string): Promise<Task[]> {
   const response = await fetch(`${API_BASE_URL}/dashboard/assigned-tasks/search?q=${encodeURIComponent(query)}`, {
     method: 'GET',
@@ -242,15 +335,17 @@ export async function searchTasks(token: string, query: string): Promise<Task[]>
   });
 
   if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Erreur lors de la recherche');
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la recherche');
   }
 
   const data = await response.json();
-  return (data.data?.tasks || data.tasks || []).map(formatTaskFromBackend);
+  const backendTasks = extractTasksFromResponse(data);
+  return backendTasks.map(formatTaskFromBackend);
 }
 
 // Récupérer les tâches d'un projet
+// GET /projects/{projectId}/tasks
 export async function getProjectTasks(token: string, projectId: number): Promise<Task[]> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks`, {
     method: 'GET',
@@ -260,10 +355,11 @@ export async function getProjectTasks(token: string, projectId: number): Promise
   });
 
   if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Erreur lors de la récupération des tâches du projet');
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la récupération des tâches du projet');
   }
 
   const data = await response.json();
-  return (data.data || data || []).map(formatTaskFromBackend);
+  const backendTasks = extractTasksFromResponse(data);
+  return backendTasks.map(formatTaskFromBackend);
 }

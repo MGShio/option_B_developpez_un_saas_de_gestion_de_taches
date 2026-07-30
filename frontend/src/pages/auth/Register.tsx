@@ -27,22 +27,118 @@ export default function Register() {
     }
   };
 
+  const containerStyle: React.CSSProperties = {
+    minHeight: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'var(--color-background)',
+    paddingLeft: '1rem',
+    paddingRight: '1rem',
+  };
+
+  const cardStyle: React.CSSProperties = {
+    backgroundColor: 'var(--color-white)',
+    padding: '2rem',
+    borderRadius: '0.5rem',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    width: '100%',
+    maxWidth: '28rem',
+  };
+
+  const titleStyle: React.CSSProperties = {
+    fontSize: '1.5rem',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: '2rem',
+    color: 'var(--color-primary)',
+  };
+
+  const errorStyle: React.CSSProperties = {
+    backgroundColor: '#FEF2F2',
+    color: '#991B1B',
+    padding: '0.75rem',
+    borderRadius: '0.375rem',
+    marginBottom: '1rem',
+  };
+
+  const formStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1.5rem',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '0.875rem',
+    fontWeight: '500',
+    color: '#374151',
+    marginBottom: '0.25rem',
+  };
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '0.5rem 1rem',
+    border: '1px solid var(--color-border)',
+    borderRadius: '0.375rem',
+    outline: 'none',
+  };
+
+  const inputFocusStyle: React.CSSProperties = {
+    borderColor: 'transparent',
+    boxShadow: '0 0 0 2px var(--color-primary)',
+  };
+
+  const hintStyle: React.CSSProperties = {
+    fontSize: '0.75rem',
+    color: '#6B7280',
+    marginTop: '0.25rem',
+  };
+
+  const errorHintStyle: React.CSSProperties = {
+    fontSize: '0.75rem',
+    color: '#EF4444',
+    marginTop: '0.25rem',
+  };
+
+  const buttonStyle: React.CSSProperties = {
+    width: '100%',
+    backgroundColor: 'var(--color-primary)',
+    color: 'var(--color-white)',
+    padding: '0.5rem 1rem',
+    borderRadius: '0.375rem',
+    fontWeight: '500',
+    border: 'none',
+    cursor: 'pointer',
+    opacity: isLoading || !password || password !== confirmPassword ? 0.5 : 1,
+  };
+
+  const footerStyle: React.CSSProperties = {
+    textAlign: 'center',
+    marginTop: '1.5rem',
+    color: '#4B5563',
+  };
+
+  const linkStyle: React.CSSProperties = {
+    color: 'var(--color-primary)',
+    fontSize: '0.875rem',
+    textDecoration: 'none',
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--color-background)] px-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center mb-8 text-[var(--color-primary)]">
-          Créer un compte
-        </h1>
+    <div style={containerStyle}>
+      <div style={cardStyle}>
+        <h1 style={titleStyle}>Créer un compte</h1>
 
         {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+          <div style={errorStyle}>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} style={formStyle}>
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="name" style={labelStyle}>
               Nom
             </label>
             <input
@@ -50,13 +146,15 @@ export default function Register() {
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-2 border border-[var(--color-border)] rounded-md focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+              style={inputStyle}
+              onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
+              onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" style={labelStyle}>
               Email
             </label>
             <input
@@ -64,13 +162,15 @@ export default function Register() {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-[var(--color-border)] rounded-md focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+              style={inputStyle}
+              onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
+              onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="password" style={labelStyle}>
               Mot de passe
             </label>
             <input
@@ -78,15 +178,17 @@ export default function Register() {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-[var(--color-border)] rounded-md focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+              style={inputStyle}
+              onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
+              onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
               minLength={8}
             />
-            <p className="text-xs text-gray-500 mt-1">Minimum 8 caractères</p>
+            <p style={hintStyle}>Minimum 8 caractères</p>
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="confirmPassword" style={labelStyle}>
               Confirmer le mot de passe
             </label>
             <input
@@ -94,26 +196,28 @@ export default function Register() {
               id="confirmPassword"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-[var(--color-border)] rounded-md focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+              style={inputStyle}
+              onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
+              onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
             />
             {password && confirmPassword && password !== confirmPassword && (
-              <p className="text-xs text-red-500 mt-1">Les mots de passe ne correspondent pas</p>
+              <p style={errorHintStyle}>Les mots de passe ne correspondent pas</p>
             )}
           </div>
 
           <button
             type="submit"
             disabled={isLoading || !password || password !== confirmPassword}
-            className="w-full bg-[var(--color-primary)] text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors font-medium disabled:opacity-50"
+            style={buttonStyle}
           >
-            {isLoading ? 'Inscription...' : 'S\'inscrire'}
+            {isLoading ? 'Inscription...' : "S'inscrire"}
           </button>
         </form>
 
-        <p className="text-center mt-6 text-gray-600">
+        <p style={footerStyle}>
           Déjà un compte ?{' '}
-          <Link to="/login" className="text-[var(--color-primary)] hover:underline">
+          <Link to="/login" style={linkStyle}>
             Se connecter
           </Link>
         </p>

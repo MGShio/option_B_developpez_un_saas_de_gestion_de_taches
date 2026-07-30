@@ -28,22 +28,139 @@ export default function Login() {
     { email: 'caroline@example.com', password: 'P@ssword123' },
   ];
 
+  const containerStyle: React.CSSProperties = {
+    minHeight: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'var(--color-background)',
+    paddingLeft: '1rem',
+    paddingRight: '1rem',
+  };
+
+  const cardStyle: React.CSSProperties = {
+    backgroundColor: 'var(--color-white)',
+    padding: '2rem',
+    borderRadius: '0.5rem',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    width: '100%',
+    maxWidth: '28rem',
+  };
+
+  const titleStyle: React.CSSProperties = {
+    fontSize: '1.5rem',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: '2rem',
+    color: 'var(--color-primary)',
+  };
+
+  const errorStyle: React.CSSProperties = {
+    backgroundColor: '#FEF2F2',
+    color: '#991B1B',
+    padding: '0.75rem',
+    borderRadius: '0.375rem',
+    marginBottom: '1rem',
+  };
+
+  const formStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1.5rem',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '0.875rem',
+    fontWeight: '500',
+    color: '#374151',
+    marginBottom: '0.25rem',
+  };
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '0.5rem 1rem',
+    border: '1px solid var(--color-border)',
+    borderRadius: '0.375rem',
+    outline: 'none',
+  };
+
+  const inputFocusStyle: React.CSSProperties = {
+    borderColor: 'transparent',
+    boxShadow: '0 0 0 2px var(--color-primary)',
+  };
+
+  const forgotPasswordStyle: React.CSSProperties = {
+    textAlign: 'right',
+  };
+
+  const linkStyle: React.CSSProperties = {
+    color: 'var(--color-primary)',
+    fontSize: '0.875rem',
+    textDecoration: 'none',
+  };
+
+  const buttonStyle: React.CSSProperties = {
+    width: '100%',
+    backgroundColor: 'var(--color-primary)',
+    color: 'var(--color-white)',
+    padding: '0.5rem 1rem',
+    borderRadius: '0.375rem',
+    fontWeight: '500',
+    border: 'none',
+    cursor: 'pointer',
+    opacity: isLoading ? 0.5 : 1,
+  };
+
+  const testSectionStyle: React.CSSProperties = {
+    marginTop: '1.5rem',
+    padding: '1rem',
+    backgroundColor: '#F9FAFB',
+    borderRadius: '0.5rem',
+  };
+
+  const testTitleStyle: React.CSSProperties = {
+    fontSize: '0.875rem',
+    color: '#4B5563',
+    marginBottom: '0.5rem',
+  };
+
+  const testAccountStyle: React.CSSProperties = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    fontSize: '0.75rem',
+    marginBottom: '0.25rem',
+  };
+
+  const fillButtonStyle: React.CSSProperties = {
+    color: 'var(--color-primary)',
+    fontSize: '0.75rem',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    textDecoration: 'none',
+  };
+
+  const footerStyle: React.CSSProperties = {
+    textAlign: 'center',
+    marginTop: '1.5rem',
+    color: '#4B5563',
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--color-background)] px-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center mb-8 text-[var(--color-primary)]">
-          Connexion
-        </h1>
+    <div style={containerStyle}>
+      <div style={cardStyle}>
+        <h1 style={titleStyle}>Connexion</h1>
 
         {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+          <div style={errorStyle}>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} style={formStyle}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" style={labelStyle}>
               Email
             </label>
             <input
@@ -51,14 +168,16 @@ export default function Login() {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-[var(--color-border)] rounded-md focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+              style={inputStyle}
+              onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
+              onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
               placeholder="alice@example.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="password" style={labelStyle}>
               Mot de passe
             </label>
             <input
@@ -66,14 +185,16 @@ export default function Login() {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-[var(--color-border)] rounded-md focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+              style={inputStyle}
+              onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
+              onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
               placeholder="P@ssword123"
             />
           </div>
 
-          <div className="text-right">
-            <Link to="/forgot-password" className="text-[var(--color-primary)] text-sm hover:underline">
+          <div style={forgotPasswordStyle}>
+            <Link to="/forgot-password" style={linkStyle}>
               Mot de passe oublié ?
             </Link>
           </div>
@@ -81,18 +202,18 @@ export default function Login() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[var(--color-primary)] text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors font-medium disabled:opacity-50"
+            style={buttonStyle}
           >
             {isLoading ? 'Connexion...' : 'Se connecter'}
           </button>
         </form>
 
         {/* Comptes de test pour faciliter le développement */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600 mb-2">Comptes de test :</p>
-          <div className="space-y-1 text-xs">
+        <div style={testSectionStyle}>
+          <p style={testTitleStyle}>Comptes de test :</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
             {testAccounts.map((account, index) => (
-              <div key={index} className="flex justify-between">
+              <div key={index} style={testAccountStyle}>
                 <span>{account.email}</span>
                 <button
                   type="button"
@@ -100,7 +221,7 @@ export default function Login() {
                     setEmail(account.email);
                     setPassword(account.password);
                   }}
-                  className="text-[var(--color-primary)] text-xs hover:underline"
+                  style={fillButtonStyle}
                 >
                   Remplir
                 </button>
@@ -109,9 +230,9 @@ export default function Login() {
           </div>
         </div>
 
-        <p className="text-center mt-6 text-gray-600">
+        <p style={footerStyle}>
           Pas encore de compte ?{' '}
-          <Link to="/register" className="text-[var(--color-primary)] hover:underline">
+          <Link to="/register" style={linkStyle}>
             Créer un compte
           </Link>
         </p>

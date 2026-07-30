@@ -9,12 +9,19 @@ import NewProject from './pages/NewProject';
 import ProjectDetail from './pages/ProjectDetail';
 import Account from './pages/Account';
 
+const loadingStyle: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '100vh',
+};
+
 // Composant pour les routes protégées
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Chargement...</div>;
+    return <div style={loadingStyle}>Chargement...</div>;
   }
 
   if (!isAuthenticated) {
@@ -29,7 +36,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Chargement...</div>;
+    return <div style={loadingStyle}>Chargement...</div>;
   }
 
   if (isAuthenticated) {
