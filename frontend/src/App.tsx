@@ -5,6 +5,7 @@ import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
+import NewProject from './pages/NewProject';
 import ProjectDetail from './pages/ProjectDetail';
 import Account from './pages/Account';
 
@@ -66,6 +67,11 @@ export default function App() {
             <Route path="projects" element={
               <PrivateRoute>
                 <Projects />
+              </PrivateRoute>
+            } />
+            <Route path="projects/new" element={
+              <PrivateRoute>
+                <NewProject />
               </PrivateRoute>
             } />
             <Route path="projects/:id" element={
