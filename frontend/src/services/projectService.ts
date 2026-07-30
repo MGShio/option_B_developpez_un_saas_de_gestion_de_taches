@@ -22,7 +22,6 @@ export interface Project {
   ownerId: number;
   owner?: User;
   members?: ProjectMember[];
-  status: 'En cours' | 'Terminé' | 'En attente';
   createdAt: string;
   updatedAt: string;
   tasksCount?: number;
@@ -35,7 +34,7 @@ export interface CreateProjectData {
 }
 
 export interface UpdateProjectData extends Partial<CreateProjectData> {
-  status?: 'En cours' | 'Terminé' | 'En attente';
+  // No status field - Project doesn't have status in backend
 }
 
 export interface ApiError {
@@ -57,7 +56,22 @@ export async function getProjects(token: string): Promise<Project[]> {
     throw new Error(error.message || 'Erreur lors de la récupération des projets');
   }
 
-  return response.json();
+  const data = await response.json();
+  // Format projects from backend
+  const projects = (data.data || data || []).map((p: any) => ({
+    ...p,
+    id: parseInt(p.id) || p.id,
+    ownerId: parseInt(p.ownerId) || p.ownerId,
+    owner: p.owner ? {
+      id: parseInt(p.owner.id) || p.owner.id,
+      email: p.owner.email,
+      name: p.owner.name,
+      createdAt: p.owner.createdAt,
+      updatedAt: p.owner.updatedAt,
+    } : undefined,
+    members: p.members || [],
+  }));
+  return projects;
 }
 
 // Récupérer un projet par ID
@@ -74,7 +88,21 @@ export async function getProjectById(token: string, projectId: number): Promise<
     throw new Error(error.message || 'Projet non trouvé');
   }
 
-  return response.json();
+  const data = await response.json();
+  const p = data.data || data;
+  return {
+    ...p,
+    id: parseInt(p.id) || p.id,
+    ownerId: parseInt(p.ownerId) || p.ownerId,
+    owner: p.owner ? {
+      id: parseInt(p.owner.id) || p.owner.id,
+      email: p.owner.email,
+      name: p.owner.name,
+      createdAt: p.owner.createdAt,
+      updatedAt: p.owner.updatedAt,
+    } : undefined,
+    members: p.members || [],
+  };
 }
 
 // Créer un nouveau projet
@@ -93,7 +121,21 @@ export async function createProject(token: string, projectData: CreateProjectDat
     throw new Error(error.message || 'Erreur lors de la création du projet');
   }
 
-  return response.json();
+  const data = await response.json();
+  const p = data.data || data;
+  return {
+    ...p,
+    id: parseInt(p.id) || p.id,
+    ownerId: parseInt(p.ownerId) || p.ownerId,
+    owner: p.owner ? {
+      id: parseInt(p.owner.id) || p.owner.id,
+      email: p.owner.email,
+      name: p.owner.name,
+      createdAt: p.owner.createdAt,
+      updatedAt: p.owner.updatedAt,
+    } : undefined,
+    members: p.members || [],
+  };
 }
 
 // Mettre à jour un projet
@@ -112,7 +154,21 @@ export async function updateProject(token: string, projectId: number, projectDat
     throw new Error(error.message || 'Erreur lors de la mise à jour du projet');
   }
 
-  return response.json();
+  const data = await response.json();
+  const p = data.data || data;
+  return {
+    ...p,
+    id: parseInt(p.id) || p.id,
+    ownerId: parseInt(p.ownerId) || p.ownerId,
+    owner: p.owner ? {
+      id: parseInt(p.owner.id) || p.owner.id,
+      email: p.owner.email,
+      name: p.owner.name,
+      createdAt: p.owner.createdAt,
+      updatedAt: p.owner.updatedAt,
+    } : undefined,
+    members: p.members || [],
+  };
 }
 
 // Supprimer un projet
@@ -144,7 +200,20 @@ export async function searchProjects(token: string, query: string): Promise<Proj
     throw new Error(error.message || 'Erreur lors de la recherche');
   }
 
-  return response.json();
+  const data = await response.json();
+  return (data.data || data || []).map((p: any) => ({
+    ...p,
+    id: parseInt(p.id) || p.id,
+    ownerId: parseInt(p.ownerId) || p.ownerId,
+    owner: p.owner ? {
+      id: parseInt(p.owner.id) || p.owner.id,
+      email: p.owner.email,
+      name: p.owner.name,
+      createdAt: p.owner.createdAt,
+      updatedAt: p.owner.updatedAt,
+    } : undefined,
+    members: p.members || [],
+  }));
 }
 
 // Ajouter un contributeur à un projet
@@ -163,7 +232,8 @@ export async function addContributor(token: string, projectId: number, userId: n
     throw new Error(error.message || 'Erreur lors de l\'ajout du contributeur');
   }
 
-  return response.json();
+  const data = await response.json();
+  return data.data || data;
 }
 
 // Supprimer un contributeur d'un projet
@@ -180,20 +250,4 @@ export async function removeContributor(token: string, projectId: number, userId
     throw new Error(error.message || 'Erreur lors de la suppression du contributeur');
   }
 }
-
-// Récupérer les tâches d'un projet
-export async function getProjectTasks(token: string, projectId: number): Promise<import('./taskService').Task[]> {
-  const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    const error: ApiError = await response.json();
-    throw new Error(error.message || 'Erreur lors de la récupération des tâches du projet');
-  }
-
-  return response.json();
-}
+

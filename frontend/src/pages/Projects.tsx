@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { storage } from '../utils/storage';
 import { getProjects, deleteProject, type Project } from '../services/projectService';
-import { getProjectTasks } from '../services/taskService';
+import { getProjectTasks, type Task } from '../services/taskService';
 
 // Couleurs des statuts
 const statusColors: Record<string, { bg: string; color: string }> = {
@@ -42,7 +42,7 @@ export default function Projects() {
         projectsData.map(async (project: Project) => {
           try {
             const tasks = await getProjectTasks(token, project.id);
-            const completedTasks = tasks.filter((t: { status: string }) => t.status === 'Terminé').length;
+            const completedTasks = tasks.filter((t: Task) => t.status === 'Terminé').length;
             return {
               ...project,
               tasksCount: tasks.length,
@@ -264,7 +264,7 @@ function ProjectCard({
   getInitials: (name: string) => string;
   getStatusColor: (status: string) => { bg: string; color: string };
 }) {
-  const colors = getStatusColor(project.status || 'En attente');
+  const colors = getStatusColor('En attente');
   
   // Obtenir les membres (mockés pour l'instant)
   const members = [
