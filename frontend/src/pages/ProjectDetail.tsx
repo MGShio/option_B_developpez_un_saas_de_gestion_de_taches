@@ -71,10 +71,10 @@ export default function ProjectDetail() {
   const [isAITaskModalOpen, setIsAITaskModalOpen] = useState(false);
   const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
   const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState<{ id: number; name: string; description: string; dueDate: string; assigneeIds: number[]; status: 'À faire' | 'En cours' | 'Terminé' } | null>(null);
+  const [editingTask, setEditingTask] = useState<{ id: number; title: string; description: string; dueDate: string; assigneeIds: string[]; status: 'À faire' | 'En cours' | 'Terminé' } | null>(null);
   const [editingProject, setEditingProject] = useState<{ id: number; name: string; description: string; contributorIds: number[] } | null>(null);
   const [newTask, setNewTask] = useState<Omit<CreateTaskData, 'projectId'>>({
-    name: '',
+    title: '',
     description: '',
     dueDate: '',
     priority: 'Moyenne',
@@ -126,7 +126,7 @@ export default function ProjectDetail() {
   // Filtrer les tâches
   const filteredTasks = tasks.filter(task => {
     const matchesFilter = activeFilter === 'all' || task.status === activeFilter;
-    const matchesSearch = task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         task.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
@@ -140,7 +140,7 @@ export default function ProjectDetail() {
         return;
       }
       
-      await updateTask(token, taskId, { status: newStatus as Task['status'] });
+      await updateTask(token, parseInt(id!), taskId, { status: newStatus as Task['status'] });
       setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus as Task['status'] } : t));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour');
@@ -149,7 +149,7 @@ export default function ProjectDetail() {
 
   // Créer une nouvelle tâche
   const handleCreateTask = async () => {
-    if (!newTask.name.trim() || !newTask.dueDate) {
+    if (!newTask.title.trim() || !newTask.dueDate) {
       setError('Le titre et la date d\'échéance sont requis');
       return;
     }
@@ -170,7 +170,7 @@ export default function ProjectDetail() {
       const createdTask = await createTask(token, taskData);
       setTasks(prev => [...prev, createdTask]);
       setIsCreateTaskModalOpen(false);
-      setNewTask({ name: '', description: '', dueDate: '', priority: 'Moyenne' });
+      setNewTask({ title: '', description: '', dueDate: '', priority: 'Moyenne' });
       setSelectedAssignees([]);
       setSelectedStatus('À faire');
       
@@ -509,10 +509,10 @@ export default function ProjectDetail() {
                   onEdit={() => {
                     setEditingTask({
                       id: task.id,
-                      name: task.name,
+                      title: task.title,
                       description: task.description || '',
                       dueDate: task.dueDate,
-                      assigneeIds: [task.assignees],
+                      assigneeIds: task.assignees.map(a => String(a.userId)),
                       status: task.status
                     });
                     setIsEditTaskModalOpen(true);
@@ -745,7 +745,7 @@ function TaskCard({ task, onStatusChange, showBorder, getInitials, onEdit }: {
             fontFamily: 'Manrope',
             fontWeight: 600,
           }}>
-            {task.name}
+            {task.title}
           </h3>
           <div style={{
             padding: '4px 16px',
@@ -950,7 +950,7 @@ function CreateTaskModal({
   statusOptions: { label: string; value: 'À faire' | 'En cours' | 'Terminé'; color: string; textColor: string }[];
 }) {
   // Vérifier si le formulaire est valide
-  const isFormValid = newTask.name.trim() && newTask.dueDate && selectedAssignees.length > 0;
+  const isFormValid = newTask.title.trim() && newTask.dueDate && selectedAssignees.length > 0;
 
   return (
     <div style={{
@@ -1006,8 +1006,8 @@ function CreateTaskModal({
             </label>
             <input
               type="text"
-              value={newTask.name}
-              onChange={(e) => setNewTask({ ...newTask, name: e.target.value })}
+              value={newTask.title}
+              onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
               placeholder=""
               style={{
                 height: 53,

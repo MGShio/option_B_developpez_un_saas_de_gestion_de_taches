@@ -1,21 +1,47 @@
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'http://localhost:8000';
+
+export interface User {
+  id: number;
+  email: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TaskAssignee {
+  id: number;
+  userId: number;
+  taskId: number;
+  user: User;
+  assignedAt: string;
+}
+
+export interface Comment {
+  id: number;
+  content: string;
+  taskId: number;
+  authorId: number;
+  author: User;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface Task {
   id: number;
-  name: string;
+  title: string;
   description: string;
   projectId: number;
-  project?: { id: number; name: string };
+  project?: { id: number; title: string };
   dueDate: string;
   status: 'À faire' | 'En cours' | 'Terminé';
   priority: 'Faible' | 'Moyenne' | 'Haute';
-  assignees: number;
+  assignees: TaskAssignee[];
   createdAt: string;
   updatedAt: string;
 }
 
 export interface CreateTaskData {
-  name: string;
+  title: string;
   description?: string;
   projectId: number;
   dueDate: string;
@@ -32,8 +58,9 @@ export interface ApiError {
 }
 
 // Récupérer toutes les tâches de l'utilisateur
+// Uses dashboard endpoint for assigned tasks
 export async function getTasks(token: string): Promise<Task[]> {
-  const response = await fetch(`${API_BASE_URL}/tasks`, {
+  const response = await fetch(`${API_BASE_URL}/dashboard/assigned-tasks`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -49,8 +76,9 @@ export async function getTasks(token: string): Promise<Task[]> {
 }
 
 // Récupérer les tâches assignées à l'utilisateur
+// Same as getTasks - uses dashboard endpoint
 export async function getAssignedTasks(token: string): Promise<Task[]> {
-  const response = await fetch(`${API_BASE_URL}/tasks/assigned`, {
+  const response = await fetch(`${API_BASE_URL}/dashboard/assigned-tasks`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -66,8 +94,9 @@ export async function getAssignedTasks(token: string): Promise<Task[]> {
 }
 
 // Récupérer une tâche par ID
-export async function getTaskById(token: string, taskId: number): Promise<Task> {
-  const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+// Tasks are nested under projects: /projects/{projectId}/tasks/{taskId}
+export async function getTaskById(token: string, projectId: number, taskId: number): Promise<Task> {
+  const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -84,7 +113,7 @@ export async function getTaskById(token: string, taskId: number): Promise<Task> 
 
 // Créer une nouvelle tâche
 export async function createTask(token: string, taskData: CreateTaskData): Promise<Task> {
-  const response = await fetch(`${API_BASE_URL}/tasks`, {
+  const response = await fetch(`${API_BASE_URL}/projects/${taskData.projectId}/tasks`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -102,8 +131,8 @@ export async function createTask(token: string, taskData: CreateTaskData): Promi
 }
 
 // Mettre à jour une tâche
-export async function updateTask(token: string, taskId: number, taskData: UpdateTaskData): Promise<Task> {
-  const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+export async function updateTask(token: string, projectId: number, taskId: number, taskData: UpdateTaskData): Promise<Task> {
+  const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -121,8 +150,8 @@ export async function updateTask(token: string, taskId: number, taskData: Update
 }
 
 // Supprimer une tâche
-export async function deleteTask(token: string, taskId: number): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+export async function deleteTask(token: string, projectId: number, taskId: number): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -137,7 +166,7 @@ export async function deleteTask(token: string, taskId: number): Promise<void> {
 
 // Rechercher des tâches
 export async function searchTasks(token: string, query: string): Promise<Task[]> {
-  const response = await fetch(`${API_BASE_URL}/tasks/search?q=${encodeURIComponent(query)}`, {
+  const response = await fetch(`${API_BASE_URL}/dashboard/assigned-tasks/search?q=${encodeURIComponent(query)}`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,

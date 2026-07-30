@@ -1,11 +1,27 @@
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'http://localhost:8000';
+
+export interface User {
+  id: number;
+  email: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProjectMember {
+  id: number;
+  role: string;
+  user: User;
+  joinedAt: string;
+}
 
 export interface Project {
   id: number;
   name: string;
   description: string;
   ownerId: number;
-  owner?: { id: number; name: string; email: string };
+  owner?: User;
+  members?: ProjectMember[];
   status: 'En cours' | 'Terminé' | 'En attente';
   createdAt: string;
   updatedAt: string;
@@ -129,6 +145,40 @@ export async function searchProjects(token: string, query: string): Promise<Proj
   }
 
   return response.json();
+}
+
+// Ajouter un contributeur à un projet
+export async function addContributor(token: string, projectId: number, userId: number): Promise<ProjectMember> {
+  const response = await fetch(`${API_BASE_URL}/projects/${projectId}/contributors`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ userId }),
+  });
+
+  if (!response.ok) {
+    const error: ApiError = await response.json();
+    throw new Error(error.message || 'Erreur lors de l\'ajout du contributeur');
+  }
+
+  return response.json();
+}
+
+// Supprimer un contributeur d'un projet
+export async function removeContributor(token: string, projectId: number, userId: number): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/projects/${projectId}/contributors/${userId}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error: ApiError = await response.json();
+    throw new Error(error.message || 'Erreur lors de la suppression du contributeur');
+  }
 }
 
 // Récupérer les tâches d'un projet

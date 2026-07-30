@@ -2,15 +2,15 @@ import { useState } from 'react';
 
 interface AITask {
   id: number;
-  name: string;
+  title: string;
   description: string;
 }
 
 export default function AITaskListModal({ onClose }: { onClose: () => void }) {
   const [aiTasks, setAITasks] = useState<AITask[]>([
-    { id: 1, name: 'Nom de la tâche', description: 'Description de la tâche' },
-    { id: 2, name: 'Nom de la tâche', description: 'Description de la tâche' },
-    { id: 3, name: 'Nom de la tâche', description: 'Description de la tâche' },
+    { id: 1, title: 'Nom de la tâche', description: 'Description de la tâche' },
+    { id: 2, title: 'Nom de la tâche', description: 'Description de la tâche' },
+    { id: 3, title: 'Nom de la tâche', description: 'Description de la tâche' },
   ]);
   const [newTaskDescription, setNewTaskDescription] = useState('');
 
@@ -28,7 +28,7 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
     if (newTaskDescription.trim()) {
       const newTask: AITask = {
         id: aiTasks.length + 1,
-        name: `Tâche ${aiTasks.length + 1}`,
+        title: `Tâche ${aiTasks.length + 1}`,
         description: newTaskDescription,
       };
       setAITasks([...aiTasks, newTask]);
@@ -145,7 +145,7 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
                       fontWeight: 600,
                       wordWrap: 'break-word',
                     }}>
-                      {task.name}
+                      {task.title}
                     </div>
                     <div style={{
                       color: '#6B7280',

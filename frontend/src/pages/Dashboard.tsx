@@ -428,7 +428,7 @@ function TaskCard({ task, projectName, onView }: {
             fontFamily: 'Manrope',
             fontWeight: 600,
           }}>
-            {task.name}
+            {task.title}
           </h3>
           <p style={{
             color: '#6B7280',
@@ -502,7 +502,7 @@ function TaskCard({ task, projectName, onView }: {
               fontFamily: 'Inter',
               fontWeight: 400,
             }}>
-              {task.assignees}
+              {task.assignees.map(a => a.user.name).join(", ")}
             </span>
           </div>
         </div>
@@ -669,7 +669,7 @@ function KanbanView({ tasks, getProjectName }: { tasks: Task[]; getProjectName: 
                         fontFamily: 'Manrope',
                         fontWeight: 600,
                       }}>
-                        {task.name}
+                        {task.title}
                       </h4>
                       <p style={{
                         color: '#6B7280',

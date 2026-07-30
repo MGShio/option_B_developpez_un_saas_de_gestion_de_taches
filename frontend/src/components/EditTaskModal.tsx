@@ -2,10 +2,10 @@ import { useState } from 'react';
 
 export interface EditTaskData {
   id: number;
-  name: string;
+  title: string;
   description: string;
   dueDate: string;
-  assigneeIds: number[];
+  assigneeIds: string[];
   status: 'À faire' | 'En cours' | 'Terminé';
 }
 
@@ -23,10 +23,10 @@ const statusOptions = [
 ];
 
 export default function EditTaskModal({ task, onClose, onSave, users }: EditTaskModalProps) {
-  const [selectAssigneeIds, setSelectAssigneeIds] = useState<string[]>(task.assigneeIds.map(String));
+  const [selectAssigneeIds, setSelectAssigneeIds] = useState<string[]>(task.assigneeIds);
   const [editedTask, setEditedTask] = useState<EditTaskData>(task);
 
-  const handleChange = (field: keyof EditTaskData, value: string | number[] | 'À faire' | 'En cours' | 'Terminé') => {
+  const handleChange = (field: keyof EditTaskData, value: string | string[] | 'À faire' | 'En cours' | 'Terminé') => {
     setEditedTask(prev => ({ ...prev, [field]: value }));
   };
 
@@ -118,8 +118,8 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
               </label>
               <input
                 type="text"
-                value={editedTask.name}
-                onChange={(e) => handleChange('name', e.target.value)}
+                value={editedTask.title}
+                onChange={(e) => handleChange('title', e.target.value)}
                 style={{
                   alignSelf: 'stretch',
                   height: 53,
@@ -263,7 +263,7 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
                 onChange={(e) => {
                   const selected = Array.from(e.target.selectedOptions, option => option.value);
                   setSelectAssigneeIds(selected);
-                  setEditedTask(prev => ({ ...prev, assigneeIds: selected.map(Number) }));
+                  setEditedTask(prev => ({ ...prev, assigneeIds: selected }));
                 }}
                 style={{
                   alignSelf: 'stretch',
@@ -285,7 +285,7 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
                 }}
               >
                 {users.map(user => (
-                  <option key={user.id} value={user.id}>
+                  <option key={user.id} value={String(user.id)}>
                     {user.name}
                   </option>
                 ))}
@@ -365,7 +365,7 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
             paddingRight: 74,
             paddingTop: 13,
             paddingBottom: 13,
-            background: editedTask.name.trim() ? '#1F1F1F' : '#E5E7EB',
+            background: editedTask.title.trim() ? '#1F1F1F' : '#E5E7EB',
             overflow: 'hidden',
             borderRadius: 10,
             justifyContent: 'center',
@@ -373,14 +373,14 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
             gap: 10,
             display: 'inline-flex',
             border: 'none',
-            cursor: editedTask.name.trim() ? 'pointer' : 'not-allowed',
+            cursor: editedTask.title.trim() ? 'pointer' : 'not-allowed',
           }}
-          disabled={!editedTask.name.trim()}
+          disabled={!editedTask.title.trim()}
         >
           <span
             style={{
               textAlign: 'center',
-              color: editedTask.name.trim() ? 'white' : '#9CA3AF',
+              color: editedTask.title.trim() ? 'white' : '#9CA3AF',
               fontSize: 16,
               fontFamily: 'Inter',
               fontWeight: 400,

@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'http://localhost:8000';
 
 export interface LoginCredentials {
   email: string;
@@ -65,7 +65,7 @@ export async function logout(): Promise<void> {
 
 // Vérifier le token et récupérer l'utilisateur
 export async function getCurrentUser(token: string) {
-  const response = await fetch(`${API_BASE_URL}/users/me`, {
+  const response = await fetch(`${API_BASE_URL}/auth/profile`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,
