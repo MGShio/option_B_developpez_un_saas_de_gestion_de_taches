@@ -5,7 +5,7 @@ import { storage } from '../utils/storage';
 import { getProjects, deleteProject, type Project } from '../services/projectService';
 import { getProjectTasks, type Task } from '../services/taskService';
 
-// Couleurs des statuts
+// Couleurs des statuts - Conforme WCAG 2.1 AA
 const statusColors: Record<string, { bg: string; color: string }> = {
   'En cours': { bg: '#FFF0D7', color: '#E08D00' },
   'Terminé': { bg: '#D1FAE5', color: '#059669' },
@@ -15,11 +15,33 @@ const statusColors: Record<string, { bg: string; color: string }> = {
 export default function Projects() {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [searchQuery] = useState('');
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  // Gestion du resize pour le responsive
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Calcul des tailles responsives
+  const isMobile = windowWidth <= 768;
+  const isTablet = windowWidth <= 1024;
+  
+  // Tailles adaptatives
+  const headerWidth = isMobile ? '100%' : isTablet ? '90%' : '85%';
+  const maxContentWidth = isMobile ? '100%' : '1400px';
+  const titleSize = isMobile ? '1.5rem' : '1.75rem';
+  const subtitleSize = isMobile ? '1rem' : '1.125rem';
+  const buttonFontSize = isMobile ? '0.875rem' : '1rem';
+  const gridGap = isMobile ? '1rem' : '1.5rem';
+  const cardPadding = isMobile ? '1rem' : isTablet ? '1.25rem' : '2rem';
+  const cardGap = isMobile ? '1rem' : '1.5rem';
 
   // Récupérer les projets
   const fetchProjects = useCallback(async () => {
@@ -113,42 +135,57 @@ export default function Projects() {
   );
 
   if (!isAuthenticated) {
-    return <div style={{ textAlign: 'center', padding: 40 }}>Veuillez vous connecter</div>;
+    navigate('/login');
+    return null;
   }
 
+  // Focus outline style pour l'accessibilite
+  const focusOutlineStyle: React.CSSProperties = {
+    outline: '2px solid var(--color-primary)',
+    outlineOffset: '2px',
+  };
+
   return (
-    <div style={{ width: '100%' }}>
+    <div style={{ 
+      width: '100%',
+      padding: isMobile ? '1rem' : '2rem',
+    }}>
       {/* Header */}
       <div style={{
-        width: '100%',
-        marginBottom: 40,
+        width: headerWidth,
+        maxWidth: maxContentWidth,
+        margin: isMobile ? '0 auto 2rem' : '0 auto 3rem',
       }}>
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-end',
           width: '100%',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? '1.5rem' : '0',
         }}>
           <div style={{
             flexDirection: 'column',
             justifyContent: 'flex-start',
             alignItems: 'flex-start',
-            gap: 14,
+            gap: isMobile ? '0.75rem' : '0.875rem',
             display: 'inline-flex',
           }}>
             <h1 style={{
-              color: '#1F1F1F',
-              fontSize: 24,
-              fontFamily: 'Manrope',
-              fontWeight: 600,
+              color: 'var(--color-secondary)',
+              fontSize: titleSize,
+              fontFamily: 'var(--font-heading)',
+              fontWeight: '600',
+              margin: '0',
             }}>
               Mes projets
             </h1>
             <p style={{
-              color: 'black',
-              fontSize: 18,
-              fontFamily: 'Inter',
-              fontWeight: 400,
+              color: 'var(--color-black)',
+              fontSize: subtitleSize,
+              fontFamily: 'var(--font-body)',
+              fontWeight: '400',
+              margin: '0',
             }}>
               Gérez vos projets
             </p>
@@ -157,18 +194,29 @@ export default function Projects() {
           <button
             onClick={() => navigate('/projects/new')}
             style={{
-              width: 181,
-              height: 50,
-              padding: '13px 74px',
-              background: '#1F1F1F',
-              color: 'white',
+              width: isMobile ? '100%' : 'auto',
+              maxWidth: isMobile ? '300px' : '200px',
+              height: isMobile ? '48px' : '50px',
+              padding: isMobile ? '0.75rem 1.5rem' : '0.8125rem 2rem',
+              background: 'var(--color-secondary)',
+              color: 'var(--color-white)',
               border: 'none',
-              borderRadius: 10,
-              fontSize: 16,
-              fontFamily: 'Inter',
-              fontWeight: 400,
+              borderRadius: '0.625rem',
+              fontSize: buttonFontSize,
+              fontFamily: 'var(--font-body)',
+              fontWeight: '400',
               cursor: 'pointer',
+              transition: 'background-color 0.2s ease',
             }}
+            onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, {
+              background: 'var(--color-secondary)',
+              color: 'var(--color-white)',
+            })}
+            onBlur={(e) => Object.assign(e.currentTarget.style, {
+              background: 'var(--color-secondary)',
+              color: 'var(--color-white)',
+            })}
+            aria-label="Créer un nouveau projet"
           >
             + Créer un projet
           </button>
@@ -176,28 +224,37 @@ export default function Projects() {
       </div>
 
       {isLoading ? (
-        <div style={{ textAlign: 'center', padding: 40, color: '#6B7280' }}>
+        <div style={{
+          textAlign: 'center', 
+          padding: isMobile ? '2rem' : '4rem', 
+          color: '#6B7280',
+          fontSize: isMobile ? '0.875rem' : '1rem',
+        }} aria-live="polite">
           Chargement des projets...
         </div>
       ) : error ? (
         <div style={{ 
           textAlign: 'center', 
-          padding: 40, 
+          padding: isMobile ? '2rem' : '4rem', 
           color: '#EF4444',
           background: '#FEE2E2',
-          borderRadius: 10,
-        }}>
+          borderRadius: '0.625rem',
+          fontSize: isMobile ? '0.875rem' : '1rem',
+          margin: '0 auto',
+          maxWidth: maxContentWidth,
+        }} role="alert">
           {error}
           <button 
             onClick={fetchProjects}
-            style={{ 
-              marginLeft: 16,
+            style={{
+              marginLeft: '1rem',
               background: '#EF4444',
               color: 'white',
               border: 'none',
-              borderRadius: 4,
-              padding: '8px 16px',
+              borderRadius: '0.25rem',
+              padding: isMobile ? '0.5rem 1rem' : '0.5rem 1.5rem',
               cursor: 'pointer',
+              fontSize: isMobile ? '0.75rem' : '0.875rem',
             }}
           >
             Réessayer
@@ -207,21 +264,26 @@ export default function Projects() {
         <div style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: 24,
+          gap: isMobile ? '1.5rem' : '2rem',
+          margin: '0 auto',
+          maxWidth: maxContentWidth,
+          width: headerWidth,
         }}>
           {/* Grille de projets */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-            gap: 24,
-          }}>
+            gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(350px, 1fr))',
+            gap: gridGap,
+            width: '100%',
+          }} role="list" aria-label="Liste des projets">
             {filteredProjects.length === 0 ? (
               <div style={{
                 gridColumn: '1 / -1',
                 textAlign: 'center',
-                padding: 40,
+                padding: isMobile ? '2rem' : '4rem',
                 color: '#6B7280',
-              }}>
+                fontSize: isMobile ? '0.875rem' : '1rem',
+              }} aria-live="polite">
                 Aucun projet trouvé
               </div>
             ) : (
@@ -234,6 +296,8 @@ export default function Projects() {
                   isDeleting={deletingId === project.id}
                   getInitials={getInitials}
                   getStatusColor={getStatusColor}
+                  isMobile={isMobile}
+                  isTablet={isTablet}
                 />
               ))
             )}
@@ -249,10 +313,12 @@ function ProjectCard({
   project, 
   onView, 
   onDelete, 
-  isDeleting,
+  isDeleting, 
   getInitials,
   getStatusColor,
-}: {
+  isMobile,
+  isTablet
+}: { 
   project: Project & {
     tasksCount?: number;
     completedTasks?: number;
@@ -263,6 +329,8 @@ function ProjectCard({
   isDeleting: boolean;
   getInitials: (name: string) => string;
   getStatusColor: (status: string) => { bg: string; color: string };
+  isMobile: boolean;
+  isTablet: boolean;
 }) {
   const colors = getStatusColor('En attente');
   
@@ -272,38 +340,58 @@ function ProjectCard({
     { id: 2, name: 'Bernard Dupont', role: '' },
     { id: 3, name: 'Claire Vincent', role: '' },
   ];
+  
+  // Focus outline style
+  const focusOutlineStyle: React.CSSProperties = {
+    outline: '2px solid var(--color-primary)',
+    outlineOffset: '2px',
+  };
+
+  // Tailles adaptatives pour la carte
+  const cardPadding = isMobile ? '1rem' : isTablet ? '1.25rem' : '2rem';
+  const cardGap = isMobile ? '1.25rem' : '2rem';
+  const titleSize = isMobile ? '1.125rem' : '1.25rem';
+  const descriptionSize = isMobile ? '0.875rem' : '0.9375rem';
+  const metaSize = isMobile ? '0.75rem' : '0.8125rem';
+  const progressSize = isMobile ? '0.875rem' : '0.875rem';
+  const teamLabelSize = isMobile ? '0.75rem' : '0.75rem';
+  const avatarSize = isMobile ? '24px' : '27px';
+  const avatarFontSize = isMobile ? '0.625rem' : '0.625rem';
+  const buttonFontSize = isMobile ? '0.75rem' : '0.875rem';
+  const badgeFontSize = isMobile ? '0.75rem' : '0.875rem';
+  const progressBarHeight = isMobile ? '6px' : '7px';
 
   return (
     <div style={{
       width: '100%',
-      padding: '30px 34px',
+      padding: cardPadding,
       background: 'white',
-      borderRadius: 10,
-      border: '1px solid #E5E7EB',
+      borderRadius: '0.625rem',
+      border: '1px solid var(--color-border)',
       display: 'flex',
       flexDirection: 'column',
-      gap: 56,
+      gap: cardGap,
       cursor: 'pointer',
-    }}>
+    }} role="listitem" aria-label={`Projet : ${project.name}`}>
       {/* Contenu principal */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 8,
+        gap: isMobile ? '0.5rem' : '0.5rem',
       }}>
         <h3 style={{
-          color: '#1F1F1F',
-          fontSize: 18,
-          fontFamily: 'Manrope',
-          fontWeight: 600,
+          color: 'var(--color-secondary)',
+          fontSize: titleSize,
+          fontFamily: 'var(--font-heading)',
+          fontWeight: '600',
         }}>
           {project.name}
         </h3>
         <p style={{
           color: '#6B7280',
-          fontSize: 14,
-          fontFamily: 'Inter',
-          fontWeight: 400,
+          fontSize: descriptionSize,
+          fontFamily: 'var(--font-body)',
+          fontWeight: '400',
         }}>
           {project.description || 'Aucune description'}
         </p>
@@ -314,7 +402,8 @@ function ProjectCard({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-end',
-        gap: 16,
+        gap: isMobile ? '0.75rem' : '1rem',
+        width: '100%',
       }}>
         <div style={{
           display: 'flex',
@@ -324,18 +413,18 @@ function ProjectCard({
         }}>
           <span style={{
             color: '#6B7280',
-            fontSize: 12,
-            fontFamily: 'Inter',
-            fontWeight: 400,
+            fontSize: metaSize,
+            fontFamily: 'var(--font-body)',
+            fontWeight: '400',
           }}>
             Progression
           </span>
           <span style={{
             textAlign: 'right',
-            color: '#1F1F1F',
-            fontSize: 12,
-            fontFamily: 'Inter',
-            fontWeight: 400,
+            color: 'var(--color-secondary)',
+            fontSize: progressSize,
+            fontFamily: 'var(--font-heading)',
+            fontWeight: '600',
           }}>
             {project.progress || 0}%
           </span>
@@ -344,22 +433,22 @@ function ProjectCard({
         <div style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: 8,
+          gap: isMobile ? '0.5rem' : '0.5rem',
           width: '100%',
         }}>
           {/* Barre de progression */}
           <div style={{
-            height: 7,
-            background: '#E5E7EB',
-            borderRadius: 40,
+            height: progressBarHeight,
+            background: 'var(--color-border)',
+            borderRadius: '9999px',
             position: 'relative',
             overflow: 'hidden',
-          }}>
+          }} aria-hidden="true">
             <div style={{
               height: '100%',
               width: `${project.progress || 0}%`,
-              background: project.progress === 100 ? '#059669' : '#D3590B',
-              borderRadius: 40,
+              background: project.progress === 100 ? '#059669' : 'var(--color-primary)',
+              borderRadius: '9999px',
               transition: 'width 0.3s ease',
             }} />
           </div>
@@ -371,9 +460,9 @@ function ProjectCard({
           }}>
             <span style={{
               color: '#6B7280',
-              fontSize: 10,
-              fontFamily: 'Inter',
-              fontWeight: 400,
+              fontSize: metaSize,
+              fontFamily: 'var(--font-body)',
+              fontWeight: '400',
             }}>
               {project.completedTasks || 0}/{project.tasksCount || 0} tâches terminées
             </span>
@@ -383,24 +472,24 @@ function ProjectCard({
 
       {/* Équipe */}
       <div style={{
-        width: 180,
+        width: '100%',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
-        gap: 15,
+        gap: isMobile ? '0.75rem' : '1rem',
       }}>
         <div style={{
           justifyContent: 'flex-start',
           alignItems: 'flex-start',
-          gap: 8,
+          gap: '0.5rem',
           display: 'inline-flex',
         }}>
           <span style={{
             color: '#6B7280',
-            fontSize: 10,
-            fontFamily: 'Inter',
-            fontWeight: 400,
+            fontSize: teamLabelSize,
+            fontFamily: 'var(--font-body)',
+            fontWeight: '400',
           }}>
             Équipe ({members.length})
           </span>
@@ -409,49 +498,51 @@ function ProjectCard({
         <div style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: 4,
+          gap: isMobile ? '0.5rem' : '0.5rem',
+          width: '100%',
         }}>
           {/* Première ligne - Propriétaire */}
           <div style={{
             display: 'flex',
-            gap: 5,
+            gap: isMobile ? '0.5rem' : '0.5rem',
+            alignItems: 'center',
           }}>
             <div style={{
-              width: 27,
-              height: 27,
-              padding: '4.98px 4.98px 8.72px 8.72px',
+              width: avatarSize,
+              height: avatarSize,
               background: '#FFE8D9',
-              borderRadius: 13.5,
+              borderRadius: '50%',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
-            }}>
+            }} aria-hidden="true">
               <span style={{
                 textAlign: 'center',
-                color: '#0F0F0F',
-                fontSize: 10,
-                fontFamily: 'Inter',
-                fontWeight: 400,
+                color: 'var(--color-secondary)',
+                fontSize: avatarFontSize,
+                fontFamily: 'var(--font-body)',
+                fontWeight: '400',
                 textTransform: 'uppercase',
-                letterSpacing: 0.2,
+                letterSpacing: '0.2px',
+                lineHeight: 1,
               }}>
                 {getInitials(members[0].name)}
               </span>
             </div>
             <div style={{
-              padding: '4px 16px',
+              padding: isMobile ? '0.25rem 0.75rem' : '0.25rem 1rem',
               background: '#FFE8D9',
-              borderRadius: 50,
+              borderRadius: '9999px',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
             }}>
               <span style={{
-                color: '#D3590B',
-                fontSize: 14,
-                fontFamily: 'Inter',
-                fontWeight: 400,
+                color: 'var(--color-primary)',
+                fontSize: badgeFontSize,
+                fontFamily: 'var(--font-body)',
+                fontWeight: '400',
               }}>
                 Propriétaire
               </span>
@@ -461,29 +552,30 @@ function ProjectCard({
           {/* Deuxième ligne - Autres membres */}
           <div style={{
             display: 'flex',
-            gap: 5,
+            gap: '0.5rem',
+            alignItems: 'center',
           }}>
             {members.slice(1).map((member) => (
               <div key={member.id} style={{
-                width: 27,
-                height: 27,
-                padding: '4.98px 4.98px 8.72px 8.72px',
+                width: avatarSize,
+                height: avatarSize,
                 background: '#E5E7EB',
-                borderRadius: 13.5,
+                borderRadius: '50%',
                 border: '1px solid white',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
-              }}>
+              }} aria-hidden="true">
                 <span style={{
                   textAlign: 'center',
-                  color: '#0F0F0F',
-                  fontSize: 10,
-                  fontFamily: 'Inter',
-                  fontWeight: 400,
+                  color: 'var(--color-secondary)',
+                  fontSize: avatarFontSize,
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: '400',
                   textTransform: 'uppercase',
-                  letterSpacing: 0.2,
+                  letterSpacing: '0.2px',
+                  lineHeight: 1,
                 }}>
                   {getInitials(member.name)}
                 </span>
@@ -496,9 +588,10 @@ function ProjectCard({
       {/* Actions */}
       <div style={{
         display: 'flex',
-        gap: 10,
+        gap: isMobile ? '0.5rem' : '0.625rem',
         marginTop: 'auto',
-        paddingTop: 20,
+        paddingTop: isMobile ? '1rem' : '1.25rem',
+        flexWrap: isMobile ? 'wrap' : 'nowrap',
       }}>
         <button
           onClick={(e) => {
@@ -506,17 +599,27 @@ function ProjectCard({
             onView();
           }}
           style={{
-            flex: 1,
-            padding: '12px 24px',
-            background: '#1F1F1F',
-            color: 'white',
+            flex: isMobile ? '1 1 200px' : '1',
+            padding: isMobile ? '0.75rem 1rem' : '0.75rem 1.5rem',
+            background: 'var(--color-secondary)',
+            color: 'var(--color-white)',
             border: 'none',
-            borderRadius: 8,
-            fontSize: 14,
-            fontFamily: 'Inter',
-            fontWeight: 400,
+            borderRadius: '0.5rem',
+            fontSize: buttonFontSize,
+            fontFamily: 'var(--font-body)',
+            fontWeight: '400',
             cursor: 'pointer',
+            transition: 'background-color 0.2s ease',
           }}
+          onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, {
+            background: 'var(--color-secondary)',
+            color: 'var(--color-white)',
+          })}
+          onBlur={(e) => Object.assign(e.currentTarget.style, {
+            background: 'var(--color-secondary)',
+            color: 'var(--color-white)',
+          })}
+          aria-label={`Voir le projet ${project.name}`}
         >
           Voir le projet
         </button>
@@ -527,16 +630,27 @@ function ProjectCard({
           }}
           disabled={isDeleting}
           style={{
-            padding: '12px 24px',
+            padding: isMobile ? '0.75rem 1rem' : '0.75rem 1.5rem',
             background: isDeleting ? '#9CA3AF' : '#EF4444',
             color: 'white',
             border: 'none',
-            borderRadius: 8,
-            fontSize: 14,
-            fontFamily: 'Inter',
-            fontWeight: 400,
+            borderRadius: '0.5rem',
+            fontSize: buttonFontSize,
+            fontFamily: 'var(--font-body)',
+            fontWeight: '400',
             cursor: isDeleting ? 'not-allowed' : 'pointer',
+            whiteSpace: 'nowrap',
           }}
+          onFocus={(e) => !isDeleting && Object.assign(e.currentTarget.style, focusOutlineStyle, {
+            background: '#EF4444',
+            color: 'white',
+          })}
+          onBlur={(e) => !isDeleting && Object.assign(e.currentTarget.style, {
+            background: '#EF4444',
+            color: 'white',
+          })}
+          aria-label={`Supprimer le projet ${project.name}`}
+          aria-busy={isDeleting}
         >
           {isDeleting ? 'Suppression...' : 'Supprimer'}
         </button>

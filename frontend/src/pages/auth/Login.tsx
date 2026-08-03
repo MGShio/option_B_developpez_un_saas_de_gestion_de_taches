@@ -1,12 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+
+// Import de l'image de fond locale
+import loginBackground from '../../images/Loginbackground.svg';
+// Import du logo
+import logoOrange from '../../images/logoorange.svg';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const { login, isLoading, error, clearError } = useAuth();
   const navigate = useNavigate();
+
+  // Gestion du resize pour le responsive
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,51 +29,73 @@ export default function Login() {
       await login({ email, password });
       navigate('/dashboard');
     } catch (err) {
-      // L'erreur est déjà gérée par useAuth
       console.error('Login failed:', err);
     }
   };
 
-  // Comptes de test (d'après le seed)
+  // Comptes de test
   const testAccounts = [
     { email: 'alice@example.com', password: 'P@ssword123' },
     { email: 'bob@example.com', password: 'P@ssword123' },
     { email: 'caroline@example.com', password: 'P@ssword123' },
   ];
 
+  // Calcul des tailles responsives
+  const isMobile = windowWidth <= 768;
+  const isTablet = windowWidth <= 1024;
+  
+  // Largeur du card : 90% sur mobile, 45% sur tablette, 40% sur desktop
+  const cardWidth = isMobile ? '90%' : isTablet ? '45%' : '40%';
+  const maxCardWidth = isMobile ? '28rem' : '32rem';
+  const padding = isMobile ? '1.5rem' : '2rem';
+  const titleSize = isMobile ? '1.75rem' : '2rem';
+  const inputPadding = isMobile ? '0.75rem 1rem' : '0.875rem 1.25rem';
+  const logoHeight = isMobile ? '28px' : '36px';
+
+  // Styles - Conforme WCAG 2.1 AA
   const containerStyle: React.CSSProperties = {
     minHeight: '100vh',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'var(--color-background)',
-    paddingLeft: '1rem',
-    paddingRight: '1rem',
+    backgroundImage: `url(${loginBackground})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    padding: '1rem',
   };
 
   const cardStyle: React.CSSProperties = {
     backgroundColor: 'var(--color-white)',
-    padding: '2rem',
-    borderRadius: '0.5rem',
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-    width: '100%',
-    maxWidth: '28rem',
+    padding: padding,
+    borderRadius: '0.75rem',
+    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    width: cardWidth,
+    maxWidth: maxCardWidth,
+  };
+
+  const logoContainerStyle: React.CSSProperties = {
+    display: 'flex',
+    justifyContent: 'center',
+    marginBottom: '1.5rem',
   };
 
   const titleStyle: React.CSSProperties = {
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
+    fontSize: titleSize,
+    fontWeight: '700',
     textAlign: 'center',
     marginBottom: '2rem',
     color: 'var(--color-primary)',
+    fontFamily: 'var(--font-heading)',
   };
 
   const errorStyle: React.CSSProperties = {
     backgroundColor: '#FEF2F2',
     color: '#991B1B',
-    padding: '0.75rem',
+    padding: '0.75rem 1rem',
     borderRadius: '0.375rem',
     marginBottom: '1rem',
+    fontSize: '0.875rem',
   };
 
   const formStyle: React.CSSProperties = {
@@ -71,23 +106,27 @@ export default function Login() {
 
   const labelStyle: React.CSSProperties = {
     display: 'block',
-    fontSize: '0.875rem',
+    fontSize: 'clamp(0.875rem, 2vw, 1rem)',
     fontWeight: '500',
     color: '#374151',
-    marginBottom: '0.25rem',
+    marginBottom: '0.5rem',
+    fontFamily: 'var(--font-body)',
   };
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
-    padding: '0.5rem 1rem',
+    padding: inputPadding,
     border: '1px solid var(--color-border)',
     borderRadius: '0.375rem',
     outline: 'none',
+    fontSize: 'clamp(0.875rem, 2vw, 1rem)',
+    fontFamily: 'var(--font-body)',
+    transition: 'box-shadow 0.2s ease',
   };
 
   const inputFocusStyle: React.CSSProperties = {
     borderColor: 'transparent',
-    boxShadow: '0 0 0 2px var(--color-primary)',
+    boxShadow: '0 0 0 3px rgba(211, 89, 11, 0.3)',
   };
 
   const forgotPasswordStyle: React.CSSProperties = {
@@ -96,72 +135,119 @@ export default function Login() {
 
   const linkStyle: React.CSSProperties = {
     color: 'var(--color-primary)',
-    fontSize: '0.875rem',
+    fontSize: 'clamp(0.875rem, 1.8vw, 0.95rem)',
     textDecoration: 'none',
+    fontFamily: 'var(--font-body)',
+  };
+
+  const linkHoverStyle: React.CSSProperties = {
+    textDecoration: 'underline',
   };
 
   const buttonStyle: React.CSSProperties = {
     width: '100%',
-    backgroundColor: 'var(--color-primary)',
+    backgroundColor: 'var(--color-secondary)',
     color: 'var(--color-white)',
-    padding: '0.5rem 1rem',
-    borderRadius: '0.375rem',
+    padding: isMobile ? '0.75rem 1rem' : '0.875rem 1.25rem',
+    borderRadius: '0.5rem',
     fontWeight: '500',
+    fontSize: 'clamp(0.875rem, 2vw, 1rem)',
     border: 'none',
-    cursor: 'pointer',
-    opacity: isLoading ? 0.5 : 1,
+    cursor: isLoading ? 'not-allowed' : 'pointer',
+    opacity: isLoading ? 0.7 : 1,
+    fontFamily: 'var(--font-body)',
+    transition: 'background-color 0.2s ease',
+  };
+
+  const buttonHoverStyle: React.CSSProperties = {
+    backgroundColor: '#373737',
   };
 
   const testSectionStyle: React.CSSProperties = {
-    marginTop: '1.5rem',
+    marginTop: '2rem',
     padding: '1rem',
     backgroundColor: '#F9FAFB',
     borderRadius: '0.5rem',
   };
 
   const testTitleStyle: React.CSSProperties = {
-    fontSize: '0.875rem',
+    fontSize: 'clamp(0.8rem, 1.5vw, 0.875rem)',
     color: '#4B5563',
-    marginBottom: '0.5rem',
+    marginBottom: '0.75rem',
+    fontFamily: 'var(--font-body)',
   };
 
   const testAccountStyle: React.CSSProperties = {
     display: 'flex',
     justifyContent: 'space-between',
-    fontSize: '0.75rem',
-    marginBottom: '0.25rem',
+    alignItems: 'center',
+    fontSize: 'clamp(0.75rem, 1.2vw, 0.8rem)',
+    marginBottom: '0.5rem',
+    fontFamily: 'var(--font-body)',
   };
 
   const fillButtonStyle: React.CSSProperties = {
     color: 'var(--color-primary)',
-    fontSize: '0.75rem',
+    fontSize: 'clamp(0.75rem, 1.2vw, 0.8rem)',
     background: 'none',
     border: 'none',
     cursor: 'pointer',
     textDecoration: 'none',
+    fontFamily: 'var(--font-body)',
+    padding: '0.25rem 0.5rem',
   };
 
   const footerStyle: React.CSSProperties = {
     textAlign: 'center',
-    marginTop: '1.5rem',
+    marginTop: '2rem',
     color: '#4B5563',
+    fontSize: 'clamp(0.875rem, 1.8vw, 0.95rem)',
+    fontFamily: 'var(--font-body)',
+  };
+
+  // Focus outline style
+  const focusOutlineStyle: React.CSSProperties = {
+    outline: '2px solid var(--color-primary)',
+    outlineOffset: '2px',
   };
 
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        <h1 style={titleStyle}>Connexion</h1>
+    <div style={containerStyle} role="main" aria-label="Page de connexion">
+      <div 
+        style={cardStyle}
+        aria-labelledby="login-title"
+        aria-describedby="login-form"
+      >
+        {/* Logo de l'application */}
+        <div style={logoContainerStyle}>
+          <img
+            src={logoOrange}
+            alt="Logo de l'application"
+            style={{ height: logoHeight, width: 'auto' }}
+          />
+        </div>
+        
+        <h1 id="login-title" style={titleStyle}>Connexion</h1>
 
         {error && (
-          <div style={errorStyle}>
+          <div 
+            style={errorStyle}
+            role="alert"
+            aria-live="assertive"
+          >
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={formStyle}>
+        <form 
+          onSubmit={handleSubmit} 
+          style={formStyle}
+          id="login-form"
+          aria-label="Formulaire de connexion"
+        >
           <div>
             <label htmlFor="email" style={labelStyle}>
-              Email
+              Adresse email
             </label>
             <input
               type="email"
@@ -172,7 +258,10 @@ export default function Login() {
               onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
               onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
-              placeholder="alice@example.com"
+              aria-required="true"
+              placeholder="votre@email.com"
+              autoComplete="email"
+              autoCapitalize="none"
             />
           </div>
 
@@ -189,13 +278,24 @@ export default function Login() {
               onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
               onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
-              placeholder="P@ssword123"
+              aria-required="true"
+              placeholder="8 caracteres minimum"
+              minLength={8}
+              autoComplete="current-password"
             />
           </div>
 
           <div style={forgotPasswordStyle}>
-            <Link to="/forgot-password" style={linkStyle}>
-              Mot de passe oublié ?
+            <Link 
+              to="/forgot-password" 
+              style={linkStyle}
+              onMouseEnter={(e) => Object.assign(e.currentTarget.style, linkHoverStyle, linkStyle)}
+              onMouseLeave={(e) => Object.assign(e.currentTarget.style, linkStyle)}
+              onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, linkStyle)}
+              onBlur={(e) => Object.assign(e.currentTarget.style, linkStyle)}
+              aria-label="Mot de passe oublie, cliquez pour reinitialiser"
+            >
+              Mot de passe oublie ?
             </Link>
           </div>
 
@@ -203,17 +303,26 @@ export default function Login() {
             type="submit"
             disabled={isLoading}
             style={buttonStyle}
+            onMouseEnter={(e) => !isLoading && Object.assign(e.currentTarget.style, buttonHoverStyle, buttonStyle)}
+            onMouseLeave={(e) => !isLoading && Object.assign(e.currentTarget.style, buttonStyle)}
+            onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, buttonStyle)}
+            onBlur={(e) => Object.assign(e.currentTarget.style, buttonStyle)}
+            aria-busy={isLoading}
           >
             {isLoading ? 'Connexion...' : 'Se connecter'}
           </button>
         </form>
 
-        {/* Comptes de test pour faciliter le développement */}
+        {/* Section des comptes de test */}
         <div style={testSectionStyle}>
-          <p style={testTitleStyle}>Comptes de test :</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <p id="test-accounts-title" style={testTitleStyle}>Comptes de test pour demonstration :</p>
+          <div role="list" aria-label="Liste des comptes de test">
             {testAccounts.map((account, index) => (
-              <div key={index} style={testAccountStyle}>
+              <div 
+                key={index} 
+                style={testAccountStyle}
+                role="listitem"
+              >
                 <span>{account.email}</span>
                 <button
                   type="button"
@@ -222,6 +331,9 @@ export default function Login() {
                     setPassword(account.password);
                   }}
                   style={fillButtonStyle}
+                  onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, fillButtonStyle)}
+                  onBlur={(e) => Object.assign(e.currentTarget.style, fillButtonStyle)}
+                  aria-label={`Remplir avec le compte ${account.email}`}
                 >
                   Remplir
                 </button>
@@ -232,8 +344,16 @@ export default function Login() {
 
         <p style={footerStyle}>
           Pas encore de compte ?{' '}
-          <Link to="/register" style={linkStyle}>
-            Créer un compte
+          <Link 
+            to="/register" 
+            style={linkStyle}
+            onMouseEnter={(e) => Object.assign(e.currentTarget.style, linkHoverStyle, linkStyle)}
+            onMouseLeave={(e) => Object.assign(e.currentTarget.style, linkStyle)}
+            onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, linkStyle)}
+            onBlur={(e) => Object.assign(e.currentTarget.style, linkStyle)}
+            aria-label="Creer un nouveau compte"
+          >
+            Creer un compte
           </Link>
         </p>
       </div>

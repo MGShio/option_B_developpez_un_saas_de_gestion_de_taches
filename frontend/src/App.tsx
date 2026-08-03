@@ -8,6 +8,7 @@ import Projects from './pages/Projects';
 import NewProject from './pages/NewProject';
 import ProjectDetail from './pages/ProjectDetail';
 import Account from './pages/Account';
+import NotFound from './pages/NotFound';
 
 const loadingStyle: React.CSSProperties = {
   display: 'flex',
@@ -91,10 +92,10 @@ export default function App() {
                 <Account />
               </PrivateRoute>
             } />
-
-            {/* Redirects pour les routes non définies */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Route>
+
+          {/* Page 404 - doit être en dehors du layout */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

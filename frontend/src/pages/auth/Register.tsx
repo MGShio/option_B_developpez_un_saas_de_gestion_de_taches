@@ -1,14 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+
+// Import de l'image de fond locale
+import registerBackground from '../../images/signinbackground.svg';
+// Import du logo
+import logoOrange from '../../images/logoorange.svg';
 
 export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const { register, isLoading, error, clearError } = useAuth();
   const navigate = useNavigate();
+
+  // Gestion du resize pour le responsive
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,44 +35,69 @@ export default function Register() {
       await register({ name, email, password });
       navigate('/dashboard');
     } catch (err) {
-      // L'erreur est déjà gérée par useAuth
       console.error('Registration failed:', err);
     }
   };
 
+  // Calcul des tailles responsives
+  const isMobile = windowWidth <= 768;
+  const isTablet = windowWidth <= 1024;
+  
+  // Largeur du card : 90% sur mobile, 45% sur tablette, 40% sur desktop
+  const cardWidth = isMobile ? '90%' : isTablet ? '45%' : '40%';
+  const maxCardWidth = isMobile ? '28rem' : '32rem';
+  const padding = isMobile ? '1.5rem' : '2rem';
+  const titleSize = isMobile ? '1.75rem' : '2rem';
+  const inputPadding = isMobile ? '0.75rem 1rem' : '0.875rem 1.25rem';
+  const logoHeight = isMobile ? '28px' : '36px';
+  
+  // Etat pour le hover du bouton
+  const isButtonDisabled = isLoading || !password || password !== confirmPassword;
+
+  // Styles - Conforme WCAG 2.1 AA
   const containerStyle: React.CSSProperties = {
     minHeight: '100vh',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'var(--color-background)',
-    paddingLeft: '1rem',
-    paddingRight: '1rem',
+    backgroundImage: `url(${registerBackground})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    padding: '1rem',
   };
 
   const cardStyle: React.CSSProperties = {
     backgroundColor: 'var(--color-white)',
-    padding: '2rem',
-    borderRadius: '0.5rem',
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-    width: '100%',
-    maxWidth: '28rem',
+    padding: padding,
+    borderRadius: '0.75rem',
+    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    width: cardWidth,
+    maxWidth: maxCardWidth,
+  };
+
+  const logoContainerStyle: React.CSSProperties = {
+    display: 'flex',
+    justifyContent: 'center',
+    marginBottom: '1.5rem',
   };
 
   const titleStyle: React.CSSProperties = {
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
+    fontSize: titleSize,
+    fontWeight: '700',
     textAlign: 'center',
     marginBottom: '2rem',
     color: 'var(--color-primary)',
+    fontFamily: 'var(--font-heading)',
   };
 
   const errorStyle: React.CSSProperties = {
     backgroundColor: '#FEF2F2',
     color: '#991B1B',
-    padding: '0.75rem',
+    padding: '0.75rem 1rem',
     borderRadius: '0.375rem',
     marginBottom: '1rem',
+    fontSize: '0.875rem',
   };
 
   const formStyle: React.CSSProperties = {
@@ -70,73 +108,121 @@ export default function Register() {
 
   const labelStyle: React.CSSProperties = {
     display: 'block',
-    fontSize: '0.875rem',
+    fontSize: 'clamp(0.875rem, 2vw, 1rem)',
     fontWeight: '500',
     color: '#374151',
-    marginBottom: '0.25rem',
+    marginBottom: '0.5rem',
+    fontFamily: 'var(--font-body)',
   };
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
-    padding: '0.5rem 1rem',
+    padding: inputPadding,
     border: '1px solid var(--color-border)',
     borderRadius: '0.375rem',
     outline: 'none',
+    fontSize: 'clamp(0.875rem, 2vw, 1rem)',
+    fontFamily: 'var(--font-body)',
+    transition: 'box-shadow 0.2s ease',
   };
 
   const inputFocusStyle: React.CSSProperties = {
     borderColor: 'transparent',
-    boxShadow: '0 0 0 2px var(--color-primary)',
+    boxShadow: '0 0 0 3px rgba(211, 89, 11, 0.3)',
   };
 
   const hintStyle: React.CSSProperties = {
-    fontSize: '0.75rem',
+    fontSize: 'clamp(0.75rem, 1.2vw, 0.8rem)',
     color: '#6B7280',
     marginTop: '0.25rem',
+    fontFamily: 'var(--font-body)',
   };
 
   const errorHintStyle: React.CSSProperties = {
-    fontSize: '0.75rem',
+    fontSize: 'clamp(0.75rem, 1.2vw, 0.8rem)',
     color: '#EF4444',
     marginTop: '0.25rem',
+    fontFamily: 'var(--font-body)',
   };
 
   const buttonStyle: React.CSSProperties = {
     width: '100%',
-    backgroundColor: 'var(--color-primary)',
+    backgroundColor: 'var(--color-secondary)',
     color: 'var(--color-white)',
-    padding: '0.5rem 1rem',
-    borderRadius: '0.375rem',
+    padding: isMobile ? '0.75rem 1rem' : '0.875rem 1.25rem',
+    borderRadius: '0.5rem',
     fontWeight: '500',
+    fontSize: 'clamp(0.875rem, 2vw, 1rem)',
     border: 'none',
-    cursor: 'pointer',
-    opacity: isLoading || !password || password !== confirmPassword ? 0.5 : 1,
+    cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
+    opacity: isButtonDisabled ? 0.7 : 1,
+    fontFamily: 'var(--font-body)',
+    transition: 'background-color 0.2s ease',
+  };
+
+  const buttonHoverStyle: React.CSSProperties = {
+    backgroundColor: '#373737',
   };
 
   const footerStyle: React.CSSProperties = {
     textAlign: 'center',
     marginTop: '1.5rem',
     color: '#4B5563',
+    fontSize: 'clamp(0.875rem, 1.8vw, 0.95rem)',
+    fontFamily: 'var(--font-body)',
   };
 
   const linkStyle: React.CSSProperties = {
     color: 'var(--color-primary)',
-    fontSize: '0.875rem',
+    fontSize: 'clamp(0.875rem, 1.8vw, 0.95rem)',
     textDecoration: 'none',
+    fontFamily: 'var(--font-body)',
+  };
+
+  const linkHoverStyle: React.CSSProperties = {
+    textDecoration: 'underline',
+  };
+
+  // Focus outline style
+  const focusOutlineStyle: React.CSSProperties = {
+    outline: '2px solid var(--color-primary)',
+    outlineOffset: '2px',
   };
 
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        <h1 style={titleStyle}>Créer un compte</h1>
+    <div style={containerStyle} role="main" aria-label="Page d'inscription">
+      <div 
+        style={cardStyle}
+        aria-labelledby="register-title"
+        aria-describedby="register-form"
+      >
+        {/* Logo de l'application */}
+        <div style={logoContainerStyle}>
+          <img
+            src={logoOrange}
+            alt="Logo de l'application"
+            style={{ height: logoHeight, width: 'auto' }}
+          />
+        </div>
+        
+        <h1 id="register-title" style={titleStyle}>Creer un compte</h1>
 
         {error && (
-          <div style={errorStyle}>
+          <div 
+            style={errorStyle}
+            role="alert"
+            aria-live="assertive"
+          >
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={formStyle}>
+        <form 
+          onSubmit={handleSubmit} 
+          style={formStyle}
+          id="register-form"
+          aria-label="Formulaire d'inscription"
+        >
           <div>
             <label htmlFor="name" style={labelStyle}>
               Nom
@@ -150,12 +236,15 @@ export default function Register() {
               onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
               onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
+              aria-required="true"
+              placeholder="Votre nom"
+              autoComplete="name"
             />
           </div>
 
           <div>
             <label htmlFor="email" style={labelStyle}>
-              Email
+              Adresse email
             </label>
             <input
               type="email"
@@ -166,6 +255,10 @@ export default function Register() {
               onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
               onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
+              aria-required="true"
+              placeholder="votre@email.com"
+              autoComplete="email"
+              autoCapitalize="none"
             />
           </div>
 
@@ -182,9 +275,12 @@ export default function Register() {
               onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
               onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
+              aria-required="true"
+              placeholder="8 caracteres minimum"
               minLength={8}
+              autoComplete="new-password"
             />
-            <p style={hintStyle}>Minimum 8 caractères</p>
+            <p style={hintStyle}>Minimum 8 caracteres</p>
           </div>
 
           <div>
@@ -200,6 +296,9 @@ export default function Register() {
               onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
               onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
+              aria-required="true"
+              placeholder="Confirmez votre mot de passe"
+              autoComplete="new-password"
             />
             {password && confirmPassword && password !== confirmPassword && (
               <p style={errorHintStyle}>Les mots de passe ne correspondent pas</p>
@@ -208,16 +307,30 @@ export default function Register() {
 
           <button
             type="submit"
-            disabled={isLoading || !password || password !== confirmPassword}
+            disabled={isButtonDisabled}
             style={buttonStyle}
+            onMouseEnter={(e) => !isButtonDisabled && Object.assign(e.currentTarget.style, buttonHoverStyle, buttonStyle)}
+            onMouseLeave={(e) => !isButtonDisabled && Object.assign(e.currentTarget.style, buttonStyle)}
+            onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, buttonStyle)}
+            onBlur={(e) => Object.assign(e.currentTarget.style, buttonStyle)}
+            aria-busy={isLoading}
+            aria-disabled={isButtonDisabled}
           >
             {isLoading ? 'Inscription...' : "S'inscrire"}
           </button>
         </form>
 
         <p style={footerStyle}>
-          Déjà un compte ?{' '}
-          <Link to="/login" style={linkStyle}>
+          Deja un compte ?{' '}
+          <Link 
+            to="/login" 
+            style={linkStyle}
+            onMouseEnter={(e) => Object.assign(e.currentTarget.style, linkHoverStyle, linkStyle)}
+            onMouseLeave={(e) => Object.assign(e.currentTarget.style, linkStyle)}
+            onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, linkStyle)}
+            onBlur={(e) => Object.assign(e.currentTarget.style, linkStyle)}
+            aria-label="Aller a la page de connexion"
+          >
             Se connecter
           </Link>
         </p>

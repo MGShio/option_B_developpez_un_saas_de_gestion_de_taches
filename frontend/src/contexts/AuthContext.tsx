@@ -1,8 +1,19 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { storage } from '../utils/storage';
-import { login as loginService, register as registerService, logout as logoutService, getCurrentUser } from '../services/authService';
-import type { LoginCredentials, RegisterCredentials, AuthResponse } from '../services/authService';
+import { 
+  login as loginService, 
+  register as registerService, 
+  logout as logoutService, 
+  getCurrentUser,
+  updateProfile as updateProfileService,
+  updatePassword as updatePasswordService,
+  type LoginCredentials, 
+  type RegisterCredentials, 
+  type AuthResponse,
+  type UpdateProfileCredentials,
+  type UpdatePasswordCredentials
+} from '../services/authService';
 
 interface User {
   id: number;
@@ -18,6 +29,8 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (credentials: RegisterCredentials) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (credentials: UpdateProfileCredentials) => Promise<void>;
+  updatePassword: (credentials: UpdatePasswordCredentials) => Promise<void>;
   clearError: () => void;
 }
 
@@ -99,6 +112,41 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
+  const updateProfile = useCallback(async (credentials: UpdateProfileCredentials) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const token = storage.getToken();
+      if (!token) {
+        throw new Error('Non authentifié');
+      }
+      const userData = await updateProfileService(token, credentials);
+      setUser(userData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour du profil');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const updatePassword = useCallback(async (credentials: UpdatePasswordCredentials) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const token = storage.getToken();
+      if (!token) {
+        throw new Error('Non authentifié');
+      }
+      await updatePasswordService(token, credentials);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur lors du changement de mot de passe');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const clearError = useCallback(() => {
     setError(null);
   }, []);
@@ -111,6 +159,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     login,
     register,
     logout,
+    updateProfile,
+    updatePassword,
     clearError,
   };
 

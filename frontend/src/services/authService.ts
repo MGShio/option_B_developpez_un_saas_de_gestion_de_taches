@@ -118,6 +118,53 @@ export async function logout(): Promise<void> {
   });
 }
 
+// Mettre à jour le profil
+export interface UpdateProfileCredentials {
+  name?: string;
+  email?: string;
+}
+
+export async function updateProfile(token: string, credentials: UpdateProfileCredentials): Promise<{ id: number; email: string; name: string }> {
+  const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(credentials),
+  });
+
+  if (!response.ok) {
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la mise à jour du profil');
+  }
+
+  const data: BackendProfileResponse = await response.json();
+  return formatUserFromBackend(data.data.user);
+}
+
+// Mettre à jour le mot de passe
+export interface UpdatePasswordCredentials {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export async function updatePassword(token: string, credentials: UpdatePasswordCredentials): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/auth/password`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(credentials),
+  });
+
+  if (!response.ok) {
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors du changement de mot de passe');
+  }
+}
+
 // Vérifier le token et récupérer l'utilisateur
 export async function getCurrentUser(token: string): Promise<{ id: number; email: string; name: string }> {
   const response = await fetch(`${API_BASE_URL}/auth/profile`, {

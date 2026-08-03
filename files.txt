@@ -1,0 +1,15 @@
+d:\Oppenclassroom\Projet\Projet 7 - D‚veloppez un SaaS de gestion de tƒches\option_B_developpez_un_saas_de_gestion_de_taches\frontend\src\App.tsx
+d:\Oppenclassroom\Projet\Projet 7 - D‚veloppez un SaaS de gestion de tƒches\option_B_developpez_un_saas_de_gestion_de_taches\frontend\src\main.tsx
+d:\Oppenclassroom\Projet\Projet 7 - D‚veloppez un SaaS de gestion de tƒches\option_B_developpez_un_saas_de_gestion_de_taches\frontend\src\components\AITaskListModal.tsx
+d:\Oppenclassroom\Projet\Projet 7 - D‚veloppez un SaaS de gestion de tƒches\option_B_developpez_un_saas_de_gestion_de_taches\frontend\src\components\CreateProjectModal.tsx
+d:\Oppenclassroom\Projet\Projet 7 - D‚veloppez un SaaS de gestion de tƒches\option_B_developpez_un_saas_de_gestion_de_taches\frontend\src\components\EditProjectModal.tsx
+d:\Oppenclassroom\Projet\Projet 7 - D‚veloppez un SaaS de gestion de tƒches\option_B_developpez_un_saas_de_gestion_de_taches\frontend\src\components\EditTaskModal.tsx
+d:\Oppenclassroom\Projet\Projet 7 - D‚veloppez un SaaS de gestion de tƒches\option_B_developpez_un_saas_de_gestion_de_taches\frontend\src\contexts\AuthContext.tsx
+d:\Oppenclassroom\Projet\Projet 7 - D‚veloppez un SaaS de gestion de tƒches\option_B_developpez_un_saas_de_gestion_de_taches\frontend\src\layouts\MainLayout.tsx
+d:\Oppenclassroom\Projet\Projet 7 - D‚veloppez un SaaS de gestion de tƒches\option_B_developpez_un_saas_de_gestion_de_taches\frontend\src\pages\Account.tsx
+d:\Oppenclassroom\Projet\Projet 7 - D‚veloppez un SaaS de gestion de tƒches\option_B_developpez_un_saas_de_gestion_de_taches\frontend\src\pages\Dashboard.tsx
+d:\Oppenclassroom\Projet\Projet 7 - D‚veloppez un SaaS de gestion de tƒches\option_B_developpez_un_saas_de_gestion_de_taches\frontend\src\pages\NewProject.tsx
+d:\Oppenclassroom\Projet\Projet 7 - D‚veloppez un SaaS de gestion de tƒches\option_B_developpez_un_saas_de_gestion_de_taches\frontend\src\pages\ProjectDetail.tsx
+d:\Oppenclassroom\Projet\Projet 7 - D‚veloppez un SaaS de gestion de tƒches\option_B_developpez_un_saas_de_gestion_de_taches\frontend\src\pages\Projects.tsx
+d:\Oppenclassroom\Projet\Projet 7 - D‚veloppez un SaaS de gestion de tƒches\option_B_developpez_un_saas_de_gestion_de_taches\frontend\src\pages\auth\Login.tsx
+d:\Oppenclassroom\Projet\Projet 7 - D‚veloppez un SaaS de gestion de tƒches\option_B_developpez_un_saas_de_gestion_de_taches\frontend\src\pages\auth\Register.tsx
