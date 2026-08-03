@@ -62,7 +62,8 @@ export default function NewProject() {
   };
 
   if (!isAuthenticated) {
-    return <div style={{ textAlign: 'center', padding: 40 }}>Veuillez vous connecter</div>;
+    navigate('/login');
+    return null;
   }
 
   // Focus outline style pour l'accessibilite - WCAG 2.1 AA

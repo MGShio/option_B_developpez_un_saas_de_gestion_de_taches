@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 // Import des logos et icônes
@@ -8,10 +8,12 @@ import logoBlack from '../images/logoblack.svg';
 import dashboardIconWhite from '../images/dashboardiconwhite.svg';
 import dashboardIconOrange from '../images/dashboardiconorange.svg';
 import folderIcon from '../images/fodlericon.svg';
+import folderIconWhite from '../images/folderinconwhite.svg';
 
 export default function MainLayout() {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -30,18 +32,27 @@ export default function MainLayout() {
 
   // Calcul des tailles responsives
   const isMobile = windowWidth <= 768;
+  const isDashboard = location.pathname === '/dashboard';
+  const isProjects = location.pathname === '/projects';
+  const isAccount = location.pathname === '/account';
   const isTablet = windowWidth <= 1024;
   
-  // Padding horizontal
-  const headerPaddingX = isMobile ? '1rem' : isTablet ? '2rem' : '6.25rem'; // 100px
-  const mainPaddingX = isMobile ? '1rem' : isTablet ? '2rem' : '6.25rem';
+  // Padding horizontal (selon maquette: 100px de chaque côté à 1440px)
+  const headerPaddingX = '100px';
+  const mainPaddingX = isMobile ? '1rem' : isTablet ? '1.5rem' : '2rem';
+  
+  // Padding droit pour l'avatar
+  const avatarPaddingRight = '100px';
   const footerPaddingX = isMobile ? '1rem' : isTablet ? '2rem' : '1.875rem'; // 30px
   
   // Tailles des éléments
   const logoWidth = isMobile ? '100px' : '147px';
   const logoHeight = isMobile ? '24px' : '18.72px';
-  const navButtonPaddingX = isMobile ? '1rem' : isTablet ? '2rem' : '3.875rem'; // 62px
-  const navButtonPaddingY = isMobile ? '0.75rem' : isTablet ? '1rem' : '1.6875rem'; // 27px
+  // Boutons de navigation (248x76.5px selon maquette)
+  const navButtonWidth = '248px';
+  const navButtonHeight = '76.5px';
+  const navButtonPaddingX = isMobile ? '1rem' : '1rem';
+  const navButtonPaddingY = isMobile ? '0.75rem' : '0.75rem';
   const navFontSize = isMobile ? '0.875rem' : '1rem';
   const avatarSize = isMobile ? '45px' : '65px';
   const avatarInitialsFontSize = isMobile ? '0.75rem' : '0.875rem';
@@ -58,18 +69,16 @@ export default function MainLayout() {
     minHeight: '100vh',
     backgroundColor: backgroundColor,
     position: 'relative',
-    overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
   };
 
   const headerStyle: React.CSSProperties = {
     width: '100%',
-    padding: `8px ${headerPaddingX}`,
+    padding: '8px 0',
     background: white,
     boxShadow: '0px 4px 12px 1px rgba(0, 0, 0, 0.02)',
     display: 'flex',
-    justifyContent: 'space-between',
     alignItems: 'center',
     position: 'sticky',
     top: 0,
@@ -79,17 +88,22 @@ export default function MainLayout() {
   const logoStyle: React.CSSProperties = {
     width: logoWidth,
     height: logoHeight,
+    paddingLeft: '100px',
     display: 'flex',
     alignItems: 'center',
   };
 
   const navStyle: React.CSSProperties = {
     display: isMobile ? 'none' : 'flex',
-    gap: '1rem',
+    flex: 1,
+    justifyContent: 'center',
+    gap: '16px',
     alignItems: 'center',
   };
 
   const navButtonStyle: React.CSSProperties = {
+    width: navButtonWidth,
+    height: navButtonHeight,
     padding: `${navButtonPaddingY} ${navButtonPaddingX}`,
     border: 'none',
     borderRadius: '0.625rem', // 10px
@@ -98,6 +112,7 @@ export default function MainLayout() {
     fontWeight: 400,
     cursor: 'pointer',
     display: 'flex',
+    justifyContent: 'center',
     alignItems: 'center',
     gap: '1rem',
     textDecoration: 'none',
@@ -115,15 +130,14 @@ export default function MainLayout() {
   };
 
   const iconStyle: React.CSSProperties = {
-    width: isMobile ? '14px' : '11px',
-    height: isMobile ? '14px' : 'auto',
+    width: isMobile ? '18px' : '24px',
+    height: isMobile ? '18px' : '24px',
     fill: 'currentColor',
   };
 
   const userAvatarStyle: React.CSSProperties = {
     width: avatarSize,
     height: avatarSize,
-    padding: isMobile ? '8px' : '21px 12px',
     backgroundColor: '#FFE8D9', // Orange clair pour l'avatar
     borderRadius: '50%',
     display: 'flex',
@@ -136,7 +150,7 @@ export default function MainLayout() {
 
   const avatarTextStyle: React.CSSProperties = {
     textAlign: 'center',
-    color: secondaryColor, // #1F1F1F
+    color: '#0F0F0F',
     fontSize: avatarInitialsFontSize,
     fontFamily: 'Inter',
     fontWeight: 400,
@@ -225,31 +239,23 @@ export default function MainLayout() {
         <nav style={navStyle} role="navigation" aria-label="Navigation principale">
           <Link
             to="/dashboard"
-            style={{ ...navButtonStyle, ...navButtonActiveStyle }}
-            onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, navButtonStyle, navButtonActiveStyle)}
-            onBlur={(e) => Object.assign(e.currentTarget.style, navButtonStyle, navButtonActiveStyle)}
+            style={{ ...navButtonStyle, ...(isDashboard ? navButtonActiveStyle : navButtonInactiveStyle) }}
           >
-            <img src={dashboardIconWhite} alt="" style={iconStyle} />
-            <img src={dashboardIconWhite} alt="" style={iconStyle} />
-            <img src={dashboardIconWhite} alt="" style={iconStyle} />
-            <img src={dashboardIconWhite} alt="" style={iconStyle} />
+            <img src={isDashboard ? dashboardIconWhite : dashboardIconOrange} alt="" style={iconStyle} />
             Tableau de bord
           </Link>
           <Link
             to="/projects"
-            style={{ ...navButtonStyle, ...navButtonInactiveStyle }}
-            onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, navButtonStyle, navButtonInactiveStyle)}
-            onBlur={(e) => Object.assign(e.currentTarget.style, navButtonStyle, navButtonInactiveStyle)}
+            style={{ ...navButtonStyle, ...(isProjects ? navButtonActiveStyle : navButtonInactiveStyle) }}
           >
-            <img src={folderIcon} alt="" style={iconStyle} />
-            <img src={folderIcon} alt="" style={iconStyle} />
+            <img src={isProjects ? folderIconWhite : folderIcon} alt="" style={iconStyle} />
             Projets
           </Link>
         </nav>
 
         {/* User Avatar ou menu mobile */}
         {user && isAuthenticated ? (
-          <>
+          <div style={{ marginLeft: 'auto', paddingRight: avatarPaddingRight }}>
             {/* Menu mobile */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -267,30 +273,24 @@ export default function MainLayout() {
             <div id="mobile-menu" style={mobileMenuStyle}>
               <Link
                 to="/dashboard"
-                style={{ ...navButtonStyle, ...navButtonActiveStyle, width: '100%' }}
+                style={{ ...navButtonStyle, ...(isDashboard ? navButtonActiveStyle : navButtonInactiveStyle), width: '100%' }}
                 onClick={() => setMobileMenuOpen(false)}
-                onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, navButtonStyle, navButtonActiveStyle)}
-                onBlur={(e) => Object.assign(e.currentTarget.style, navButtonStyle, navButtonActiveStyle)}
               >
-                <img src={dashboardIconOrange} alt="" style={{ ...iconStyle, width: '16px', height: '16px' }} />
+                <img src={isDashboard ? dashboardIconWhite : dashboardIconOrange} alt="" style={iconStyle} />
                 Tableau de bord
               </Link>
               <Link
                 to="/projects"
-                style={{ ...navButtonStyle, ...navButtonInactiveStyle, width: '100%' }}
+                style={{ ...navButtonStyle, ...(isProjects ? navButtonActiveStyle : navButtonInactiveStyle), width: '100%' }}
                 onClick={() => setMobileMenuOpen(false)}
-                onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, navButtonStyle, navButtonInactiveStyle)}
-                onBlur={(e) => Object.assign(e.currentTarget.style, navButtonStyle, navButtonInactiveStyle)}
               >
-                <img src={folderIcon} alt="" style={{ ...iconStyle, width: '16px', height: '16px' }} />
+                <img src={isProjects ? folderIconWhite : folderIcon} alt="" style={iconStyle} />
                 Projets
               </Link>
               <Link
                 to="/account"
                 style={{ ...navButtonStyle, ...navButtonInactiveStyle, width: '100%' }}
                 onClick={() => setMobileMenuOpen(false)}
-                onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, navButtonStyle, navButtonInactiveStyle)}
-                onBlur={(e) => Object.assign(e.currentTarget.style, navButtonStyle, navButtonInactiveStyle)}
               >
                 Mon compte
               </Link>
@@ -309,24 +309,26 @@ export default function MainLayout() {
                 {getInitials(user.name)}
               </span>
             </div>
-          </>
+          </div>
         ) : (
-          <Link
-            to="/login"
-            style={{
-              ...navButtonStyle,
-              backgroundColor: secondaryColor,
-              color: white,
-              padding: isMobile ? '0.75rem 1.5rem' : `${navButtonPaddingY} ${navButtonPaddingX}`,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-            }}
-            onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, navButtonStyle, { backgroundColor: secondaryColor, color: white })}
-            onBlur={(e) => Object.assign(e.currentTarget.style, navButtonStyle, { backgroundColor: secondaryColor, color: white })}
-          >
-            Se connecter
-          </Link>
+          <div style={{ marginLeft: 'auto', paddingRight: avatarPaddingRight }}>
+            <Link
+              to="/login"
+              style={{
+                ...navButtonStyle,
+                backgroundColor: secondaryColor,
+                color: white,
+                padding: isMobile ? '0.75rem 1.5rem' : `${navButtonPaddingY} ${navButtonPaddingX}`,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+              onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, navButtonStyle, { backgroundColor: secondaryColor, color: white })}
+              onBlur={(e) => Object.assign(e.currentTarget.style, navButtonStyle, { backgroundColor: secondaryColor, color: white })}
+            >
+              Se connecter
+            </Link>
+          </div>
         )}
       </header>
 
