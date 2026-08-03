@@ -71,6 +71,7 @@ export default function MainLayout() {
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
+    overflowX: 'hidden',
   };
 
   const headerStyle: React.CSSProperties = {
@@ -188,6 +189,7 @@ export default function MainLayout() {
 
   const mainStyle: React.CSSProperties = {
     flex: 1,
+    width: '100%',
     padding: `2.5rem ${mainPaddingX}`,
     display: 'flex',
     flexDirection: 'column',
@@ -197,27 +199,25 @@ export default function MainLayout() {
     width: '100%',
     height: isMobile ? '56px' : '68px',
     background: white,
-    position: 'sticky',
-    bottom: 0,
-    left: 0,
     display: 'flex',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: `0 ${footerPaddingX}`,
     borderTop: '1px solid #E5E7EB',
   };
 
   const footerLogoStyle: React.CSSProperties = {
     width: isMobile ? '80px' : '101px',
     height: isMobile ? '16px' : '12.86px',
+    display: 'flex',
+    alignItems: 'center',
   };
 
   const footerTextStyle: React.CSSProperties = {
-    position: 'absolute',
-    right: footerPaddingX,
     color: 'black',
     fontSize: isMobile ? '0.875rem' : '1rem',
     fontFamily: 'Inter',
     fontWeight: 400,
+    whiteSpace: 'nowrap',
   };
 
   // Focus outline style pour l'accessibilite
@@ -339,10 +339,10 @@ export default function MainLayout() {
 
       {/* Footer */}
       <footer style={footerStyle} role="contentinfo">
-        <div style={footerLogoStyle} aria-hidden="true">
+        <div style={{ ...footerLogoStyle, paddingLeft: '20px' }} aria-hidden="true">
           <img src={logoBlack} alt="Logo Abricot" style={{ height: '100%', width: 'auto' }} />
         </div>
-        <span style={footerTextStyle}>
+        <span style={{ ...footerTextStyle, paddingRight: '20px' }}>
           Abricot 2025
         </span>
       </footer>
