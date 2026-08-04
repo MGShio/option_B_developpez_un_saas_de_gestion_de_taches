@@ -339,8 +339,8 @@ export default function MainLayout() {
 
       {/* Footer */}
       <footer style={footerStyle} role="contentinfo">
-        <div style={{ ...footerLogoStyle, paddingLeft: '20px' }} aria-hidden="true">
-          <img src={logoBlack} alt="Logo Abricot" style={{ height: '100%', width: 'auto' }} />
+        <div style={footerLogoStyle} aria-hidden="true">
+          <img src={logoBlack} alt="Logo Abricot" style={{ height: '100%', width: 'auto', paddingLeft: '20px' }} />
         </div>
         <span style={{ ...footerTextStyle, paddingRight: '20px' }}>
           Abricot 2025
