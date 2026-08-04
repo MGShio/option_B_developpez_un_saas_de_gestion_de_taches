@@ -16,6 +16,18 @@ export default function Register() {
   const { register, isLoading, error, clearError } = useAuth();
   const navigate = useNavigate();
 
+  // Reset body margin pour éviter les bordures blanches
+  useEffect(() => {
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
+    document.body.style.minHeight = '100vh';
+    return () => {
+      document.body.style.margin = '';
+      document.body.style.padding = '';
+      document.body.style.minHeight = '';
+    };
+  }, []);
+
   // Gestion du resize pour le responsive
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -43,9 +55,8 @@ export default function Register() {
   const isMobile = windowWidth <= 768;
   const isTablet = windowWidth <= 1024;
   
-  // Largeur du card : 90% sur mobile, 45% sur tablette, 40% sur desktop
-  const cardWidth = isMobile ? '90%' : isTablet ? '45%' : '40%';
-  const maxCardWidth = isMobile ? '28rem' : '32rem';
+  // Largeur du card : 90% sur mobile, 45% sur tablette, 39% sur desktop (562px/1440px)
+  const cardWidth = isMobile ? '90%' : isTablet ? '45%' : '39%';
   const padding = isMobile ? '1.5rem' : '2rem';
   const titleSize = isMobile ? '1.75rem' : '2rem';
   const inputPadding = isMobile ? '0.75rem 1rem' : '0.875rem 1.25rem';
@@ -56,24 +67,25 @@ export default function Register() {
 
   // Styles - Conforme WCAG 2.1 AA
   const containerStyle: React.CSSProperties = {
-    minHeight: '100vh',
+    height: '100vh',
+    width: '100%',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     backgroundImage: `url(${registerBackground})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
-    padding: '1rem',
+    margin: 0,
+    padding: 0,
   };
 
   const cardStyle: React.CSSProperties = {
     backgroundColor: 'var(--color-white)',
     padding: padding,
-    borderRadius: '0.75rem',
+    height: '93%',
     boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
     width: cardWidth,
-    maxWidth: maxCardWidth,
   };
 
   const logoContainerStyle: React.CSSProperties = {
