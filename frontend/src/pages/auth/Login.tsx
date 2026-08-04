@@ -58,7 +58,7 @@ export default function Login() {
   
   // Largeur du card : 90% sur mobile, 45% sur tablette, 39% sur desktop (562px/1440px)
   const cardWidth = isMobile ? '90%' : isTablet ? '45%' : '39%';
-  const padding = isMobile ? '1.5rem' : '2rem';
+  const padding = isMobile ? '1.5rem' : isTablet ? '2rem' : '8.75rem';
   const titleSize = isMobile ? '1.75rem' : '2rem';
   const inputPadding = isMobile ? '0.75rem 1rem' : '0.875rem 1.25rem';
   const logoHeight = isMobile ? '28px' : '36px';
@@ -84,12 +84,13 @@ export default function Login() {
     height: '93%',
     boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
     width: cardWidth,
+    maxWidth: '562px',
   };
 
   const logoContainerStyle: React.CSSProperties = {
     display: 'flex',
     justifyContent: 'center',
-    marginBottom: '1.5rem',
+    marginBottom: '202px',
   };
 
   const titleStyle: React.CSSProperties = {
@@ -211,7 +212,7 @@ export default function Login() {
 
   const footerStyle: React.CSSProperties = {
     textAlign: 'center',
-    marginTop: '2rem',
+    marginTop: '202px',
     color: '#4B5563',
     fontSize: 'clamp(0.875rem, 1.8vw, 0.95rem)',
     fontFamily: 'var(--font-body)',

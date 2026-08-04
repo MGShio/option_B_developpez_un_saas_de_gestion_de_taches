@@ -13,6 +13,7 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
   const { register, isLoading, error, clearError } = useAuth();
   const navigate = useNavigate();
 
@@ -30,7 +31,10 @@ export default function Register() {
 
   // Gestion du resize pour le responsive
   useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      setWindowHeight(window.innerHeight);
+    };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -57,10 +61,14 @@ export default function Register() {
   
   // Largeur du card : 90% sur mobile, 45% sur tablette, 39% sur desktop (562px/1440px)
   const cardWidth = isMobile ? '90%' : isTablet ? '45%' : '39%';
-  const padding = isMobile ? '1.5rem' : '2rem';
+  const padding = isMobile ? '1.5rem' : isTablet ? '2rem' : '8.75rem';
   const titleSize = isMobile ? '1.75rem' : '2rem';
   const inputPadding = isMobile ? '0.75rem 1rem' : '0.875rem 1.25rem';
   const logoHeight = isMobile ? '28px' : '36px';
+  
+  // Marges pour le logo (55px haut, 202px entre logo et titre sur 1024px)
+  const logoMarginTop = isMobile ? '1.5rem' : isTablet ? '2rem' : `${(55 / 1024) * windowHeight}px`;
+  const logoMarginBottom = isMobile ? '1.5rem' : isTablet ? '2rem' : `${(202 / 1024) * windowHeight}px`;
   
   // Etat pour le hover du bouton
   const isButtonDisabled = isLoading || !password || password !== confirmPassword;
@@ -83,15 +91,17 @@ export default function Register() {
   const cardStyle: React.CSSProperties = {
     backgroundColor: 'var(--color-white)',
     padding: padding,
-    height: '93%',
+    height: '80.7%',
     boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
     width: cardWidth,
+    maxWidth: '562px',
   };
 
   const logoContainerStyle: React.CSSProperties = {
     display: 'flex',
     justifyContent: 'center',
-    marginBottom: '1.5rem',
+    marginTop: logoMarginTop,
+    marginBottom: logoMarginBottom,
   };
 
   const titleStyle: React.CSSProperties = {
