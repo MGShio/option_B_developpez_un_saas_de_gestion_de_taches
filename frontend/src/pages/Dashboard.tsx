@@ -194,9 +194,12 @@ export default function Dashboard() {
     <div style={{ width: '100%' }}>
       {/* Welcome Section */}
       <div style={{
-        width: '100%',
-        maxWidth: maxContentWidth,
+        width: mainContainerWidth,
         marginBottom: isMobile ? '2rem' : 'clamp(3rem, 8vh, 5rem)',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        paddingLeft: containerPadding,
+        paddingRight: containerPadding,
         display: 'flex',
         alignItems: isMobile ? 'flex-start' : 'center',
         flexDirection: isMobile ? 'column' : 'row',
@@ -285,6 +288,11 @@ export default function Dashboard() {
 
       {/* View Toggle */}
       <div style={{
+        width: mainContainerWidth,
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        paddingLeft: containerPadding,
+        paddingRight: containerPadding,
         display: 'flex',
         gap: isMobile ? '0.5rem' : '0.625rem',
         marginBottom: isMobile ? '2rem' : '2.5rem',
