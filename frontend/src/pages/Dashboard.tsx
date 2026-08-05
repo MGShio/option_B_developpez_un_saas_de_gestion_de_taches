@@ -7,6 +7,10 @@ import { getProjects, createProject, type Project } from '../services/projectSer
 import CreateProjectModal, { type ModalCreateProjectData } from '../components/CreateProjectModal';
 import checkmarkIcon from '../images/checkmark.svg';
 import calendarIcon from '../images/calendaricon.svg';
+import folderIconGrey from '../images/foldericongrey.svg';
+import calendarIconGrey from '../images/calendaricongrey.svg';
+import textBubbleGrey from '../images/textbubblegrey.svg';
+
 
 // Couleurs des statuts - Conforme WCAG 2.1 AA
 const statusColors: Record<string, { bg: string; color: string; border: string }> = {
@@ -45,6 +49,19 @@ const CheckmarkIcon = ({ isActive }: { isActive: boolean }) => (
 
 const CalendarIcon = ({ isActive }: { isActive: boolean }) => (
   <img src={calendarIcon} alt="Vue Kanban" style={{ width: '1rem', height: '1rem', userSelect: 'none' }} />
+);
+
+// Meta icons for TaskCard
+const FolderIconGrey = () => (
+  <img src={folderIconGrey} alt="" style={{ width: '1rem', height: '1rem', userSelect: 'none' }} />
+);
+
+const CalendarIconGrey = () => (
+  <img src={calendarIconGrey} alt="" style={{ width: '1rem', height: '1rem', userSelect: 'none' }} />
+);
+
+const TextBubbleGrey = () => (
+  <img src={textBubbleGrey} alt="" style={{ width: '1rem', height: '1rem', userSelect: 'none' }} />
 );
 
 export default function Dashboard() {
@@ -436,7 +453,6 @@ export default function Dashboard() {
             <div style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: isMobile ? '0.5rem' : '0.5rem',
             }}>
               <h2 style={{
                 color: 'var(--color-secondary)',
@@ -585,7 +601,6 @@ function TaskCard({
           display: 'flex',
           flexDirection: 'column',
           gap: isMobile ? '0.5rem' : '0.4375rem',
-          width: titleWidth,
         }}>
           <h3 style={{
             color: 'var(--color-black)',
@@ -611,7 +626,7 @@ function TaskCard({
           gap: metaGap,
           flexWrap: isMobile ? 'wrap' : 'nowrap',
           width: isMobile ? '100%' : 'auto',
-          justifyContent: isMobile ? 'flex-start' : 'center',
+          justifyContent: 'left',
         }}>
           <div style={{
             display: 'flex',
@@ -619,6 +634,7 @@ function TaskCard({
             gap: '0.5rem',
             width: isMobile ? '100%' : 'auto',
           }}>
+            <FolderIconGrey />
             <span style={{
               color: '#6B7280',
               fontSize: isMobile ? '0.75rem' : '0.8125rem',
@@ -637,6 +653,7 @@ function TaskCard({
             alignItems: 'center',
             width: isMobile ? '100%' : 'min(3.875rem, 5vw)',
           }}>
+            <CalendarIconGrey />
             <span style={{
               color: '#6B7280',
               fontSize: isMobile ? '0.75rem' : '0.8125rem',
@@ -657,6 +674,7 @@ function TaskCard({
             alignItems: 'center',
             gap: '0.5rem',
           }}>
+            <TextBubbleGrey />
             <div style={{
               width: '0.9375rem', height: '0.9375rem',
               background: '#6B7280',
