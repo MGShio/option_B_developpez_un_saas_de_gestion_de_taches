@@ -5,6 +5,8 @@ import { storage } from '../utils/storage';
 import { getAssignedTasks, searchTasks, type Task } from '../services/taskService';
 import { getProjects, createProject, type Project } from '../services/projectService';
 import CreateProjectModal, { type ModalCreateProjectData } from '../components/CreateProjectModal';
+import checkmarkIcon from '../images/checkmark.svg';
+import calendarIcon from '../images/calendaricon.svg';
 
 // Couleurs des statuts - Conforme WCAG 2.1 AA
 const statusColors: Record<string, { bg: string; color: string; border: string }> = {
@@ -20,7 +22,8 @@ const Separator = () => (
       width: '0.0625rem', 
       height: '0.75rem', 
       background: '#9CA3AF', 
-      transform: 'rotate(90deg)' 
+      transform: 'rotate(90deg)',
+      userSelect: 'none',
     }}
     role="separator"
     aria-hidden="true"
@@ -36,16 +39,12 @@ const SearchIcon = ({ color = '#6B7280' }: { color?: string }) => (
 );
 
 // Icônes pour les vues
-const ListIcon = ({ active }: { active: boolean }) => (
-  <svg width="1rem" height="1rem" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="1rem" height="1rem" fill={active ? '#D3590B' : '#6B7280'} />
-  </svg>
+const CheckmarkIcon = ({ isActive }: { isActive: boolean }) => (
+  <img src={checkmarkIcon} alt="Vue Liste" style={{ width: '1rem', height: '1rem', userSelect: 'none' }} />
 );
 
-const ListIconSmall = ({ active }: { active: boolean }) => (
-  <svg width="0.625rem" height="0.5rem" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="0.625rem" height="0.5rem" fill={active ? '#D3590B' : '#6B7280'} />
-  </svg>
+const CalendarIcon = ({ isActive }: { isActive: boolean }) => (
+  <img src={calendarIcon} alt="Vue Kanban" style={{ width: '1rem', height: '1rem', userSelect: 'none' }} />
 );
 
 export default function Dashboard() {
@@ -77,7 +76,9 @@ export default function Dashboard() {
   
   // Tailles adaptatives
   const welcomeSectionWidth = isMobile ? '100%' : isTablet ? '70%' : '36vw';
-  const mainContainerWidth = isMobile ? '100%' : isTablet ? '95%' : '85%';
+  const mainContainerWidth = isMobile ? '100%' : isTablet ? '95%' : '88%';
+  const tasksContainerWidth = isMobile ? '100%' : isTablet ? '95%' : '85%';
+
   const maxContentWidth = isMobile ? '100%' : '82vw';
   const titleSize = isMobile ? '1.5rem' : '1.75rem';
   const subtitleSize = isMobile ? '1rem' : '1.125rem';
@@ -88,7 +89,7 @@ export default function Dashboard() {
   const metaTextSize = isMobile ? '0.75rem' : '0.8125rem';
   const statusBadgeSize = isMobile ? '0.75rem' : '0.875rem';
   const buttonFontSize = isMobile ? '0.875rem' : '1rem';
-  const inputHeight = isMobile ? 'min(44px, 6.5vh)' : 'min(53px, 4vh)';
+  const inputHeight = isMobile ? 'min(2.75rem, 6.5vh)' : 'min(3.3125rem, 4vh)';
   const containerPadding = isMobile ? '1rem' : isTablet ? '1.5rem' : '2.5rem';
 
   // Récupérer les données
@@ -228,7 +229,7 @@ export default function Dashboard() {
         <button
           onClick={() => setIsCreateModalOpen(true)}
           style={{
-            height: isMobile ? 'min(48px, 6.5vh)' : 'min(50px, 4vh)',
+            height: isMobile ? 'min(3rem, 6.5vh)' : 'min(3.125rem, 4vh)',
             paddingTop: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
             paddingBottom: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
             paddingLeft: isMobile ? '1.5rem' : 'clamp(2rem, 5vw, 4.625rem)',
@@ -245,7 +246,7 @@ export default function Dashboard() {
             whiteSpace: 'nowrap',
           }}
           onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, {
-            height: isMobile ? 'min(48px, 6.5vh)' : 'min(50px, 4vh)',
+            height: isMobile ? 'min(3rem, 6.5vh)' : 'min(3.125rem, 4vh)',
             paddingTop: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
             paddingBottom: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
             paddingLeft: isMobile ? '1.5rem' : 'clamp(2rem, 5vw, 4.625rem)',
@@ -264,7 +265,7 @@ export default function Dashboard() {
             outlineOffset: '0.125rem',
           })}
           onBlur={(e) => Object.assign(e.currentTarget.style, {
-            height: isMobile ? 'min(48px, 6.5vh)' : 'min(50px, 4vh)',
+            height: isMobile ? 'min(3rem, 6.5vh)' : 'min(3.125rem, 4vh)',
             paddingTop: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
             paddingBottom: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
             paddingLeft: isMobile ? '1.5rem' : 'clamp(2rem, 5vw, 4.625rem)',
@@ -325,8 +326,7 @@ export default function Dashboard() {
           aria-pressed={activeView === 'list'}
           aria-label="Vue Liste"
         >
-          <ListIcon active={activeView === 'list'} />
-          <ListIconSmall active={activeView === 'list'} />
+          <CheckmarkIcon isActive={activeView === 'list'} />
           <span style={{
             color: activeView === 'list' ? 'var(--color-primary)' : '#6B7280',
           }}>
@@ -360,6 +360,7 @@ export default function Dashboard() {
           aria-pressed={activeView === 'kanban'}
           aria-label="Vue Kanban"
         >
+          <CalendarIcon isActive={activeView === 'kanban'} />
           <span style={{
             color: activeView === 'kanban' ? 'var(--color-primary)' : '#6B7280',
           }}>
@@ -414,8 +415,7 @@ export default function Dashboard() {
       ) : (
         /* Vue Liste */
         <div style={{
-          width: mainContainerWidth,
-          maxWidth: maxContentWidth,
+          width: tasksContainerWidth,
           background: 'white',
           borderRadius: '0.625rem',
           border: '0.0625rem solid var(--color-border)',
@@ -458,8 +458,7 @@ export default function Dashboard() {
 
             {/* Search Bar */}
             <div style={{
-              width: isMobile ? '100%' : 'min(357px, 25vw)',
-              maxWidth: '100%',
+              width: isMobile ? '100%' : 'min(22.3125rem, 25vw)',
               paddingTop: isMobile ? '0.75rem' : 'clamp(1rem, 2vw, 1.4375rem)', paddingBottom: isMobile ? '0.75rem' : 'clamp(1rem, 2vw, 1.4375rem)', paddingLeft: isMobile ? '1rem' : 'clamp(1.5rem, 3vw, 2rem)', paddingRight: isMobile ? '1rem' : 'clamp(1.5rem, 3vw, 2rem)',
               background: 'white',
               borderRadius: '0.5rem',
@@ -495,7 +494,6 @@ export default function Dashboard() {
             display: 'flex',
             flexDirection: 'column',
             gap: isMobile ? '1rem' : '1.0625rem',
-            width: '100%',
           }}>
             {tasks.length === 0 ? (
               <div style={{
@@ -559,11 +557,11 @@ function TaskCard({
   // Tailles adaptatives pour la carte
   const cardPaddingX = isMobile ? '1rem' : isTablet ? '1.5rem' : '2.5rem';
   const cardPaddingY = isMobile ? '1rem' : isTablet ? '1.25rem' : '1.5625rem';
-  const titleWidth = isMobile ? '100%' : 'min(153px, 12vw)';
+  const titleWidth = isMobile ? '100%' : 'min(9.5625rem, 12vw)';
   const metaGap = isMobile ? '0.75rem' : '0.9375rem';
   const statusButtonPadding = isMobile ? '0.25rem 0.75rem' : '0.25rem 1rem';
   const statusButtonFontSize = isMobile ? '0.75rem' : '0.875rem';
-  const viewButtonWidth = isMobile ? '100%' : 'min(121px, 9vw)';
+  const viewButtonWidth = isMobile ? '100%' : 'min(7.5625rem, 9vw)';
   const viewButtonPadding = isMobile ? '0.75rem' : '0.8125rem 0';
 
   return (
@@ -637,7 +635,7 @@ function TaskCard({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            width: isMobile ? '100%' : 'min(62px, 5vw)',
+            width: isMobile ? '100%' : 'min(3.875rem, 5vw)',
           }}>
             <span style={{
               color: '#6B7280',
@@ -660,10 +658,10 @@ function TaskCard({
             gap: '0.5rem',
           }}>
             <div style={{
-              width: 15,
-              height: 15,
+              width: '0.9375rem', height: '0.9375rem',
               background: '#6B7280',
               borderRadius: '50%',
+              userSelect: 'none',
             }} aria-hidden="true" />
             <span style={{
               color: '#6B7280',
@@ -708,7 +706,7 @@ function TaskCard({
             onClick={onView}
             style={{
               width: '100%',
-              height: isMobile ? 'min(44px, 6.5vh)' : 'min(50px, 4vh)',
+              height: isMobile ? 'min(2.75rem, 6.5vh)' : 'min(3.125rem, 4vh)',
               padding: viewButtonPadding,
               background: 'var(--color-secondary)',
               color: 'var(--color-white)',
@@ -729,7 +727,6 @@ function TaskCard({
       
       {isMobile && (
         <div style={{
-          width: '100%',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -759,7 +756,7 @@ function TaskCard({
             onClick={onView}
             style={{
               flex: 1,
-              height: 'min(44px, 2.8vh)',
+              height: 'min(2.75rem, 2.8vh)',
               padding: '0.75rem',
               background: 'var(--color-secondary)',
               color: 'var(--color-white)',
@@ -856,10 +853,10 @@ function KanbanView({
               gap: isMobile ? '0.5rem' : '0.75rem',
             }}>
               <div style={{
-                width: 12,
-                height: 12,
+                width: '0.75rem', height: '0.75rem',
                 background: colors.color,
-                borderRadius: 3,
+                borderRadius: '0.1875rem',
+                userSelect: 'none',
               }} aria-hidden="true" />
               <h3 style={{
                 color: 'var(--color-secondary)',
