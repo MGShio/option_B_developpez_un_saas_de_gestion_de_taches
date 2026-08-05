@@ -22,10 +22,12 @@ export default function Register() {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.minHeight = '100vh';
+    document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.margin = '';
       document.body.style.padding = '';
       document.body.style.minHeight = '';
+      document.body.style.overflow = '';
     };
   }, []);
 
@@ -61,14 +63,13 @@ export default function Register() {
   
   // Largeur du card : 90% sur mobile, 45% sur tablette, 39% sur desktop (562px/1440px)
   const cardWidth = isMobile ? '90%' : isTablet ? '45%' : '39%';
-  const padding = isMobile ? '1.5rem' : isTablet ? '2rem' : '8.75rem';
+  const padding = isMobile ? '1.5rem' : isTablet ? '2rem' : 'clamp(1.5rem, 4vw, 4rem)';
   const titleSize = isMobile ? '1.75rem' : '2rem';
   const inputPadding = isMobile ? '0.75rem 1rem' : '0.875rem 1.25rem';
   const logoHeight = isMobile ? '28px' : '36px';
   
-  // Marges pour le logo (55px haut, 202px entre logo et titre sur 1024px)
-  const logoMarginTop = isMobile ? '1.5rem' : isTablet ? '2rem' : `${(55 / 1024) * windowHeight}px`;
-  const logoMarginBottom = isMobile ? '1.5rem' : isTablet ? '2rem' : `${(202 / 1024) * windowHeight}px`;
+  // Marges pour le logo
+  const logoMarginBottom = isMobile ? '1.5rem' : isTablet ? '2rem' : 'clamp(2rem, 8vh, 3rem)';
   
   // Etat pour le hover du bouton
   const isButtonDisabled = isLoading || !password || password !== confirmPassword;
@@ -78,7 +79,7 @@ export default function Register() {
     height: '100vh',
     width: '100%',
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'stretch',
     justifyContent: 'flex-start',
     backgroundImage: `url(${registerBackground})`,
     backgroundSize: 'cover',
@@ -86,31 +87,38 @@ export default function Register() {
     backgroundRepeat: 'no-repeat',
     margin: 0,
     padding: 0,
+    overflow: 'hidden',
+    userSelect: 'none',
   };
 
   const cardStyle: React.CSSProperties = {
     backgroundColor: 'var(--color-white)',
     padding: padding,
-    height: '80.7%',
     boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
     width: cardWidth,
     maxWidth: '562px',
+    display: 'flex',
+    flexDirection: 'column',
+    userSelect: 'none',
   };
 
   const logoContainerStyle: React.CSSProperties = {
     display: 'flex',
     justifyContent: 'center',
-    marginTop: logoMarginTop,
-    marginBottom: logoMarginBottom,
+    marginBottom: '19.73vh',
+    flexShrink: 0,
+    userSelect: 'none',
   };
 
   const titleStyle: React.CSSProperties = {
     fontSize: titleSize,
     fontWeight: '700',
     textAlign: 'center',
-    marginBottom: '2rem',
+    marginBottom: '1.5rem',
     color: 'var(--color-primary)',
     fontFamily: 'var(--font-heading)',
+    flexShrink: 0,
+    userSelect: 'none',
   };
 
   const errorStyle: React.CSSProperties = {
@@ -120,12 +128,22 @@ export default function Register() {
     borderRadius: '0.375rem',
     marginBottom: '1rem',
     fontSize: '0.875rem',
+    flexShrink: 0,
+    userSelect: 'none',
   };
 
   const formStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
     gap: '1.5rem',
+    flex: 1,
+    minHeight: 0,
+    width: 'clamp(280px, 20vw, 282px)',
+    margin: '0 auto',
+    overflowY: 'auto',
+    paddingRight: '0.5rem',
+    alignItems: 'center',
+    userSelect: 'none',
   };
 
   const labelStyle: React.CSSProperties = {
@@ -135,10 +153,11 @@ export default function Register() {
     color: '#374151',
     marginBottom: '0.5rem',
     fontFamily: 'var(--font-body)',
+    userSelect: 'none',
   };
 
   const inputStyle: React.CSSProperties = {
-    width: '100%',
+    width: '85%',
     padding: inputPadding,
     border: '1px solid var(--color-border)',
     borderRadius: '0.375rem',
@@ -146,6 +165,7 @@ export default function Register() {
     fontSize: 'clamp(0.875rem, 2vw, 1rem)',
     fontFamily: 'var(--font-body)',
     transition: 'box-shadow 0.2s ease',
+    boxShadow: 'none',
   };
 
   const inputFocusStyle: React.CSSProperties = {
@@ -158,6 +178,7 @@ export default function Register() {
     color: '#6B7280',
     marginTop: '0.25rem',
     fontFamily: 'var(--font-body)',
+    userSelect: 'none',
   };
 
   const errorHintStyle: React.CSSProperties = {
@@ -165,10 +186,11 @@ export default function Register() {
     color: '#EF4444',
     marginTop: '0.25rem',
     fontFamily: 'var(--font-body)',
+    userSelect: 'none',
   };
 
   const buttonStyle: React.CSSProperties = {
-    width: '100%',
+    width: '80%',
     backgroundColor: 'var(--color-secondary)',
     color: 'var(--color-white)',
     padding: isMobile ? '0.75rem 1rem' : '0.875rem 1.25rem',
@@ -180,6 +202,8 @@ export default function Register() {
     opacity: isButtonDisabled ? 0.7 : 1,
     fontFamily: 'var(--font-body)',
     transition: 'background-color 0.2s ease',
+    flexShrink: 0,
+    userSelect: 'none',
   };
 
   const buttonHoverStyle: React.CSSProperties = {
@@ -188,10 +212,13 @@ export default function Register() {
 
   const footerStyle: React.CSSProperties = {
     textAlign: 'center',
-    marginTop: '1.5rem',
+    marginTop: 'auto',
+    padding: 'clamp(1rem, 4vh, 2rem) 0',
     color: '#4B5563',
     fontSize: 'clamp(0.875rem, 1.8vw, 0.95rem)',
     fontFamily: 'var(--font-body)',
+    flexShrink: 0,
+    userSelect: 'none',
   };
 
   const linkStyle: React.CSSProperties = {
@@ -199,6 +226,8 @@ export default function Register() {
     fontSize: 'clamp(0.875rem, 1.8vw, 0.95rem)',
     textDecoration: 'none',
     fontFamily: 'var(--font-body)',
+    borderBottom: '1px solid var(--color-primary)',
+    userSelect: 'none',
   };
 
   const linkHoverStyle: React.CSSProperties = {
@@ -223,11 +252,11 @@ export default function Register() {
           <img
             src={logoOrange}
             alt="Logo de l'application"
-            style={{ height: logoHeight, width: 'auto' }}
+            style={{ height: logoHeight, width: 'auto', userSelect: 'none' }}
           />
         </div>
         
-        <h1 id="register-title" style={titleStyle}>Creer un compte</h1>
+        <h1 id="register-title" style={titleStyle}>Inscription</h1>
 
         {error && (
           <div 
@@ -255,7 +284,7 @@ export default function Register() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               style={inputStyle}
-              onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
+              onFocus={(e) => Object.assign(e.target.style, { ...inputStyle, ...inputFocusStyle })}
               onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
               aria-required="true"
@@ -266,7 +295,7 @@ export default function Register() {
 
           <div>
             <label htmlFor="email" style={labelStyle}>
-              Adresse email
+              Email
             </label>
             <input
               type="email"
@@ -274,7 +303,7 @@ export default function Register() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={inputStyle}
-              onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
+              onFocus={(e) => Object.assign(e.target.style, { ...inputStyle, ...inputFocusStyle })}
               onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
               aria-required="true"
@@ -294,7 +323,7 @@ export default function Register() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={inputStyle}
-              onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
+              onFocus={(e) => Object.assign(e.target.style, { ...inputStyle, ...inputFocusStyle })}
               onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
               aria-required="true"
@@ -315,7 +344,7 @@ export default function Register() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               style={inputStyle}
-              onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
+              onFocus={(e) => Object.assign(e.target.style, { ...inputStyle, ...inputFocusStyle })}
               onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
               aria-required="true"
@@ -343,7 +372,7 @@ export default function Register() {
         </form>
 
         <p style={footerStyle}>
-          Deja un compte ?{' '}
+          Déjà inscrit ?{' '}
           <Link 
             to="/login" 
             style={linkStyle}

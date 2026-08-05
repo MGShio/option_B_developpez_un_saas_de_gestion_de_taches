@@ -72,6 +72,7 @@ export default function Login() {
     margin: 0,
     padding: 0,
     overflow: 'hidden',
+    userSelect: 'none',
   };
 
   const cardStyle: React.CSSProperties = {
@@ -82,6 +83,7 @@ export default function Login() {
     maxWidth: '562px',
     display: 'flex',
     flexDirection: 'column',
+    userSelect: 'none',
   };
 
   const logoContainerStyle: React.CSSProperties = {
@@ -89,6 +91,7 @@ export default function Login() {
     justifyContent: 'center',
     marginBottom: 'clamp(2rem, 8vh, 3rem)',
     flexShrink: 0,
+    userSelect: 'none',
   };
 
   const titleStyle: React.CSSProperties = {
@@ -100,6 +103,7 @@ export default function Login() {
     color: 'var(--color-primary)',
     fontFamily: 'var(--font-heading)',
     flexShrink: 0,
+    userSelect: 'none',
   };
 
   const errorStyle: React.CSSProperties = {
@@ -110,6 +114,7 @@ export default function Login() {
     marginBottom: '1rem',
     fontSize: '0.875rem',
     flexShrink: 0,
+    userSelect: 'none',
   };
 
   const formStyle: React.CSSProperties = {
@@ -123,6 +128,7 @@ export default function Login() {
     overflowY: 'auto',
     paddingRight: '0.5rem',
     alignItems: 'center',
+    userSelect: 'none',
   };
 
   const labelStyle: React.CSSProperties = {
@@ -132,6 +138,7 @@ export default function Login() {
     color: '#374151',
     marginBottom: '0.5rem',
     fontFamily: 'var(--font-body)',
+    userSelect: 'none',
   };
 
   const inputStyle: React.CSSProperties = {
@@ -143,6 +150,7 @@ export default function Login() {
     fontSize: 'clamp(0.875rem, 2vw, 1rem)',
     fontFamily: 'var(--font-body)',
     transition: 'box-shadow 0.2s ease',
+    boxShadow: 'none',
   };
 
   const inputFocusStyle: React.CSSProperties = {
@@ -152,6 +160,7 @@ export default function Login() {
 
   const forgotPasswordStyle: React.CSSProperties = {
     textAlign: 'center',
+    userSelect: 'none',
   };
 
   const linkStyle: React.CSSProperties = {
@@ -160,6 +169,7 @@ export default function Login() {
     textDecoration: 'none',
     fontFamily: 'var(--font-body)',
     borderBottom: '1px solid var(--color-primary)',
+    userSelect: 'none',
   };
 
   const linkHoverStyle: React.CSSProperties = {
@@ -180,6 +190,7 @@ export default function Login() {
     fontFamily: 'var(--font-body)',
     transition: 'background-color 0.2s ease',
     flexShrink: 0,
+    userSelect: 'none',
   };
 
   const buttonHoverStyle: React.CSSProperties = {
@@ -194,6 +205,7 @@ export default function Login() {
     fontSize: 'clamp(0.875rem, 1.8vw, 0.95rem)',
     fontFamily: 'var(--font-body)',
     flexShrink: 0,
+    userSelect: 'none',
   };
 
   // Focus outline style
@@ -214,7 +226,7 @@ export default function Login() {
           <img
             src={logoOrange}
             alt="Logo de l'application"
-            style={{ height: logoHeight, width: 'auto' }}
+            style={{ height: logoHeight, width: 'auto', userSelect: 'none' }}
           />
         </div>
         
@@ -246,7 +258,7 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={inputStyle}
-              onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
+              onFocus={(e) => Object.assign(e.target.style, { ...inputStyle, ...inputFocusStyle })}
               onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
               aria-required="true"
@@ -266,7 +278,7 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={inputStyle}
-              onFocus={(e) => Object.assign(e.target.style, inputFocusStyle, inputStyle)}
+              onFocus={(e) => Object.assign(e.target.style, { ...inputStyle, ...inputFocusStyle })}
               onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               required
               aria-required="true"
@@ -299,7 +311,7 @@ export default function Login() {
               onBlur={(e) => Object.assign(e.currentTarget.style, linkStyle)}
               aria-label="Mot de passe oublie, cliquez pour reinitialiser"
             >
-              Mot de passe oublie ?
+              Mot de passe oublié ?
             </Link>
           </div>
         </form>
