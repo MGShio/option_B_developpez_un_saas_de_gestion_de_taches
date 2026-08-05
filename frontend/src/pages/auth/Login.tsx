@@ -122,6 +122,7 @@ export default function Login() {
     margin: '0 auto',
     overflowY: 'auto',
     paddingRight: '0.5rem',
+    alignItems: 'center',
   };
 
   const labelStyle: React.CSSProperties = {
@@ -134,7 +135,7 @@ export default function Login() {
   };
 
   const inputStyle: React.CSSProperties = {
-    width: '100%',
+    width: '85%',
     padding: inputPadding,
     border: '1px solid var(--color-border)',
     borderRadius: '0.375rem',
@@ -158,6 +159,7 @@ export default function Login() {
     fontSize: 'clamp(0.875rem, 1.8vw, 0.95rem)',
     textDecoration: 'none',
     fontFamily: 'var(--font-body)',
+    borderBottom: '1px solid var(--color-primary)',
   };
 
   const linkHoverStyle: React.CSSProperties = {
@@ -165,7 +167,7 @@ export default function Login() {
   };
 
   const buttonStyle: React.CSSProperties = {
-    width: '100%',
+    width: '80%',
     backgroundColor: 'var(--color-secondary)',
     color: 'var(--color-white)',
     padding: isMobile ? '0.75rem 1rem' : '0.875rem 1.25rem',
