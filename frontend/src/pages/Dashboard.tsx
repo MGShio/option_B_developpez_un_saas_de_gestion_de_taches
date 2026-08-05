@@ -17,8 +17,8 @@ const statusColors: Record<string, { bg: string; color: string; border: string }
 const Separator = () => (
   <div 
     style={{ 
-      width: 1, 
-      height: 12, 
+      width: '0.0625rem', 
+      height: '0.75rem', 
       background: '#9CA3AF', 
       transform: 'rotate(90deg)' 
     }}
@@ -29,22 +29,22 @@ const Separator = () => (
 
 // Composant SearchIcon
 const SearchIcon = ({ color = '#6B7280' }: { color?: string }) => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="7" cy="7" r="6" stroke={color} strokeWidth="1" fill="none" />
-    <path d="M10 10L13 13" stroke={color} strokeWidth="1" strokeLinecap="round" />
+  <svg width="0.875rem" height="0.875rem" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="7" cy="7" r="6" stroke={color} strokeWidth="0.0625rem" fill="none" />
+    <path d="M10 10L13 13" stroke={color} strokeWidth="0.0625rem" strokeLinecap="round" />
   </svg>
 );
 
 // Icônes pour les vues
 const ListIcon = ({ active }: { active: boolean }) => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="16" height="16" fill={active ? '#D3590B' : '#6B7280'} />
+  <svg width="1rem" height="1rem" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1rem" height="1rem" fill={active ? '#D3590B' : '#6B7280'} />
   </svg>
 );
 
 const ListIconSmall = ({ active }: { active: boolean }) => (
-  <svg width="9.71" height="8" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="9.71" height="8" fill={active ? '#D3590B' : '#6B7280'} />
+  <svg width="0.625rem" height="0.5rem" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="0.625rem" height="0.5rem" fill={active ? '#D3590B' : '#6B7280'} />
   </svg>
 );
 
@@ -76,9 +76,9 @@ export default function Dashboard() {
   const isTablet = windowWidth <= 1024;
   
   // Tailles adaptatives
-  const welcomeSectionWidth = isMobile ? '100%' : isTablet ? '70%' : '530px';
+  const welcomeSectionWidth = isMobile ? '100%' : isTablet ? '70%' : '36vw';
   const mainContainerWidth = isMobile ? '100%' : isTablet ? '95%' : '85%';
-  const maxContentWidth = isMobile ? '100%' : '1200px';
+  const maxContentWidth = isMobile ? '100%' : '82vw';
   const titleSize = isMobile ? '1.5rem' : '1.75rem';
   const subtitleSize = isMobile ? '1rem' : '1.125rem';
   const sectionTitleSize = isMobile ? '1.125rem' : '1.25rem';
@@ -88,7 +88,7 @@ export default function Dashboard() {
   const metaTextSize = isMobile ? '0.75rem' : '0.8125rem';
   const statusBadgeSize = isMobile ? '0.75rem' : '0.875rem';
   const buttonFontSize = isMobile ? '0.875rem' : '1rem';
-  const inputHeight = isMobile ? '44px' : '53px';
+  const inputHeight = isMobile ? 'min(44px, 6.5vh)' : 'min(53px, 4vh)';
   const containerPadding = isMobile ? '1rem' : isTablet ? '1.5rem' : '2.5rem';
 
   // Récupérer les données
@@ -186,35 +186,101 @@ export default function Dashboard() {
 
   // Focus outline style pour l'accessibilite
   const focusOutlineStyle: React.CSSProperties = {
-    outline: '2px solid var(--color-primary)',
-    outlineOffset: '2px',
+    outline: '0.125rem solid var(--color-primary)',
+    outlineOffset: '0.125rem',
   };
 
   return (
     <div style={{ width: '100%' }}>
       {/* Welcome Section */}
       <div style={{
-        width: welcomeSectionWidth,
+        width: '100%',
         maxWidth: maxContentWidth,
-        marginBottom: isMobile ? '2rem' : '5rem',
+        marginBottom: isMobile ? '2rem' : 'clamp(3rem, 8vh, 5rem)',
+        display: 'flex',
+        alignItems: isMobile ? 'flex-start' : 'center',
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: isMobile ? '1.5rem' : '2vw',
+        justifyContent: 'space-between',
       }}>
-        <h1 style={{
-          color: 'var(--color-secondary)',
-          fontSize: titleSize,
-          fontFamily: 'var(--font-heading)',
-          fontWeight: '600',
-          marginBottom: isMobile ? '0.75rem' : '0.875rem',
-        }}>
-          Tableau de bord
-        </h1>
-        <p style={{
-          color: 'var(--color-black)',
-          fontSize: subtitleSize,
-          fontFamily: 'var(--font-body)',
-          fontWeight: '400',
-        }}>
-          Bonjour {user?.name}, voici un aperçu de vos projets et tâches
-        </p>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <h1 style={{
+            color: 'var(--color-secondary)',
+            fontSize: titleSize,
+            fontFamily: 'var(--font-heading)',
+            fontWeight: '600',
+            marginBottom: isMobile ? '0.75rem' : '0',
+          }}>
+            Tableau de bord
+          </h1>
+          <p style={{
+            color: 'var(--color-black)',
+            fontSize: subtitleSize,
+            fontFamily: 'var(--font-body)',
+            fontWeight: '400',
+          }}>
+            Bonjour {user?.name}, voici un aperçu de vos projets et tâches
+          </p>
+        </div>
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          style={{
+            height: isMobile ? 'min(48px, 6.5vh)' : 'min(50px, 4vh)',
+            paddingTop: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
+            paddingBottom: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
+            paddingLeft: isMobile ? '1.5rem' : 'clamp(2rem, 5vw, 4.625rem)',
+            paddingRight: isMobile ? '1.5rem' : 'clamp(2rem, 5vw, 4.625rem)',
+            background: 'var(--color-secondary)',
+            color: 'var(--color-white)',
+            border: 'none',
+            borderRadius: '0.625rem',
+            fontSize: buttonFontSize,
+            fontFamily: 'var(--font-body)',
+            fontWeight: '400',
+            cursor: 'pointer',
+            transition: 'background-color 0.2s ease',
+            whiteSpace: 'nowrap',
+          }}
+          onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, {
+            height: isMobile ? 'min(48px, 6.5vh)' : 'min(50px, 4vh)',
+            paddingTop: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
+            paddingBottom: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
+            paddingLeft: isMobile ? '1.5rem' : 'clamp(2rem, 5vw, 4.625rem)',
+            paddingRight: isMobile ? '1.5rem' : 'clamp(2rem, 5vw, 4.625rem)',
+            background: 'var(--color-secondary)',
+            color: 'var(--color-white)',
+            border: 'none',
+            borderRadius: '0.625rem',
+            fontSize: buttonFontSize,
+            fontFamily: 'var(--font-body)',
+            fontWeight: '400',
+            cursor: 'pointer',
+            transition: 'background-color 0.2s ease',
+            whiteSpace: 'nowrap',
+            outline: '0.125rem solid var(--color-primary)',
+            outlineOffset: '0.125rem',
+          })}
+          onBlur={(e) => Object.assign(e.currentTarget.style, {
+            height: isMobile ? 'min(48px, 6.5vh)' : 'min(50px, 4vh)',
+            paddingTop: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
+            paddingBottom: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
+            paddingLeft: isMobile ? '1.5rem' : 'clamp(2rem, 5vw, 4.625rem)',
+            paddingRight: isMobile ? '1.5rem' : 'clamp(2rem, 5vw, 4.625rem)',
+            background: 'var(--color-secondary)',
+            color: 'var(--color-white)',
+            border: 'none',
+            borderRadius: '0.625rem',
+            fontSize: buttonFontSize,
+            fontFamily: 'var(--font-body)',
+            fontWeight: '400',
+            cursor: 'pointer',
+            transition: 'background-color 0.2s ease',
+            whiteSpace: 'nowrap',
+          })}
+          aria-label="Créer un nouveau projet"
+        >
+          + Créer un projet
+        </button>
       </div>
 
       {/* View Toggle */}
@@ -229,7 +295,7 @@ export default function Dashboard() {
           style={{
             padding: isMobile ? '0.75rem 1rem' : '0.875rem 1rem',
             background: activeView === 'list' ? '#FFE8D9' : 'white',
-            border: activeView === 'list' ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
+            border: activeView === 'list' ? '0.0625rem solid var(--color-primary)' : '0.0625rem solid var(--color-border)',
             borderRadius: '0.5rem',
             cursor: 'pointer',
             display: 'flex',
@@ -242,11 +308,11 @@ export default function Dashboard() {
           }}
           onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, {
             background: activeView === 'list' ? '#FFE8D9' : 'white',
-            border: activeView === 'list' ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
+            border: activeView === 'list' ? '0.0625rem solid var(--color-primary)' : '0.0625rem solid var(--color-border)',
           })}
           onBlur={(e) => Object.assign(e.currentTarget.style, {
             background: activeView === 'list' ? '#FFE8D9' : 'white',
-            border: activeView === 'list' ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
+            border: activeView === 'list' ? '0.0625rem solid var(--color-primary)' : '0.0625rem solid var(--color-border)',
           })}
           aria-pressed={activeView === 'list'}
           aria-label="Vue Liste"
@@ -264,7 +330,7 @@ export default function Dashboard() {
           style={{
             padding: isMobile ? '0.75rem 1rem' : '0.875rem 1rem',
             background: activeView === 'kanban' ? '#FFE8D9' : 'white',
-            border: activeView === 'kanban' ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
+            border: activeView === 'kanban' ? '0.0625rem solid var(--color-primary)' : '0.0625rem solid var(--color-border)',
             borderRadius: '0.5rem',
             cursor: 'pointer',
             display: 'flex',
@@ -277,11 +343,11 @@ export default function Dashboard() {
           }}
           onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, {
             background: activeView === 'kanban' ? '#FFE8D9' : 'white',
-            border: activeView === 'kanban' ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
+            border: activeView === 'kanban' ? '0.0625rem solid var(--color-primary)' : '0.0625rem solid var(--color-border)',
           })}
           onBlur={(e) => Object.assign(e.currentTarget.style, {
             background: activeView === 'kanban' ? '#FFE8D9' : 'white',
-            border: activeView === 'kanban' ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
+            border: activeView === 'kanban' ? '0.0625rem solid var(--color-primary)' : '0.0625rem solid var(--color-border)',
           })}
           aria-pressed={activeView === 'kanban'}
           aria-label="Vue Kanban"
@@ -297,7 +363,7 @@ export default function Dashboard() {
       {isLoading ? (
         <div style={{
           textAlign: 'center', 
-          padding: isMobile ? '2rem' : '4rem', 
+          padding: isMobile ? '2rem' : 'clamp(2rem, 8vh, 4rem)', 
           color: '#6B7280',
           fontSize: isMobile ? '0.875rem' : '1rem',
         }} aria-live="polite">
@@ -306,7 +372,7 @@ export default function Dashboard() {
       ) : error ? (
         <div style={{ 
           textAlign: 'center', 
-          padding: isMobile ? '2rem' : '4rem', 
+          padding: isMobile ? '2rem' : 'clamp(2rem, 8vh, 4rem)', 
           color: '#EF4444',
           background: '#FEE2E2',
           borderRadius: '0.625rem',
@@ -321,7 +387,7 @@ export default function Dashboard() {
               color: 'white',
               border: 'none',
               borderRadius: '0.25rem',
-              padding: isMobile ? '0.5rem 1rem' : '0.5rem 1.5rem',
+              paddingTop: isMobile ? '0.5rem' : '0.5rem', paddingBottom: isMobile ? '0.5rem' : '0.5rem', paddingLeft: isMobile ? '1rem' : 'clamp(1rem, 2vw, 1.5rem)', paddingRight: isMobile ? '1rem' : 'clamp(1rem, 2vw, 1.5rem)',
               cursor: 'pointer',
               fontSize: isMobile ? '0.75rem' : '0.875rem',
             }}
@@ -344,7 +410,7 @@ export default function Dashboard() {
           maxWidth: maxContentWidth,
           background: 'white',
           borderRadius: '0.625rem',
-          border: '1px solid var(--color-border)',
+          border: '0.0625rem solid var(--color-border)',
           padding: containerPadding,
           display: 'flex',
           flexDirection: 'column',
@@ -356,7 +422,6 @@ export default function Dashboard() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'flex-start',
-            width: '100%',
             flexDirection: isMobile ? 'column' : 'row',
             gap: isMobile ? '1.5rem' : '0',
           }}>
@@ -385,12 +450,12 @@ export default function Dashboard() {
 
             {/* Search Bar */}
             <div style={{
-              width: isMobile ? '100%' : '357px',
+              width: isMobile ? '100%' : 'min(357px, 25vw)',
               maxWidth: '100%',
-              padding: isMobile ? '0.75rem 1rem' : '1.4375rem 2rem',
+              paddingTop: isMobile ? '0.75rem' : 'clamp(1rem, 2vw, 1.4375rem)', paddingBottom: isMobile ? '0.75rem' : 'clamp(1rem, 2vw, 1.4375rem)', paddingLeft: isMobile ? '1rem' : 'clamp(1.5rem, 3vw, 2rem)', paddingRight: isMobile ? '1rem' : 'clamp(1.5rem, 3vw, 2rem)',
               background: 'white',
               borderRadius: '0.5rem',
-              border: '1px solid var(--color-border)',
+              border: '0.0625rem solid var(--color-border)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -427,7 +492,7 @@ export default function Dashboard() {
             {tasks.length === 0 ? (
               <div style={{
                 textAlign: 'center', 
-                padding: isMobile ? '2rem' : '4rem',
+                padding: isMobile ? '2rem' : 'clamp(2rem, 8vh, 4rem)',
                 color: '#6B7280',
                 fontSize: isMobile ? '0.875rem' : '1rem',
               }} aria-live="polite">
@@ -449,42 +514,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Create Project Button */}
-      <button 
-        onClick={() => setIsCreateModalOpen(true)}
-        style={{
-          position: 'fixed' as const,
-          height: isMobile ? '48px' : '50px',
-          padding: isMobile ? '0.75rem 1.5rem' : '0.8125rem 4.625rem',
-          background: 'var(--color-secondary)',
-          color: 'var(--color-white)',
-          border: 'none',
-          borderRadius: '0.625rem',
-          fontSize: buttonFontSize,
-          fontFamily: 'var(--font-body)',
-          fontWeight: '400',
-          cursor: 'pointer',
-          zIndex: 50,
-          transition: 'background-color 0.2s ease',
-          bottom: isMobile ? '80px' : '100px',
-          left: isMobile ? '50%' : undefined,
-          right: isMobile ? undefined : (isTablet ? '2rem' : '6.25rem'),
-          transform: isMobile ? 'translateX(-50%)' : undefined,
-          width: isMobile ? '90%' : 'auto',
-          maxWidth: isMobile ? '300px' : undefined,
-        }}
-        onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, {
-          background: 'var(--color-secondary)',
-          color: 'var(--color-white)',
-        })}
-        onBlur={(e) => Object.assign(e.currentTarget.style, {
-          background: 'var(--color-secondary)',
-          color: 'var(--color-white)',
-        })}
-        aria-label="Créer un nouveau projet"
-      >
-        + Créer un projet
-      </button>
+
 
       {/* Modale de création de projet */}
       {isCreateModalOpen && (
@@ -521,20 +551,19 @@ function TaskCard({
   // Tailles adaptatives pour la carte
   const cardPaddingX = isMobile ? '1rem' : isTablet ? '1.5rem' : '2.5rem';
   const cardPaddingY = isMobile ? '1rem' : isTablet ? '1.25rem' : '1.5625rem';
-  const titleWidth = isMobile ? '100%' : '153px';
+  const titleWidth = isMobile ? '100%' : 'min(153px, 12vw)';
   const metaGap = isMobile ? '0.75rem' : '0.9375rem';
   const statusButtonPadding = isMobile ? '0.25rem 0.75rem' : '0.25rem 1rem';
   const statusButtonFontSize = isMobile ? '0.75rem' : '0.875rem';
-  const viewButtonWidth = isMobile ? '100%' : '121px';
+  const viewButtonWidth = isMobile ? '100%' : 'min(121px, 9vw)';
   const viewButtonPadding = isMobile ? '0.75rem' : '0.8125rem 0';
 
   return (
     <div style={{
-      width: '100%',
       padding: `${cardPaddingY} ${cardPaddingX}`,
       background: 'white',
       borderRadius: '0.625rem',
-      border: '1px solid var(--color-border)',
+      border: '0.0625rem solid var(--color-border)',
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
@@ -545,7 +574,6 @@ function TaskCard({
         display: 'flex',
         flexDirection: 'column',
         gap: isMobile ? '0.75rem' : '2rem',
-        width: isMobile ? '100%' : 'auto',
       }}>
         <div style={{
           display: 'flex',
@@ -601,7 +629,7 @@ function TaskCard({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            width: isMobile ? '100%' : '62px',
+            width: isMobile ? '100%' : 'min(62px, 5vw)',
           }}>
             <span style={{
               color: '#6B7280',
@@ -652,8 +680,8 @@ function TaskCard({
           <div style={{
             padding: statusButtonPadding,
             background: colors.bg,
-            border: `1px solid ${colors.border}`,
-            borderRadius: '9999px',
+            border: `0.0625rem solid ${colors.border}`,
+            borderRadius: '6.25rem',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
@@ -672,7 +700,7 @@ function TaskCard({
             onClick={onView}
             style={{
               width: '100%',
-              height: isMobile ? '44px' : '50px',
+              height: isMobile ? 'min(44px, 6.5vh)' : 'min(50px, 4vh)',
               padding: viewButtonPadding,
               background: 'var(--color-secondary)',
               color: 'var(--color-white)',
@@ -703,8 +731,8 @@ function TaskCard({
           <div style={{
             padding: statusButtonPadding,
             background: colors.bg,
-            border: `1px solid ${colors.border}`,
-            borderRadius: '9999px',
+            border: `0.0625rem solid ${colors.border}`,
+            borderRadius: '6.25rem',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
@@ -723,7 +751,7 @@ function TaskCard({
             onClick={onView}
             style={{
               flex: 1,
-              height: '44px',
+              height: 'min(44px, 2.8vh)',
               padding: '0.75rem',
               background: 'var(--color-secondary)',
               color: 'var(--color-white)',
@@ -773,7 +801,7 @@ function KanbanView({
   });
 
   // Tailles adaptatives pour Kanban
-  const columnMinWidth = isMobile ? '280px' : isTablet ? '300px' : '350px';
+  const columnMinWidth = isMobile ? '80vw' : isTablet ? '30vw' : '24vw';
   const columnPadding = isMobile ? '1rem' : isTablet ? '1.25rem' : '1.5rem';
   const statusIndicatorSize = isMobile ? '0.75rem' : '0.875rem';
   const statusTitleSize = isMobile ? '1rem' : '1.125rem';
@@ -792,7 +820,7 @@ function KanbanView({
       paddingBottom: isMobile ? '1rem' : '1.25rem',
       paddingLeft: isMobile ? '0' : '2rem',
       margin: isMobile ? '0' : '0 auto',
-      maxWidth: isMobile ? '100%' : '1200px',
+      maxWidth: isMobile ? '100%' : '82vw',
     }} role="region" aria-label="Vue Kanban des tâches">
       {(['À faire', 'En cours', 'Terminé'] as const).map((status) => {
         const colors = statusColors[status];
@@ -806,7 +834,7 @@ function KanbanView({
               maxWidth: isMobile ? '100%' : columnMinWidth,
               background: 'white',
               borderRadius: '0.75rem',
-              border: '1px solid var(--color-border)',
+              border: '0.0625rem solid var(--color-border)',
               padding: columnPadding,
               display: 'flex',
               flexDirection: 'column',
@@ -868,7 +896,7 @@ function KanbanView({
                       padding: cardPadding,
                       background: '#F9FAFB',
                       borderRadius: '0.5rem',
-                      border: '1px solid var(--color-border)',
+                      border: '0.0625rem solid var(--color-border)',
                       cursor: 'pointer',
                       transition: 'background 0.2s',
                     }}
