@@ -22,7 +22,7 @@ const statusColors: Record<string, { bg: string; color: string; border: string }
 // Composant Separator réutilisable
 const Separator = () => (
   <div 
-    style={{ 
+    style={{
       width: '0.0625rem', 
       height: '0.75rem', 
       background: '#9CA3AF', 
@@ -396,7 +396,7 @@ export default function Dashboard() {
           Chargement des données...
         </div>
       ) : error ? (
-        <div style={{ 
+        <div style={{
           textAlign: 'center', 
           padding: isMobile ? '2rem' : 'clamp(2rem, 8vh, 4rem)', 
           color: '#EF4444',
@@ -446,7 +446,7 @@ export default function Dashboard() {
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'flex-start',
+            alignItems: 'center',
             flexDirection: isMobile ? 'column' : 'row',
             gap: isMobile ? '1.5rem' : '0',
           }}>
@@ -526,9 +526,9 @@ export default function Dashboard() {
                   key={task.id} 
                   task={task} 
                   projectName={getProjectName(task.projectId)} 
-                  onView={() => navigate(`/projects/${task.projectId}`)}
-                  isMobile={isMobile}
-                  isTablet={isTablet}
+                  onView={() => navigate(`/projects/${task.projectId}`)} 
+                  isMobile={isMobile} 
+                  isTablet={isTablet} 
                 />
               ))
             )}
@@ -559,15 +559,15 @@ function TaskCard({
   task, 
   projectName, 
   onView, 
-  isMobile,
+  isMobile, 
   isTablet
 }: { 
   task: Task; 
   projectName: string; 
-  onView: () => void;
-  isMobile: boolean;
-  isTablet: boolean;
-}) {
+  onView: () => void; 
+  isMobile: boolean; 
+  isTablet: boolean; 
+}) { 
   const colors = statusColors[task.status] || { bg: '#E5E7EB', color: '#6B7280', border: '#9CA3AF' };
   
   // Tailles adaptatives pour la carte
@@ -651,7 +651,7 @@ function TaskCard({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            width: isMobile ? '100%' : 'min(3.875rem, 5vw)',
+            width: isMobile ? '100%' : 'auto',
           }}>
             <CalendarIconGrey />
             <span style={{
@@ -659,6 +659,7 @@ function TaskCard({
               fontSize: isMobile ? '0.75rem' : '0.8125rem',
               fontFamily: 'var(--font-body)',
               fontWeight: '400',
+              marginLeft: '0.5rem',
             }}>
               {new Date(task.dueDate).toLocaleDateString('fr-FR', {
                 day: 'numeric',
@@ -675,12 +676,6 @@ function TaskCard({
             gap: '0.5rem',
           }}>
             <TextBubbleGrey />
-            <div style={{
-              width: '0.9375rem', height: '0.9375rem',
-              background: '#6B7280',
-              borderRadius: '50%',
-              userSelect: 'none',
-            }} aria-hidden="true" />
             <span style={{
               color: '#6B7280',
               fontSize: isMobile ? '0.75rem' : '0.8125rem',
@@ -800,14 +795,14 @@ function TaskCard({
 function KanbanView({ 
   tasks, 
   getProjectName, 
-  isMobile,
+  isMobile, 
   isTablet
 }: { 
-  tasks: Task[];
-  getProjectName: (projectId: number) => string;
-  isMobile: boolean;
-  isTablet: boolean;
-}) {
+  tasks: Task[]; 
+  getProjectName: (projectId: number) => string; 
+  isMobile: boolean; 
+  isTablet: boolean; 
+}) { 
   const navigate = useNavigate();
   
   // Regrouper les tâches par statut
@@ -829,10 +824,18 @@ function KanbanView({
   const statusIndicatorSize = isMobile ? '0.75rem' : '0.875rem';
   const statusTitleSize = isMobile ? '1rem' : '1.125rem';
   const countSize = isMobile ? '0.75rem' : '0.8125rem';
-  const cardPadding = isMobile ? '1rem' : isTablet ? '1.25rem' : '1.5rem';
-  const cardTitleSize = isMobile ? '0.875rem' : '0.9375rem';
-  const cardDescriptionSize = isMobile ? '0.75rem' : '0.8125rem';
-  const cardMetaSize = isMobile ? '0.625rem' : '0.75rem';
+
+  // Tailles adaptatives pour les cartes Kanban
+  const kanbanCardPaddingX = isMobile ? '1.5rem' : isTablet ? '2rem' : '2.5rem';
+  const kanbanCardPaddingY = isMobile ? '1rem' : isTablet ? '1.25rem' : '1.5625rem';
+  const kanbanCardGap = isMobile ? '1.25rem' : '2rem';
+  const kanbanHeaderGap = isMobile ? '0.5rem' : '2rem';
+  const kanbanTitleSize = isMobile ? '1rem' : '1.125rem';
+  const kanbanDescriptionSize = isMobile ? '0.875rem' : '0.9375rem';
+  const kanbanMetaSize = isMobile ? '0.75rem' : '0.8125rem';
+  const kanbanMetaGap = isMobile ? '0.5rem' : '0.9375rem';
+  const kanbanStatusPadding = isMobile ? '0.25rem 0.75rem' : '0.25rem 1rem';
+  const kanbanStatusFontSize = isMobile ? '0.75rem' : '0.875rem';
 
   return (
     <div style={{
@@ -912,74 +915,163 @@ function KanbanView({
                   Aucune tâche
                 </div>
               ) : (
-                statusTasks.map((task) => (
-                  <div 
-                    key={task.id}
-                    style={{
-                      padding: cardPadding,
-                      background: '#F9FAFB',
-                      borderRadius: '0.5rem',
-                      border: '0.0625rem solid var(--color-border)',
-                      cursor: 'pointer',
-                      transition: 'background 0.2s',
-                    }}
-                    onClick={() => navigate(`/projects/${task.projectId}`)}
-                    role="article"
-                    aria-label={`Tâche : ${task.title}, statut : ${task.status}`}
-                    tabIndex={0}
-                    onKeyPress={(e) => { if (e.key === 'Enter') navigate(`/projects/${task.projectId}`); }}
-                  >
-                    <div style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: isMobile ? '0.5rem' : '0.75rem',
-                    }}>
-                      <h4 style={{
-                        color: 'var(--color-secondary)',
-                        fontSize: cardTitleSize,
-                        fontFamily: 'var(--font-heading)',
-                        fontWeight: '600',
+                statusTasks.map((task) => {
+                  const taskColors = statusColors[task.status];
+                  
+                  return (
+                    <div 
+                      key={task.id}
+                      style={{
+                        padding: `${kanbanCardPaddingY} ${kanbanCardPaddingX}`,
+                        background: 'white',
+                        borderRadius: '0.625rem',
+                        border: '0.0625rem solid #E5E7EB',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: kanbanCardGap,
+                      }}
+                      role="article"
+                      aria-label={`Tâche : ${task.title}, statut : ${task.status}`}
+                    >
+                      {/* En-tête avec titre et statut */}
+                      <div style={{
+                        alignSelf: 'stretch',
+                        justifyContent: 'space-between',
+                        display: 'inline-flex',
                       }}>
-                        {task.title}
-                      </h4>
+                        <h4 style={{
+                          color: 'var(--color-black)',
+                          fontSize: kanbanTitleSize,
+                          fontFamily: 'var(--font-heading)',
+                          fontWeight: '600',
+                        }}>
+                          {task.title}
+                        </h4>
+                        <div style={{
+                          padding: kanbanStatusPadding,
+                          background: taskColors.bg,
+                          border: `0.0625rem solid ${taskColors.border}`,
+                          borderRadius: '6.25rem',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          display: 'flex',
+                        }}>
+                          <span style={{
+                            color: taskColors.color,
+                            fontSize: kanbanStatusFontSize,
+                            fontFamily: 'var(--font-body)',
+                            fontWeight: '400',
+                          }}>
+                            {task.status}
+                          </span>
+                        </div>
+                      </div>
                       <p style={{
                         color: '#6B7280',
-                        fontSize: cardDescriptionSize,
+                        fontSize: kanbanDescriptionSize,
                         fontFamily: 'var(--font-body)',
                         fontWeight: '400',
                       }}>
                         {task.description || 'Aucune description'}
                       </p>
                       <div style={{
-                        display: 'flex',
+                        justifyContent: 'flex-start',
                         alignItems: 'center',
-                        gap: isMobile ? '0.5rem' : '0.75rem',
+                        gap: kanbanMetaGap,
+                        display: 'inline-flex',
                         flexWrap: 'wrap',
-                        marginTop: isMobile ? '0.5rem' : '0.75rem',
                       }}>
-                        <span style={{
-                          fontSize: cardMetaSize,
-                          color: '#9CA3AF',
-                          background: '#E5E7EB',
-                          padding: '0.25rem 0.5rem',
-                          borderRadius: '0.25rem',
-                          fontFamily: 'var(--font-body)',
-                          fontWeight: '400',
+                        <div style={{
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          display: 'flex',
                         }}>
-                          {getProjectName(task.projectId)}
-                        </span>
-                        <span style={{
-                          fontSize: cardMetaSize,
-                          color: '#9CA3AF',
-                          fontFamily: 'var(--font-body)',
-                          fontWeight: '400',
+                          <FolderIconGrey />
+                          <span style={{
+                            color: '#6B7280',
+                            fontSize: kanbanMetaSize,
+                            fontFamily: 'var(--font-body)',
+                            fontWeight: '400',
+                          }}>
+                            {getProjectName(task.projectId)}
+                          </span>
+                        </div>
+
+                        <Separator />
+
+                        <div style={{
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          display: 'flex',
                         }}>
-                          {new Date(task.dueDate).toLocaleDateString('fr-FR')}
-                        </span>
+                          <CalendarIconGrey />
+                          <span style={{
+                            color: '#6B7280',
+                            fontSize: kanbanMetaSize,
+                            fontFamily: 'var(--font-body)',
+                            fontWeight: '400',
+                            marginLeft: '0.5rem',
+                          }}>
+                            {new Date(task.dueDate).toLocaleDateString('fr-FR', {
+                              day: 'numeric',
+                              month: 'short',
+                            })}
+                          </span>
+                        </div>
+
+                        <Separator />
+
+                        <div style={{
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          display: 'flex',
+                        }}>
+                          <TextBubbleGrey />
+                          <span style={{
+                            color: '#6B7280',
+                            fontSize: kanbanMetaSize,
+                            fontFamily: 'var(--font-body)',
+                            fontWeight: '400',
+                          }}>
+                            {task.assignees?.length || 0}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Bouton Voir - toujours en dessous des métadonnées */}
+                      <div style={{
+                        alignSelf: 'flex-start',
+                        marginTop: isMobile ? '0.75rem' : '0',
+                      }}>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/projects/${task.projectId}`);
+                          }}
+                          style={{
+                            width: isMobile ? '100%' : 'min(7.5625rem, 9vw)',
+                            height: isMobile ? 'min(2.75rem, 6.5vh)' : 'min(3.125rem, 4vh)',
+                            padding: isMobile ? '0.75rem' : '0.8125rem',
+                            background: 'var(--color-secondary)',
+                            color: 'var(--color-white)',
+                            border: 'none',
+                            borderRadius: '0.625rem',
+                            fontSize: isMobile ? '0.875rem' : '1rem',
+                            fontFamily: 'var(--font-body)',
+                            fontWeight: '400',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.2s ease',
+                          }}
+                          aria-label={`Voir le projet : ${getProjectName(task.projectId)}`}
+                        >
+                          Voir
+                        </button>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
@@ -988,3 +1080,4 @@ function KanbanView({
     </div>
   );
 }
+
