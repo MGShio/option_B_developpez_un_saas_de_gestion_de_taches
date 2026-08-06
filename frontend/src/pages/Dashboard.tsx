@@ -938,6 +938,7 @@ function KanbanView({
                         alignSelf: 'stretch',
                         justifyContent: 'space-between',
                         display: 'inline-flex',
+                        alignItems: 'center',
                       }}>
                         <h4 style={{
                           color: 'var(--color-black)',
@@ -955,6 +956,7 @@ function KanbanView({
                           justifyContent: 'center',
                           alignItems: 'center',
                           display: 'flex',
+                          height: 'fit-content',
                         }}>
                           <span style={{
                             color: taskColors.color,
@@ -1080,4 +1082,3 @@ function KanbanView({
     </div>
   );
 }
-
