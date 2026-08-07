@@ -71,7 +71,14 @@ export default function ProjectDetail() {
   
   const [project, setProject] = useState<Project | null>(null);
 
-  // Vérifier si l'utilisateur actuel est le propriétaire du projet
+  // Vérifier si l'utilisateur a accès au projet (propriétaire ou membre de l'équipe)
+  const hasAccess = project ? 
+    user?.id === project.ownerId || 
+    user?.id === project.owner?.id ||
+    project.members?.some(m => m.user.id === user?.id) 
+    : false;
+  
+  // Vérifier si l'utilisateur est le propriétaire du projet
   const isOwner = user?.id === project?.ownerId;
   const [tasks, setTasks] = useState<Task[]>([]);
   const [activeView, setActiveView] = useState<'list' | 'calendar'>('list');
@@ -85,8 +92,8 @@ export default function ProjectDetail() {
   const [isAITaskModalOpen, setIsAITaskModalOpen] = useState(false);
   const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
   const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState<{ id: number; title: string; description: string; dueDate: string; assigneeIds: string[]; status: 'À faire' | 'En cours' | 'Terminé' } | null>(null);
-  const [editingProject, setEditingProject] = useState<{ id: number; name: string; description: string; contributorIds: number[] } | null>(null);
+  const [editingTask, setEditingTask] = useState<{ id: string; title: string; description: string; dueDate: string; assigneeIds: string[]; status: 'À faire' | 'En cours' | 'Terminé' } | null>(null);
+  const [editingProject, setEditingProject] = useState<{ id: string; name: string; description: string; contributorIds: string[] } | null>(null);
   const [newTask, setNewTask] = useState<Omit<CreateTaskData, 'projectId'>>({
     title: '',
     description: '',
@@ -142,16 +149,41 @@ export default function ProjectDetail() {
       }
       
       // Récupérer le projet
-      const projectData = await getProjectById(token, parseInt(id));
+      const projectData = await getProjectById(token, id);
       setProject(projectData);
       
+      // Vérifier si l'utilisateur a accès au projet
+      const userHasAccess = user?.id === projectData.ownerId || 
+        user?.id === projectData.owner?.id ||
+        projectData.members?.some(m => m.user.id === user?.id);
+      
+      console.log('Debug access:', {
+        userId: user?.id,
+        projectOwnerId: projectData.ownerId,
+        projectOwnerUserId: projectData.owner?.id,
+        members: projectData.members?.map(m => m.user.id),
+        hasAccess: userHasAccess
+      });
+      
+      if (!userHasAccess) {
+        setError('Accès refusé: vous devez être propriétaire ou membre de ce projet');
+        navigate('/projects');
+        return;
+      }
+      
       // Récupérer les tâches du projet
-      const tasksData = await getProjectTasks(token, parseInt(id));
+      const tasksData = await getProjectTasks(token, id);
       setTasks(tasksData);
       
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors du chargement du projet');
+      const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement du projet';
+      if (errorMessage.includes('Accès refusé')) {
+        setError('Accès refusé: vous devez être propriétaire ou membre de ce projet pour y accéder.');
+      } else {
+        setError(errorMessage);
+      }
       console.error('Erreur:', err);
+      console.error('User ID:', user?.id, 'Project ownerId:', project?.ownerId);
     } finally {
       setIsLoading(false);
     }
@@ -1814,3 +1846,4 @@ function CreateTaskModal({
     </div>
   );
 }
+

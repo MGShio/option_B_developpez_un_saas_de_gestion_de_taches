@@ -1,17 +1,5 @@
 const API_BASE_URL = 'http://localhost:8000';
 
-// Helper to convert backend string ID to frontend number ID
-function convertBackendIdToNumber(backendId: string): number {
-  const num = parseInt(backendId, 10);
-  if (!isNaN(num)) return num;
-  let hash = 0;
-  for (let i = 0; i < backendId.length; i++) {
-    hash = (hash << 5) - hash + backendId.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
-
 // Backend response types
 interface BackendUser {
   id: string;
@@ -42,27 +30,27 @@ interface BackendProject {
 // Convert backend project to frontend project
 export function formatProjectFromBackend(backendProject: BackendProject): Project {
   return {
-    id: convertBackendIdToNumber(backendProject.id),
+    id: backendProject.id,
     name: backendProject.name,
     description: backendProject.description || '',
-    ownerId: convertBackendIdToNumber(backendProject.ownerId),
+    ownerId: backendProject.ownerId,
     owner: backendProject.owner ? {
-      id: convertBackendIdToNumber(backendProject.owner.id),
+      id: backendProject.owner.id,
       email: backendProject.owner.email,
       name: backendProject.owner.name,
       createdAt: backendProject.owner.createdAt,
       updatedAt: backendProject.owner.updatedAt,
     } : undefined,
     members: backendProject.members?.map((m) => ({
-      id: convertBackendIdToNumber(m.id),
+      id: m.id,
       role: m.role,
       user: m.user ? {
-        id: convertBackendIdToNumber(m.user.id),
+        id: m.user.id,
         email: m.user.email,
         name: m.user.name,
         createdAt: m.user.createdAt,
         updatedAt: m.user.updatedAt,
-      } : { id: 0, email: '', name: 'Inconnu', createdAt: '', updatedAt: '' },
+      } : { id: '', email: '', name: 'Inconnu', createdAt: '', updatedAt: '' },
       joinedAt: m.joinedAt,
     })) || [],
     createdAt: backendProject.createdAt,
@@ -86,6 +74,9 @@ function extractProjectsFromResponse(data: any): BackendProject[] {
 
 // Generic function to extract single project from backend response
 function extractProjectFromResponse(data: any): BackendProject {
+  if (data?.data?.project) {
+    return data.data.project;
+  }
   if (data?.data) {
     return data.data;
   }
@@ -93,7 +84,7 @@ function extractProjectFromResponse(data: any): BackendProject {
 }
 
 export interface User {
-  id: number;
+  id: string;
   email: string;
   name: string;
   createdAt?: string;
@@ -101,17 +92,17 @@ export interface User {
 }
 
 export interface ProjectMember {
-  id: number;
+  id: string;
   role: string;
   user: User;
   joinedAt?: string;
 }
 
 export interface Project {
-  id: number;
+  id: string;
   name: string;
   description: string;
-  ownerId: number;
+  ownerId: string;
   owner?: User;
   members?: ProjectMember[];
   createdAt: string;
@@ -156,7 +147,7 @@ export async function getProjects(token: string): Promise<Project[]> {
 
 // Récupérer un projet par ID
 // GET /projects/{projectId}
-export async function getProjectById(token: string, projectId: number): Promise<Project> {
+export async function getProjectById(token: string, projectId: string): Promise<Project> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
     method: 'GET',
     headers: {
@@ -198,7 +189,7 @@ export async function createProject(token: string, projectData: CreateProjectDat
 
 // Mettre à jour un projet
 // PATCH /projects/{projectId}
-export async function updateProject(token: string, projectId: number, projectData: UpdateProjectData): Promise<Project> {
+export async function updateProject(token: string, projectId: string, projectData: UpdateProjectData): Promise<Project> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
     method: 'PATCH',
     headers: {
@@ -220,7 +211,7 @@ export async function updateProject(token: string, projectId: number, projectDat
 
 // Supprimer un projet
 // DELETE /projects/{projectId}
-export async function deleteProject(token: string, projectId: number): Promise<void> {
+export async function deleteProject(token: string, projectId: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
     method: 'DELETE',
     headers: {
@@ -256,7 +247,7 @@ export async function searchProjects(token: string, query: string): Promise<Proj
 
 // Ajouter un contributeur à un projet
 // POST /projects/{projectId}/contributors
-export async function addContributor(token: string, projectId: number, userId: number): Promise<ProjectMember> {
+export async function addContributor(token: string, projectId: string, userId: string): Promise<ProjectMember> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/contributors`, {
     method: 'POST',
     headers: {
@@ -277,7 +268,7 @@ export async function addContributor(token: string, projectId: number, userId: n
 
 // Supprimer un contributeur d'un projet
 // DELETE /projects/{projectId}/contributors/{userId}
-export async function removeContributor(token: string, projectId: number, userId: number): Promise<void> {
+export async function removeContributor(token: string, projectId: string, userId: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/contributors/${userId}`, {
     method: 'DELETE',
     headers: {

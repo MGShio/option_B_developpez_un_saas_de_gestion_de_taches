@@ -192,7 +192,7 @@ export default function Dashboard() {
   };
 
   // Obtenir le nom du projet à partir de l'ID
-  const getProjectName = (projectId: number) => {
+  const getProjectName = (projectId: string) => {
     const project = projects.find(p => p.id === projectId);
     return project ? project.name : 'Projet inconnu';
   };
@@ -799,7 +799,7 @@ function KanbanView({
   isTablet
 }: { 
   tasks: Task[]; 
-  getProjectName: (projectId: number) => string; 
+  getProjectName: (projectId: string) => string; 
   isMobile: boolean; 
   isTablet: boolean; 
 }) { 

@@ -26,22 +26,10 @@ interface BackendProfileResponse {
   };
 }
 
-// Helper to convert backend string ID to frontend number ID
-function convertBackendIdToNumber(backendId: string): number {
-  const num = parseInt(backendId, 10);
-  if (!isNaN(num)) return num;
-  let hash = 0;
-  for (let i = 0; i < backendId.length; i++) {
-    hash = (hash << 5) - hash + backendId.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
-
 // Convert backend user to frontend user
-function formatUserFromBackend(backendUser: BackendUser): { id: number; email: string; name: string } {
+function formatUserFromBackend(backendUser: BackendUser): { id: string; email: string; name: string } {
   return {
-    id: convertBackendIdToNumber(backendUser.id),
+    id: backendUser.id,
     email: backendUser.email,
     name: backendUser.name || 'Utilisateur',
   };
@@ -59,7 +47,7 @@ export interface RegisterCredentials extends LoginCredentials {
 export interface AuthResponse {
   token: string;
   user: {
-    id: number;
+    id: string;
     email: string;
     name: string;
   };
@@ -124,7 +112,7 @@ export interface UpdateProfileCredentials {
   email?: string;
 }
 
-export async function updateProfile(token: string, credentials: UpdateProfileCredentials): Promise<{ id: number; email: string; name: string }> {
+export async function updateProfile(token: string, credentials: UpdateProfileCredentials): Promise<{ id: string; email: string; name: string }> {
   const response = await fetch(`${API_BASE_URL}/auth/profile`, {
     method: 'PUT',
     headers: {
@@ -166,7 +154,7 @@ export async function updatePassword(token: string, credentials: UpdatePasswordC
 }
 
 // Vérifier le token et récupérer l'utilisateur
-export async function getCurrentUser(token: string): Promise<{ id: number; email: string; name: string }> {
+export async function getCurrentUser(token: string): Promise<{ id: string; email: string; name: string }> {
   const response = await fetch(`${API_BASE_URL}/auth/profile`, {
     method: 'GET',
     headers: {

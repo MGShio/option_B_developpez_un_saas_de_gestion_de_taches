@@ -1,19 +1,7 @@
 const API_BASE_URL = 'http://localhost:8000';
 
-// Helper to convert backend string ID to frontend number ID
-function convertBackendIdToNumber(backendId: string): number {
-  const num = parseInt(backendId, 10);
-  if (!isNaN(num)) return num;
-  let hash = 0;
-  for (let i = 0; i < backendId.length; i++) {
-    hash = (hash << 5) - hash + backendId.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
-
 export interface User {
-  id: number;
+  id: string;
   email: string;
   name: string;
   createdAt?: string;
@@ -21,25 +9,25 @@ export interface User {
 }
 
 export interface TaskAssignee {
-  id: number;
-  userId: number;
-  taskId: number;
+  id: string;
+  userId: string;
+  taskId: string;
   user: User;
   assignedAt?: string;
 }
 
 export interface Comment {
-  id: number;
+  id: string;
   content: string;
-  taskId: number;
-  authorId: number;
+  taskId: string;
+  authorId: string;
   author: User;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface ProjectSummary {
-  id: number;
+  id: string;
   title: string;
 }
 
@@ -118,28 +106,28 @@ interface BackendTask {
 // Function to convert task data from backend format to frontend format
 export function formatTaskFromBackend(backendTask: BackendTask): Task {
   return {
-    id: convertBackendIdToNumber(backendTask.id),
+    id: backendTask.id,
     title: backendTask.title,
     description: backendTask.description || '',
-    projectId: convertBackendIdToNumber(backendTask.projectId),
+    projectId: backendTask.projectId,
     project: backendTask.project ? {
-      id: convertBackendIdToNumber(backendTask.project.id),
+      id: backendTask.project.id,
       title: backendTask.project.name || backendTask.project.title || '',
     } : undefined,
     dueDate: backendTask.dueDate,
     status: toFrontendStatus(backendTask.status) as Task['status'],
     priority: toFrontendPriority(backendTask.priority) as Task['priority'],
     assignees: backendTask.assignees?.map((a) => ({
-      id: convertBackendIdToNumber(a.id),
-      userId: convertBackendIdToNumber(a.userId),
-      taskId: convertBackendIdToNumber(a.taskId),
+      id: a.id,
+      userId: a.userId,
+      taskId: a.taskId,
       user: a.user ? {
-        id: convertBackendIdToNumber(a.user.id),
+        id: a.user.id,
         email: a.user.email,
         name: a.user.name,
         createdAt: a.user.createdAt,
         updatedAt: a.user.updatedAt,
-      } : { id: 0, email: '', name: 'Inconnu', createdAt: '', updatedAt: '' },
+      } : { id: '', email: '', name: 'Inconnu', createdAt: '', updatedAt: '' },
       assignedAt: a.assignedAt,
     })) || [],
     createdAt: backendTask.createdAt,
@@ -166,10 +154,10 @@ export function formatTaskToBackend(frontendTask: Partial<CreateTaskData>): any 
 }
 
 export interface Task {
-  id: number;
+  id: string;
   title: string;
   description: string;
-  projectId: number;
+  projectId: string;
   project?: ProjectSummary;
   dueDate: string;
   status: 'À faire' | 'En cours' | 'Terminé';
@@ -182,7 +170,7 @@ export interface Task {
 export interface CreateTaskData {
   title: string;
   description?: string;
-  projectId: number;
+  projectId: string;
   dueDate: string;
   priority: 'Faible' | 'Moyenne' | 'Haute';
 }
@@ -213,6 +201,9 @@ function extractTasksFromResponse(data: any): BackendTask[] {
 
 // Generic function to extract single task from backend response
 function extractTaskFromResponse(data: any): BackendTask {
+  if (data?.data?.task) {
+    return data.data.task;
+  }
   if (data?.data) {
     return data.data;
   }
@@ -246,7 +237,7 @@ export async function getTasks(token: string): Promise<Task[]> {
 
 // Récupérer une tâche par ID
 // GET /projects/{projectId}/tasks/{taskId}
-export async function getTaskById(token: string, projectId: number, taskId: number): Promise<Task> {
+export async function getTaskById(token: string, projectId: string, taskId: string): Promise<Task> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}`, {
     method: 'GET',
     headers: {
@@ -288,7 +279,7 @@ export async function createTask(token: string, taskData: CreateTaskData): Promi
 
 // Mettre à jour une tâche
 // PATCH /projects/{projectId}/tasks/{taskId}
-export async function updateTask(token: string, projectId: number, taskId: number, taskData: UpdateTaskData): Promise<Task> {
+export async function updateTask(token: string, projectId: string, taskId: string, taskData: UpdateTaskData): Promise<Task> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}`, {
     method: 'PATCH',
     headers: {
@@ -310,7 +301,7 @@ export async function updateTask(token: string, projectId: number, taskId: numbe
 
 // Supprimer une tâche
 // DELETE /projects/{projectId}/tasks/{taskId}
-export async function deleteTask(token: string, projectId: number, taskId: number): Promise<void> {
+export async function deleteTask(token: string, projectId: string, taskId: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}`, {
     method: 'DELETE',
     headers: {
@@ -346,7 +337,7 @@ export async function searchTasks(token: string, query: string): Promise<Task[]>
 
 // Récupérer les tâches d'un projet
 // GET /projects/{projectId}/tasks
-export async function getProjectTasks(token: string, projectId: number): Promise<Task[]> {
+export async function getProjectTasks(token: string, projectId: string): Promise<Task[]> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks`, {
     method: 'GET',
     headers: {

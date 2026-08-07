@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import EditProjectModal from '../components/EditProjectModal';
 import { storage } from '../utils/storage';
 import { getProjects, deleteProject, type Project } from '../services/projectService';
 import { getProjectTasks, type Task } from '../services/taskService';
-import EditProjectModal from '../components/EditProjectModal';
 import equipeIcon from '../images/equipeicon.svg';
 
 // Couleurs des statuts - Conforme WCAG 2.1 AA
@@ -22,8 +22,7 @@ export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Gestion du resize pour le responsive
   useEffect(() => {
@@ -97,7 +96,7 @@ export default function Projects() {
   }, [isAuthenticated, fetchProjects]);
 
   // Supprimer un projet
-  const handleDeleteProject = async (projectId: number) => {
+  const handleDeleteProject = async (projectId: string) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
       return;
     }
@@ -285,7 +284,7 @@ export default function Projects() {
                 <ProjectCard
                   key={project.id}
                   project={project}
-                  onEdit={(p) => setEditingProject(p)}
+                  navigate={navigate}
                   getInitials={getInitials}
                   getStatusColor={getStatusColor}
                   isMobile={isMobile}
@@ -296,22 +295,6 @@ export default function Projects() {
           </div>
         </div>
       )}
-      {editingProject && (
-        <EditProjectModal
-          project={{
-            id: editingProject.id,
-            name: editingProject.name,
-            description: editingProject.description || '',
-            contributorIds: editingProject.members?.map(m => m.user?.id || 0) || [],
-          }}
-          onClose={() => setEditingProject(null)}
-          onSave={(updatedProject) => {
-            setProjects(prev => prev.map(p => p.id === updatedProject.id ? { ...p, name: updatedProject.name, description: updatedProject.description } : p));
-            setEditingProject(null);
-          }}
-          users={[]}
-        />
-      )}
     </div>
   );
 }
@@ -319,7 +302,7 @@ export default function Projects() {
 // Composant ProjectCard
 function ProjectCard({ 
   project, 
-  onEdit, 
+  navigate,
   getInitials,
   getStatusColor,
   isMobile,
@@ -330,7 +313,7 @@ function ProjectCard({
     completedTasks?: number;
     progress?: number;
   };
-  onEdit: (project: Project) => void;
+  navigate: (path: string) => void;
   getInitials: (name: string) => string;
   getStatusColor: (status: string) => { bg: string; color: string };
   isMobile: boolean;
@@ -338,11 +321,14 @@ function ProjectCard({
 }) {
   const colors = getStatusColor('En attente');
   
-  // Obtenir les membres (mockés pour l'instant)
+  // Obtenir les membres réels du projet
   const members = [
     { id: project.ownerId, name: project.owner?.name || 'Propriétaire', role: 'Propriétaire' },
-    { id: 2, name: 'Bernard Dupont', role: '' },
-    { id: 3, name: 'Claire Vincent', role: '' },
+    ...(project.members?.map(m => ({
+      id: m.user.id,
+      name: m.user.name,
+      role: m.role
+    })) || [])
   ];
   
   // Focus outline style
@@ -376,7 +362,7 @@ function ProjectCard({
       flexDirection: 'column',
       gap: cardGap,
       cursor: 'pointer',
-    }} role="listitem" aria-label={`Projet : ${project.name}`} onClick={() => onEdit(project)}>
+    }} role="listitem" aria-label={`Projet : ${project.name}`} onClick={() => navigate(`/projects/${project.id}`)}>
       {/* Contenu principal */}
       <div style={{
         display: 'flex',
@@ -586,11 +572,6 @@ function ProjectCard({
     </div>
   );
 }
-
-
-
-
-
 
 
 

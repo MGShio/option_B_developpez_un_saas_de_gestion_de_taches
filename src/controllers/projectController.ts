@@ -265,7 +265,7 @@ export const getProjects = async (
           {
             members: {
               some: {
-                userId: authReq.user.id,
+                userId: authReq.user!.id,
               },
             },
           },
@@ -338,13 +338,7 @@ export const getProject = async (
       return;
     }
 
-    // Vérifier l'accès au projet
-    const hasAccess = await hasProjectAccess(authReq.user.id, id);
-    if (!hasAccess) {
-      sendError(res, "Accès refusé au projet", "FORBIDDEN", 403);
-      return;
-    }
-
+    // Récupérer le projet d'abord
     const project = await prisma.project.findUnique({
       where: { id },
       include: {
@@ -393,8 +387,27 @@ export const getProject = async (
       return;
     }
 
+    // Vérifier l'accès directement
+    const isOwner = authReq.user!.id === project.ownerId;
+    const isMember = project.members.some(m => m.userId === authReq.user!.id);
+    const hasAccess = isOwner || isMember;
+
+    console.log('Project access debug:', {
+      userId: authReq.user!.id,
+      projectId: id,
+      projectOwnerId: project.ownerId,
+      isOwner,
+      isMember,
+      hasAccess
+    });
+
+    if (!hasAccess) {
+      sendError(res, "Accès refusé au projet", "FORBIDDEN", 403);
+      return;
+    }
+
     // Ajouter le rôle de l'utilisateur
-    const role = await getUserProjectRole(authReq.user.id, id);
+    const role = await getUserProjectRole(authReq.user!.id, id);
 
     sendSuccess(res, "Projet récupéré avec succès", {
       project: { ...project, userRole: role },

@@ -12,6 +12,8 @@ export const hasProjectAccess = async (
   projectId: string
 ): Promise<boolean> => {
   try {
+    console.log('Checking access:', { userId, projectId });
+    
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
@@ -28,6 +30,7 @@ export const hasProjectAccess = async (
       },
     });
 
+    console.log('Project found:', !!project, 'Project ownerId:', project?.ownerId);
     return !!project;
   } catch (error) {
     console.error("Erreur lors de la vérification d'accès au projet:", error);
