@@ -37,7 +37,7 @@ export default function Projects() {
   const isTablet = windowWidth <= 1024;
   
   // Tailles adaptatives
-  const headerWidth = isMobile ? '100%' : isTablet ? '95%' : '88%';
+  const headerWidth = isMobile ? '100%' : isTablet ? '95%' : '80.97vw';
   const containerPadding = isMobile ? '1rem' : isTablet ? '1.5rem' : '2.5rem';
   const titleSize = isMobile ? '1.5rem' : '1.75rem';
   const subtitleSize = isMobile ? '1rem' : '1.125rem';
@@ -151,7 +151,7 @@ export default function Projects() {
   return (
     <div style={{ 
       width: '100%',
-      padding: isMobile ? '1rem' : '2rem',
+      padding: isMobile ? '1rem' : '0',
     }}>
       {/* Header */}
       <div style={{
@@ -257,11 +257,8 @@ export default function Projects() {
       ) : (
         <div style={{
           width: headerWidth,
+          margin: '0 auto',
           marginBottom: 'clamp(3rem, 8vh, 5rem)',
-          marginLeft: 'auto',
-          marginRight: 'auto',
-          paddingLeft: containerPadding,
-          paddingRight: containerPadding,
           display: 'flex',
           flexDirection: 'column',
           gap: isMobile ? '1.5rem' : '2rem',
