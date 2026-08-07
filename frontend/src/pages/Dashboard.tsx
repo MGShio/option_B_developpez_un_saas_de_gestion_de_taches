@@ -869,16 +869,11 @@ function KanbanView({
           >
             {/* En-tête de la colonne */}
             <div style={{
-              display: 'flex',
+              justifyContent: 'flex-start',
               alignItems: 'center',
-              gap: isMobile ? '0.5rem' : '0.75rem',
+              gap: 8,
+              display: 'inline-flex',
             }}>
-              <div style={{
-                width: '0.75rem', height: '0.75rem',
-                background: colors.color,
-                borderRadius: '0.1875rem',
-                userSelect: 'none',
-              }} aria-hidden="true" />
               <h3 style={{
                 color: 'var(--color-secondary)',
                 fontSize: statusTitleSize,
@@ -887,15 +882,30 @@ function KanbanView({
               }}>
                 {status}
               </h3>
-              <span style={{
-                color: '#6B7280',
-                fontSize: countSize,
-                fontFamily: 'var(--font-body)',
-                fontWeight: '400',
-                marginLeft: 'auto',
+              <div style={{
+                paddingLeft: 16,
+                paddingRight: 16,
+                paddingTop: 4,
+                paddingBottom: 4,
+                background: '#E5E7EB',
+                overflow: 'hidden',
+                borderRadius: 50,
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 10,
+                display: 'flex',
+                height: 'fit-content',
               }}>
-                {statusTasks.length}
-              </span>
+                <div style={{
+                  color: '#6B7280',
+                  fontSize: 14,
+                  fontFamily: 'Inter',
+                  fontWeight: '400',
+                  wordWrap: 'break-word',
+                }}>
+                  {statusTasks.length}
+                </div>
+              </div>
             </div>
 
             {/* Cartes des tâches */}
@@ -1082,3 +1092,6 @@ function KanbanView({
     </div>
   );
 }
+
+
+
