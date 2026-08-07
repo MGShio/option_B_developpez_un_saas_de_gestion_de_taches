@@ -229,7 +229,7 @@ export default function ProjectDetail() {
   });
 
   // Changer le statut d'une tâche
-  const handleStatusChange = async (taskId: number, newStatus: string) => {
+  const handleStatusChange = async (taskId: string, newStatus: string) => {
     try {
       const token = storage.getToken();
       if (!token) {
@@ -237,7 +237,7 @@ export default function ProjectDetail() {
         return;
       }
       
-      await updateTask(token, parseInt(id!), taskId, { status: newStatus as Task['status'] });
+      await updateTask(token, id!, taskId, { status: newStatus as Task['status'] });
       setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus as Task['status'] } : t));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour');
@@ -363,8 +363,7 @@ export default function ProjectDetail() {
   // Mock des contributeurs
   const contributors = [
     { id: project.ownerId, name: project.owner?.name || 'Propriétaire', role: 'Propriétaire' },
-    { id: 2, name: 'Bertrand Dupont', role: '' },
-    { id: 3, name: 'Anne Dupont', role: '' },
+    ...(project.members?.map(m => ({ id: m.user.id, name: m.user.name, role: m.role })) || []
   ];
   const users = contributors;
 
@@ -1208,10 +1207,7 @@ function TaskCard({
 }) {
   const colors = statusColors[task.status] || { bg: '#E5E7EB', color: '#6B7280' };
   
-  const assignees = [
-    { id: 2, name: 'Bertrand Dupont' },
-    { id: 3, name: 'Anne Dupont' },
-  ];
+  const assignees = task.assignees?.map(a => ({ id: a.userId, name: a.user.name })) || [];
 
   const cardPadding = isMobile ? '1rem' : isTablet ? '1.5rem' : '2rem';
   const titleSize = isMobile ? '1rem' : '1.125rem';
@@ -1513,7 +1509,7 @@ function CreateTaskModal({
   setSelectedAssignees: (ids: string[]) => void;
   selectedStatus: 'À faire' | 'En cours' | 'Terminé';
   setSelectedStatus: (status: 'À faire' | 'En cours' | 'Terminé') => void;
-  users: { id: number; name: string; role?: string }[];
+  users: { id: string; name: string; role?: string }[];
   statusOptions: { label: string; value: 'À faire' | 'En cours' | 'Terminé'; color: string; textColor: string }[];
   isMobile: boolean;
   focusOutlineStyle: React.CSSProperties;

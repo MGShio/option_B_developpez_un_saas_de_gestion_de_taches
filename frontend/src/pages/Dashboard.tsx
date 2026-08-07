@@ -72,7 +72,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [users] = useState<{ id: number; name: string; role?: string }[]>([]);
+  const [users] = useState<{ id: string; name: string; role?: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
