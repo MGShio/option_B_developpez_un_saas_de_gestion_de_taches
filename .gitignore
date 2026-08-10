@@ -9,3 +9,36 @@ node_modules
 *.sqlite
 *.sqlite3
 dev.db
+
+# Fichiers temporaires et scripts de fix
+*.py
+*.ps1
+fix_*.py
+apply_*.ps1
+
+# Fichiers de documentation générés
+docs/
+*.md
+CRITICAL_FIXES_README.md
+IMPLEMENTATION_GUIDE_CRITICAL_FIXES.md
+ANALYSE_CONFORMITE_REQUISITIONS.md
+CHANGELOG.md
+IMPLEMENTATION_PERMISSIONS_ET_COMMENTAIRES.md
+RESUME_MODIFICATIONS.md
+
+# Fichiers IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Fichiers de build
+frontend/dist/
+
+# Fichiers de log
+*.log
+npm-debug.log*
+
+# Fichiers temporaires
+*.tmp
+*.temp

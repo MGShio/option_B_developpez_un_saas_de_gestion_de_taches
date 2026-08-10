@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth, type User } from '../contexts/AuthContext';
 import { storage } from '../utils/storage';
 import { getProjectById, deleteProject, type Project } from '../services/projectService';
-import { getProjectTasks, updateTask, createTask, type Task, type CreateTaskData } from '../services/taskService';
+import { getProjectTasks, updateTask, createTask, type Task, type CreateTaskData, type Comment, getTaskComments, createComment, deleteCommentService } from '../services/taskService';
 import AITaskListModal from '../components/AITaskListModal';
 import EditProjectModal from '../components/EditProjectModal';
 import EditTaskModal from '../components/EditTaskModal';
+import { canModifyProject, canDeleteProject, canCreateTasks, isProjectOwner, isProjectAdmin, hasProjectAccess, getUserRoleLabel } from '../utils/permissions';
+import TaskComments from '../components/TaskComments';
 
 // Couleurs des statuts
 const statusColors: Record<string, { bg: string; color: string }> = {
@@ -72,14 +74,15 @@ export default function ProjectDetail() {
   const [project, setProject] = useState<Project | null>(null);
 
   // Vérifier si l'utilisateur a accès au projet (propriétaire ou membre de l'équipe)
-  const hasAccess = project ? 
-    user?.id === project.ownerId || 
-    user?.id === project.owner?.id ||
-    project.members?.some(m => m.user.id === user?.id) 
-    : false;
+  const hasAccess = hasProjectAccess(user, project);
   
   // Vérifier si l'utilisateur est le propriétaire du projet
-  const isOwner = user?.id === project?.ownerId;
+  const isOwner = isProjectOwner(user, project);
+  const canModify = canModifyProject(user, project);
+  const canDelete = canDeleteProject(user, project);
+  const canCreate = canCreateTasks(user, project);
+  const userRoleLabel = getUserRoleLabel(user, project);
+
   const [tasks, setTasks] = useState<Task[]>([]);
   const [activeView, setActiveView] = useState<'list' | 'calendar'>('list');
   const [activeFilter] = useState<string>('all');
@@ -104,6 +107,11 @@ export default function ProjectDetail() {
   const [selectedStatus, setSelectedStatus] = useState<'À faire' | 'En cours' | 'Terminé'>('À faire');
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Comments state
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
+  const [commentsError, setCommentsError] = useState<string | null>(null);
 
   // Gestion du resize pour le responsive
   useEffect(() => {
@@ -153,9 +161,7 @@ export default function ProjectDetail() {
       setProject(projectData);
       
       // Vérifier si l'utilisateur a accès au projet
-      const userHasAccess = user?.id === projectData.ownerId || 
-        user?.id === projectData.owner?.id ||
-        projectData.members?.some(m => m.user.id === user?.id);
+      const userHasAccess = hasProjectAccess(user, projectData);
       
       console.log('Debug access:', {
         userId: user?.id,
@@ -187,13 +193,45 @@ export default function ProjectDetail() {
     } finally {
       setIsLoading(false);
     }
-  }, [id, navigate]);
+  }, [id, navigate, user]);
+  // Fetch comments for all tasks in the project
+  const fetchComments = useCallback(async () => {
+    if (!id || !project || !user) return;
+    
+    const token = storage.getToken();
+    if (!token) return;
+    
+    setIsLoadingComments(true);
+    setCommentsError(null);
+    
+    try {
+      if (tasks.length > 0) {
+        const firstTask = tasks[0];
+        const taskComments = await getTaskComments(token, id, firstTask.id);
+        setComments(taskComments);
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement des commentaires';
+      setCommentsError(errorMessage);
+      console.error('Error fetching comments:', err);
+    } finally {
+      setIsLoadingComments(false);
+    }
+  }, [id, project, user, tasks]);
+
 
   useEffect(() => {
     if (isAuthenticated && id) {
       fetchData();
     }
   }, [isAuthenticated, id, fetchData]);
+
+  // Fetch comments when tasks or project change
+  useEffect(() => {
+    if (isAuthenticated && id && project && user) {
+      fetchComments();
+    }
+  }, [isAuthenticated, id, project, user, tasks, fetchComments]);
 
   // Supprimer le projet
   const handleDeleteProject = async () => {
@@ -212,6 +250,46 @@ export default function ProjectDetail() {
     } finally {
       setIsDeleting(false);
       setIsConfirmingDelete(false);
+    }
+  };
+
+  // Handle adding a comment to a task
+  const handleAddComment = async (taskId: string, content: string) => {
+    if (!id || !user) return;
+    
+    const token = storage.getToken();
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    
+    try {
+      const newComment = await createComment(token, id, taskId, content);
+      setComments(prev => [...prev, newComment]);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de ajout du commentaire';
+      setCommentsError(errorMessage);
+      throw err;
+    }
+  };
+
+  // Handle deleting a comment from a task
+  const handleDeleteComment = async (taskId: string, commentId: string) => {
+    if (!id || !user) return;
+    
+    const token = storage.getToken();
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    
+    try {
+      await deleteCommentService(token, id, taskId, commentId);
+      setComments(prev => prev.filter(c => c.id !== commentId));
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la suppression du commentaire';
+      setCommentsError(errorMessage);
+      throw err;
     }
   };
 
@@ -361,9 +439,10 @@ export default function ProjectDetail() {
   }
 
   // Mock des contributeurs
+  const memberContribs = project.members?.map(m => ({ id: m.user.id, name: m.user.name, role: m.role })) || [];
   const contributors = [
     { id: project.ownerId, name: project.owner?.name || 'Propriétaire', role: 'Propriétaire' },
-    ...(project.members?.map(m => ({ id: m.user.id, name: m.user.name, role: m.role })) || []
+    ...memberContribs
   ];
   const users = contributors;
 
@@ -450,8 +529,24 @@ export default function ProjectDetail() {
             >
               {project.name}
             </h1>
-            {isOwner && (
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+              {user && (
+                <span
+                  style={{
+                    padding: '4px 12px',
+                    background: userRoleLabel === 'Propriétaire' ? '#FFE8D9' : '#E5E7EB',
+                    borderRadius: 50,
+                    fontSize: isMobile ? '0.75rem' : '0.875rem',
+                    fontFamily: 'Inter',
+                    fontWeight: 500,
+                    color: userRoleLabel === 'Propriétaire' ? '#D3590B' : '#6B7280',
+                  }}
+                  aria-label={`Votre rôle: ${userRoleLabel}`}
+                >
+                  {userRoleLabel}
+                </span>
+              )}
+              {canModify && (
                 <button
                   onClick={() => {
                     setEditingProject({
@@ -478,6 +573,8 @@ export default function ProjectDetail() {
                 >
                   Modifier
                 </button>
+              )}
+              {canDelete && (
                 <button
                   onClick={() => setIsConfirmingDelete(true)}
                   disabled={isDeleting}
@@ -497,8 +594,8 @@ export default function ProjectDetail() {
                 >
                   Supprimer
                 </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
           <p 
             style={{
@@ -815,7 +912,13 @@ export default function ProjectDetail() {
                 <TaskCard
                   key={task.id}
                   task={task}
+                  project={project}
+                  currentUser={user}
                   onStatusChange={(newStatus) => handleStatusChange(task.id, newStatus)}
+                  onAddComment={(content) => handleAddComment(task.id, content)}
+                  onDeleteComment={(commentId) => handleDeleteComment(task.id, commentId)}
+                  comments={comments.filter(c => c.taskId === task.id)}
+                  isLoadingComments={isLoadingComments}
                   showBorder={index < filteredTasks.length - 1}
                   getInitials={getInitials}
                   onEdit={() => {
@@ -963,7 +1066,8 @@ export default function ProjectDetail() {
         </div>
       </div>
 
-      {/* Boutons flottants */}
+      {canCreate && (
+  
       <div 
         style={{
           position: 'fixed',
@@ -1020,6 +1124,7 @@ export default function ProjectDetail() {
           + Créer une tâche
         </button>
       </div>
+      )}
 
       {/* Modal de confirmation de suppression */}
       {isConfirmingDelete && (
@@ -1189,8 +1294,14 @@ export default function ProjectDetail() {
 
 // Composant TaskCard
 function TaskCard({ 
-  task, 
+  task,
+  project,
+  currentUser,
   onStatusChange, 
+  onAddComment,
+  onDeleteComment,
+  comments,
+  isLoadingComments,
   showBorder, 
   getInitials, 
   onEdit, 
@@ -1198,7 +1309,13 @@ function TaskCard({
   isTablet
 }: {
   task: Task;
+  project: Project | null;
+  currentUser: User | null;
   onStatusChange: (status: string) => void;
+  onAddComment: (content: string) => Promise<void>;
+  onDeleteComment: (commentId: string) => Promise<void>;
+  comments: Comment[];
+  isLoadingComments: boolean;
   showBorder: boolean;
   getInitials: (name: string) => string;
   onEdit?: () => void;
@@ -1464,23 +1581,22 @@ function TaskCard({
       <div 
         style={{
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          flexDirection: 'column',
+          gap: '1rem',
         }}
       >
-        <span 
-          style={{
-            color: '#1F1F1F',
-            fontSize: isMobile ? '0.875rem' : '0.9375rem',
-            fontFamily: 'Inter',
-            fontWeight: 400,
-          }}
-        >
-          Commentaires (1)
-        </span>
-        <svg width="16" height="8" viewBox="0 0 16 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M2 2L8 6L14 2" stroke="#1F1F1F" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+        {project && currentUser && (
+          <TaskComments
+            taskId={task.id}
+            projectId={project.id}
+            project={project}
+            comments={comments}
+            currentUser={currentUser}
+            onAddComment={onAddComment}
+            onDeleteComment={onDeleteComment}
+            isLoading={isLoadingComments}
+          />
+        )}
       </div>
     </div>
   );

@@ -354,3 +354,71 @@ export async function getProjectTasks(token: string, projectId: string): Promise
   const backendTasks = extractTasksFromResponse(data);
   return backendTasks.map(formatTaskFromBackend);
 }
+
+// Récupérer les commentaires d'une tâche
+// GET /projects/{projectId}/tasks/{taskId}/comments
+export async function getTaskComments(token: string, projectId: string, taskId: string): Promise<Comment[]> {
+  const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}/comments`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la récupération des commentaires');
+  }
+
+  const data = await response.json();
+  if (data?.data?.comments) {
+    return data.data.comments;
+  }
+  if (data?.data) {
+    return data.data;
+  }
+  return [];
+}
+
+// Créer un commentaire sur une tâche
+// POST /projects/{projectId}/tasks/{taskId}/comments
+export async function createComment(token: string, projectId: string, taskId: string, content: string): Promise<Comment> {
+  const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}/comments`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ content }),
+  });
+
+  if (!response.ok) {
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la création du commentaire');
+  }
+
+  const data = await response.json();
+  if (data?.data?.comment) {
+    return data.data.comment;
+  }
+  if (data?.data) {
+    return data.data;
+  }
+  return data;
+}
+
+// Supprimer un commentaire
+// DELETE /projects/{projectId}/tasks/{taskId}/comments/{commentId}
+export async function deleteCommentService(token: string, projectId: string, taskId: string, commentId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}/comments/${commentId}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error: { message?: string; error?: string } = await response.json();
+    throw new Error(error.message || error.error || 'Erreur lors de la suppression du commentaire');
+  }
+}

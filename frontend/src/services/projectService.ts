@@ -21,6 +21,7 @@ interface BackendProject {
   name: string;
   description: string;
   ownerId: string;
+  userRole?: 'ADMIN' | 'CONTRIBUTOR' | null;
   owner?: BackendUser;
   members?: BackendProjectMember[];
   createdAt: string;
@@ -28,20 +29,28 @@ interface BackendProject {
 }
 
 // Convert backend project to frontend project
-export function formatProjectFromBackend(backendProject: BackendProject): Project {
-  return {
+function formatProjectFromBackend(backendProject: any): Project {
+  const project: any = {
     id: backendProject.id,
     name: backendProject.name,
     description: backendProject.description || '',
     ownerId: backendProject.ownerId,
-    owner: backendProject.owner ? {
+    createdAt: backendProject.createdAt,
+    updatedAt: backendProject.updatedAt,
+  };
+
+  if (backendProject.owner) {
+    project.owner = {
       id: backendProject.owner.id,
       email: backendProject.owner.email,
       name: backendProject.owner.name,
       createdAt: backendProject.owner.createdAt,
       updatedAt: backendProject.owner.updatedAt,
-    } : undefined,
-    members: backendProject.members?.map((m) => ({
+    };
+  }
+
+  if (backendProject.members) {
+    project.members = backendProject.members.map((m: any) => ({
       id: m.id,
       role: m.role,
       user: m.user ? {
@@ -52,10 +61,15 @@ export function formatProjectFromBackend(backendProject: BackendProject): Projec
         updatedAt: m.user.updatedAt,
       } : { id: '', email: '', name: 'Inconnu', createdAt: '', updatedAt: '' },
       joinedAt: m.joinedAt,
-    })) || [],
-    createdAt: backendProject.createdAt,
-    updatedAt: backendProject.updatedAt,
-  };
+    }));
+  }
+
+  // Extraire userRole si présent
+  if (backendProject.userRole !== undefined) {
+    project.userRole = backendProject.userRole;
+  }
+
+  return project;
 }
 
 // Generic function to extract projects from backend response
@@ -109,6 +123,7 @@ export interface Project {
   updatedAt: string;
   tasksCount?: number;
   membersCount?: number;
+  userRole?: 'ADMIN' | 'CONTRIBUTOR' | null; // Rôle de l'utilisateur dans ce projet
 }
 
 export interface CreateProjectData {
@@ -142,7 +157,14 @@ export async function getProjects(token: string): Promise<Project[]> {
 
   const data = await response.json();
   const backendProjects = extractProjectsFromResponse(data);
-  return backendProjects.map(formatProjectFromBackend);
+  return backendProjects.map((p: any) => {
+    const project = formatProjectFromBackend(p);
+    // Extraire userRole si présent dans la réponse
+    if (p.userRole !== undefined) {
+      project.userRole = p.userRole;
+    }
+    return project;
+  });
 }
 
 // Récupérer un projet par ID
@@ -162,7 +184,16 @@ export async function getProjectById(token: string, projectId: string): Promise<
 
   const data = await response.json();
   const backendProject = extractProjectFromResponse(data);
-  return formatProjectFromBackend(backendProject);
+  const project = formatProjectFromBackend(backendProject);
+  
+  // Extraire userRole si présent dans la réponse
+  if (backendProject.userRole !== undefined) {
+    project.userRole = backendProject.userRole;
+  } else if (data?.data?.project?.userRole !== undefined) {
+    project.userRole = data.data.project.userRole;
+  }
+  
+  return project;
 }
 
 // Créer un nouveau projet

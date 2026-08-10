@@ -15,7 +15,7 @@ import {
   type UpdatePasswordCredentials
 } from '../services/authService';
 
-interface User {
+export interface User {
   id: string;
   email: string;
   name: string;

@@ -1,0 +1,174 @@
+Auto evaluation :
+
+Lʼauthentification est fonctionnelle :
+Il est possible de créer un compte
+Il est possible de se connecter
+Lʼutilisateur peut changer son mot de passe
+Les droits dʼaccès sont gérés comme demandé :
+Tout le monde peut créer un projet et en devenir
+automatiquement administrateur ;
+Seuls les contributeurs dʼun projet peuvent le consulter et
+y créer / supprimer des tâches ;
+Seuls les administrateurs dʼun projet peuvent modifier les
+infos du projet (description, contributeur, deadlines)
+Les fonctionnalités définies dans le document de spécifications
+sont fonctionnelles et conformes
+Le code respecte les bonnes pratiques dʼaccessibilité, de
+standard AA minimum, notamment :
+les balises ARIA sont présentes ;
+la navigation au clavier est possible ;
+aucune image nʼest sans texte alternatif ;
+aucune erreur nʼest soulevée par le plugin WAVE.
+Lʼensemble des pages ainsi que leur navigation sont conformes
+aux maquettes :
+Page de connexion / inscription ;
+Page profil et ses différentes vues ;
+Page projet, création et édition ;
+Page 404.
+Lʼensemble de lʼapplication est responsive et sʼadapte
+correctement à toutes les tailles dʼécrans.
+Aucune erreur nʼest présente sur le site, ni dans la console.
+Lʼauthentification se fait de manière sécurisée.
+Qualité du code :
+Le code est propre, organisé et conforme aux standards ;
+Les fonctions et composants sont rigoureusement
+nommés ;
+Le code est commenté quand cʼest nécessaire.
+
+Etape du projet :
+
+Résultat attendu  
+
+    Le backend qui tourne avec tous les outils associés
+
+Recommandations  
+
+    Lisez attentivement le fichier README du projet backend.
+
+    Vous pouvez exécuter le script permettant de peupler la base de données.
+
+    Vous pouvez visualiser la base de données directement avec Prisma Studio.
+
+    L’API est documentée avec Swagger : testez les différentes routes pour comprendre ce qui est attendu dans le projet.
+
+Résultat attendu  
+
+    Un projet front-end initialisé pour démarrer votre développement.
+
+Recommandations  
+
+    Configurez votre environnement de développement (ESLint, Prettier)
+
+    Vous êtes libre de choisir la librairie CSS que vous souhaitez utiliser
+
+    Vous pouvez commencer à déclarer les principales variables de couleurs, de typographie, etc. dès maintenant.
+
+Points de vigilance
+
+    Dans ce projet, vous avez le choix entre utiliser React en JS ou bien Typescript. Pensez à choisir la configuration de projet correspondante dès le début. Une fois votre choix fait, il sera plus compliqué de tout configurer à partir d’une base de code existante (même si ce n’est pas impossible).
+
+
+Résultat attendu
+
+    La navigation de base et le layout principal
+
+Recommandations
+
+    Créez le système de routing avec les pages de votre application.
+
+    Implémentez le layout global avec la navigation.
+
+    Mettez en place la structure des dossiers selon les bonnes pratiques.
+
+Points de vigilance
+
+    Il existe plusieurs systèmes de routing avec NextJS, faites simple et restez sur la technologie qui est recommandée.
+
+    Ne passez pas trop de temps à réfléchir à l’organisation de fichiers parfaite.
+
+Résultat attendu  
+
+    Les pages d’authentification intégrées et fonctionnelles pour se connecter et s’inscrire.
+
+Recommandations  
+
+    Basez-vous sur le backend pour faire vos requêtes.
+
+    Vous pouvez utiliser les comptes utilisateurs qui figurent dans le script de seed de la base de données.
+
+    Vous pouvez par exemple commencer par créer la page de profil utilisateur comme première route connectée.
+
+Points de vigilance
+
+    Les routes où l’utilisateur doit être authentifié ne doivent pas être accessibles sans token.
+
+    Sécurisez le stockage des tokens (évitez le localStorage pour les données sensibles).
+
+    Attention à gérer correctement les cas d'erreur (mauvais identifiants, compte inexistant).
+
+Résultat attendu  
+
+    L’ensemble de l’interface intégrée, excepté la génération de tâches automatique et la page d’authentification.
+
+Recommandations  
+
+    Vous pouvez procéder étape par étape pour cette intégration.
+
+    Vous pouvez par exemple commencer par intégrer la gestion des projets.
+
+    Puis vous pouvez intégrer la gestion des tâches.
+
+    Et ensuite, intégrez les différents tableaux de bord, les filtres, et les vues.
+
+    N’hésitez pas à utiliser des librairies externes de composants, par exemple pour les modales, ou pour implémenter des toasts de notification.
+
+Points de vigilance
+
+    Assurez-vous de pouvoir justifier l’utilisation de chaque librairie externe.
+
+    Implémentez la logique métier avant de vous concentrer sur le design pour éviter de vous perdre dans les détails visuels.
+
+
+Specification fonctionnelles :
+
+SaaS de Gestion de Projet Collaboratif
+1. Fonctionnalités
+L'application doit inclure les fonctionnalités suivantes :
+1. Authentification et Gestion des Utilisateurs
+● Inscription/Connexion : Les utilisateurs doivent pouvoir s'inscrire et se connecter
+en utilisant une adresse e-mail et un mot de passe.
+● Gestion de Profil : Les utilisateurs peuvent modifier leur nom, leur adresse e-mail
+et leur mot de passe.
+● Rôles Utilisateur : Tous les utilisateurs auront le même rôle, mais les informations
+et actions auxquelles ils auront accès vont changer selon le projet :
+○ Sʼils sont administrateur du projet, ils pourront lʼéditer, supprimer, créer et
+supprimer des nouvelles tâches.
+○ Sʼils sont contributeur, ils pourront seulement créer de nouvelles tâches ou
+les supprimer.
+○ Sʼils sont ni contributeurs, ni administrateur, ils ne pourront pas accéder au
+projet.
+2. Gestion des Projets
+● Création de Projet : Les utilisateurs peuvent créer de nouveaux projets, en
+spécifiant un nom, une description et des contributeurs. Ils seront alors
+administrateurs des projets quʼils auront créés.
+● Visualisation des Projets : Vue d'ensemble des projets auxquels l'utilisateur est
+associé en tant que propriétaire ou contributeur.
+● Modification/Suppression de Projet : Les administrateurs de projet peuvent
+modifier les détails du projet et le supprimer, ou bien ajouter / retirer des
+contributeurs.
+3. Gestion des Tâches
+● Création de Tâche : Création de tâches au sein d'un projet, avec un titre, une
+description, une date d'échéance et un statut.
+● Assignation de Tâche : Attribution de tâches à un ou plusieurs utilisateurs.
+● Statut de Tâche : Suivi du statut des tâches À faire, En cours, Terminée).
+● Commentaires de Tâche : Les utilisateurs peuvent ajouter des commentaires aux
+tâches pour la collaboration.
+4. Tableau de Bord et Vues
+● Tableau de Bord Personnel - 3 vues :
+○ Vue liste des tâches assignées à l'utilisateur, les plus urgents dʼabord ;
+○ Vue kanban des tâches du mois par statut À faire, En cours, Terminée).
+○ Vue liste des projets dans lesquels lʼutilisateur a des tâches assignées, les
+plus urgents dʼabord.
+● Vue Liste : Liste détaillée de toutes les tâches d'un projet.
+● Optionnel : Recherche et Filtrage : Possibilité de rechercher et de filtrer les projets
+et les tâches par différents critères (assigné à, date d'échéance, statut, etc.)

@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth, type User } from '../contexts/AuthContext';
 import EditProjectModal from '../components/EditProjectModal';
+import { canDeleteProject, canModifyProject, hasProjectAccess } from '../utils/permissions';
 import { storage } from '../utils/storage';
 import { getProjects, deleteProject, type Project } from '../services/projectService';
 import { getProjectTasks, type Task } from '../services/taskService';

@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { storage } from '../utils/storage';
 import { getAssignedTasks, searchTasks, type Task } from '../services/taskService';
+import { getDashboardStats, getProjectsWithTaskCounts, type DashboardStats, type ProjectWithTaskCount, type TaskSummary } from '../services/dashboardService';
 import { getProjects, createProject, type Project } from '../services/projectService';
 import CreateProjectModal, { type ModalCreateProjectData } from '../components/CreateProjectModal';
+import ProjectsWithTasksView from '../components/ProjectsWithTasksView';
 import checkmarkIcon from '../images/checkmark.svg';
 import calendarIcon from '../images/calendaricon.svg';
 import folderIconGrey from '../images/foldericongrey.svg';
@@ -72,6 +74,8 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [projectsWithStats, setProjectsWithStats] = useState<ProjectWithTaskCount[]>([]);
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
   const [users] = useState<{ id: string; name: string; role?: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -127,9 +131,14 @@ export default function Dashboard() {
       const tasksData = await getAssignedTasks(token);
       setTasks(tasksData);
       
-      // Récupérer les projets
-      const projectsData = await getProjects(token);
-      setProjects(projectsData);
+      // Récupérer les projets avec statistiques
+      const projectsWithStatsData = await getProjectsWithTaskCounts(token);
+      setProjectsWithStats(projectsWithStatsData);
+      setProjects(projectsWithStatsData);
+      
+      // Récupérer les statistiques du dashboard
+      const statsData = await getDashboardStats(token);
+      setDashboardStats(statsData);
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement des données');
