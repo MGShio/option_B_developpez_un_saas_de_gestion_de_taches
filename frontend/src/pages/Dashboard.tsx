@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { storage } from '../utils/storage';
@@ -70,11 +70,28 @@ export default function Dashboard() {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [activeView, setActiveView] = useState<'list' | 'kanban'>('list');
+  const [activeView, setActiveView] = useState<'list' | 'kanban' | 'projects'>('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [projectsWithStats, setProjectsWithStats] = useState<ProjectWithTaskCount[]>([]);
+
+  // Handler for project click
+  const handleProjectClick = useCallback((projectId: string) => {
+    navigate('/projects/' + projectId);
+  }, [navigate]);
+
+  // Compute tasks by project for ProjectsWithTasksView
+  const tasksByProject = useMemo(() => {
+    const map = new Map<string, Task[]>();
+    tasks.forEach(task => {
+      if (!map.has(task.projectId)) {
+        map.set(task.projectId, []);
+      }
+      map.get(task.projectId)?.push(task);
+    });
+    return map;
+  }, [tasks]);
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
   const [users] = useState<{ id: string; name: string; role?: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -251,7 +268,39 @@ export default function Dashboard() {
           }}>
             Bonjour {user?.name}, voici un aperçu de vos projets et tâches
           </p>
-        </div>
+          <button
+          onClick={() => setActiveView('projects')}
+          style={{
+            padding: isMobile ? '0.75rem 1rem' : '0.875rem 1rem',
+            background: activeView === 'projects' ? '#FFE8D9' : 'white',
+            border: activeView === 'projects' ? '0.0625rem solid var(--color-primary)' : '0.0625rem solid var(--color-border)',
+            borderRadius: '0.5rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: isMobile ? '0.5rem' : '0.875rem',
+            fontSize: isMobile ? '0.875rem' : '0.9375rem',
+            fontFamily: 'Inter',
+            fontWeight: '400',
+            transition: 'all 0.2s ease',
+          }}
+          onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, {
+            background: activeView === 'projects' ? '#FFE8D9' : 'white',
+            border: activeView === 'projects' ? '0.0625rem solid var(--color-primary)' : '0.0625rem solid var(--color-border)',
+          })}
+          onBlur={(e) => Object.assign(e.currentTarget.style, {
+            background: activeView === 'projects' ? '#FFE8D9' : 'white',
+            border: activeView === 'projects' ? '0.0625rem solid var(--color-primary)' : '0.0625rem solid var(--color-border)',
+          })}
+          aria-pressed={activeView === 'projects'}
+          aria-label="Mes projets avec tâches assignées"
+        >
+          <img src={folderIconGrey} alt="Mes projets" style={{ width: '1rem', height: '1rem', userSelect: 'none' }} />
+          <span style={{ color: activeView === 'projects' ? 'var(--color-primary)' : '#6B7280' }}>
+            Mes projets
+          </span>
+        </button>
+      </div>
         <button
           onClick={() => setIsCreateModalOpen(true)}
           style={{

@@ -109,8 +109,8 @@ export default function ProjectDetail() {
   const [isDeleting, setIsDeleting] = useState(false);
   
   // Comments state
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [isLoadingComments, setIsLoadingComments] = useState(false);
+  const [commentsByTask, setCommentsByTask] = useState<Record<string, Comment[]>>({});
+  const [loadingCommentsByTask, setLoadingCommentsByTask] = useState<Record<string, boolean>>({});
   const [commentsError, setCommentsError] = useState<string | null>(null);
 
   // Gestion du resize pour le responsive
@@ -194,30 +194,27 @@ export default function ProjectDetail() {
       setIsLoading(false);
     }
   }, [id, navigate, user]);
-  // Fetch comments for all tasks in the project
-  const fetchComments = useCallback(async () => {
-    if (!id || !project || !user) return;
+    // Fetch comments for a specific task
+  const fetchCommentsForTask = useCallback(async (taskId: string) => {
+    if (!id || !project || !user || !taskId) return;
     
     const token = storage.getToken();
     if (!token) return;
     
-    setIsLoadingComments(true);
+    setLoadingCommentsByTask(prev => ({ ...prev, [taskId]: true }));
     setCommentsError(null);
     
     try {
-      if (tasks.length > 0) {
-        const firstTask = tasks[0];
-        const taskComments = await getTaskComments(token, id, firstTask.id);
-        setComments(taskComments);
-      }
+      const taskComments = await getTaskComments(token, id, taskId);
+      setCommentsByTask(prev => ({ ...prev, [taskId]: taskComments }));
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement des commentaires';
       setCommentsError(errorMessage);
       console.error('Error fetching comments:', err);
     } finally {
-      setIsLoadingComments(false);
+      setLoadingCommentsByTask(prev => ({ ...prev, [taskId]: false }));
     }
-  }, [id, project, user, tasks]);
+  }, [id, project, user]);
 
 
   useEffect(() => {
@@ -226,12 +223,7 @@ export default function ProjectDetail() {
     }
   }, [isAuthenticated, id, fetchData]);
 
-  // Fetch comments when tasks or project change
-  useEffect(() => {
-    if (isAuthenticated && id && project && user) {
-      fetchComments();
-    }
-  }, [isAuthenticated, id, project, user, tasks, fetchComments]);
+  
 
   // Supprimer le projet
   const handleDeleteProject = async () => {
@@ -265,7 +257,10 @@ export default function ProjectDetail() {
     
     try {
       const newComment = await createComment(token, id, taskId, content);
-      setComments(prev => [...prev, newComment]);
+      setCommentsByTask(prev => ({
+        ...prev,
+        [taskId]: [...(prev[taskId] || []), newComment]
+      }));
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de ajout du commentaire';
       setCommentsError(errorMessage);
@@ -285,7 +280,10 @@ export default function ProjectDetail() {
     
     try {
       await deleteCommentService(token, id, taskId, commentId);
-      setComments(prev => prev.filter(c => c.id !== commentId));
+      setCommentsByTask(prev => ({
+        ...prev,
+        [taskId]: (prev[taskId] || []).filter(c => c.id !== commentId)
+      }));
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la suppression du commentaire';
       setCommentsError(errorMessage);
@@ -917,8 +915,8 @@ export default function ProjectDetail() {
                   onStatusChange={(newStatus) => handleStatusChange(task.id, newStatus)}
                   onAddComment={(content) => handleAddComment(task.id, content)}
                   onDeleteComment={(commentId) => handleDeleteComment(task.id, commentId)}
-                  comments={comments.filter(c => c.taskId === task.id)}
-                  isLoadingComments={isLoadingComments}
+                  comments={commentsByTask[task.id] || []}
+                  isLoadingComments={loadingCommentsByTask[task.id] || false}
                   showBorder={index < filteredTasks.length - 1}
                   getInitials={getInitials}
                   onEdit={() => {
@@ -1592,9 +1590,10 @@ function TaskCard({
             project={project}
             comments={comments}
             currentUser={currentUser}
-            onAddComment={onAddComment}
-            onDeleteComment={onDeleteComment}
+            onAddComment={(content) => onAddComment(content)}
+            onDeleteComment={(commentId) => onDeleteComment(commentId)}
             isLoading={isLoadingComments}
+            onMount={() => fetchCommentsForTask(task.id)}
           />
         )}
       </div>

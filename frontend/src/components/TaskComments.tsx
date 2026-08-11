@@ -7,7 +7,7 @@
  * - Supprimer un commentaire (si l'utilisateur en est l'auteur ou un admin)
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Comment } from '../services/taskService';
 import type { User } from '../contexts/AuthContext';
 import { isProjectAdmin as checkIsProjectAdmin } from '../utils/permissions';
