@@ -26,7 +26,9 @@ const BackIcon = ({ size = 24 }: { size?: number }) => (
 
 const ListIcon = ({ size = 16 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="16" height="16" fill="#D3590B" />
+    <rect y="2" width="16" height="2" fill="#D3590B" />
+    <rect y="7" width="16" height="2" fill="#D3590B" />
+    <rect y="12" width="16" height="2" fill="#D3590B" />
   </svg>
 );
 
@@ -336,7 +338,7 @@ export default function ProjectDetail() {
       
       const taskData: CreateTaskData = {
         ...newTask,
-        projectId: parseInt(id!),
+        projectId: id!,
         priority: newTask.priority as 'Faible' | 'Moyenne' | 'Haute',
       };
       
@@ -622,23 +624,16 @@ export default function ProjectDetail() {
         <div 
           style={{
             flex: 1,
+            background: 'white',
+            border: '1px solid #E5E7EB',
+            borderRadius: 10,
+            padding: 'clamp(1rem, 1.5vw, 1.5rem)',
             display: 'flex',
             flexDirection: 'column',
-            gap: isMobile ? '1rem' : '1.5rem',
+            gap: 'clamp(1rem, 1.5vw, 1.5rem)',
           }}
         >
           {/* Header des tâches */}
-          <div 
-            style={{
-              background: 'white',
-              borderRadius: 10,
-              border: '1px solid #E5E7EB',
-              padding: isMobile ? '1rem' : isTablet ? '1.5rem' : '2rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: isMobile ? '1rem' : '1.5rem',
-            }}
-          >
             <div 
               style={{
                 display: 'flex',
@@ -880,7 +875,6 @@ export default function ProjectDetail() {
                 </div>
               </div>
             )}
-          </div>
 
           {/* Liste des tâches */}
           <div 
@@ -1069,13 +1063,13 @@ export default function ProjectDetail() {
       <div 
         style={{
           position: 'fixed',
-          bottom: isMobile ? '80px' : '100px',
-          right: isMobile ? '50%' : (isTablet ? '2rem' : '6.25rem'),
-          transform: isMobile ? 'translateX(-50%)' : 'none',
+          bottom: 'clamp(2rem, 5vh, 3rem)',
+          right: 'clamp(1rem, 2vw, 2rem)',
           display: 'flex',
-          gap: isMobile ? '0.5rem' : '1rem',
-          flexDirection: isMobile ? 'column-reverse' : 'row',
+          gap: 'clamp(0.5rem, 1vw, 1rem)',
+          flexDirection: isMobile ? 'column' : 'row',
           alignItems: 'center',
+          zIndex: 1000,
         }}
       >
         <button
@@ -1593,7 +1587,6 @@ function TaskCard({
             onAddComment={(content) => onAddComment(content)}
             onDeleteComment={(commentId) => onDeleteComment(commentId)}
             isLoading={isLoadingComments}
-            onMount={() => fetchCommentsForTask(task.id)}
           />
         )}
       </div>
