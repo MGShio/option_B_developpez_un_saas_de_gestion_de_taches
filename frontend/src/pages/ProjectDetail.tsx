@@ -218,7 +218,6 @@ export default function ProjectDetail() {
     }
   }, [id, project, user]);
 
-
   useEffect(() => {
     if (isAuthenticated && id) {
       fetchData();
@@ -616,14 +615,130 @@ export default function ProjectDetail() {
       <div 
         style={{
           display: 'flex',
+          flexDirection: 'column',
           gap: isMobile ? '1rem' : '1.5rem',
-          flexDirection: isMobile ? 'column' : 'row',
+          maxWidth: '1440px',
+          margin: '0 auto',
+          width: '100%',
         }}
       >
-        {/* Section principale - Tâches */}
+        {/* Section Contributeurs */}
         <div 
           style={{
             flex: 1,
+            background: '#F3F4F6',
+            border: '1px solid #E5E7EB',
+            borderRadius: 10,
+            padding: isMobile ? '1rem' : '1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: isMobile ? '1rem' : '1.5rem',
+          }}
+          role="complementary"
+          aria-label="Liste des contributeurs"
+        >
+          <div 
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '1rem',
+            }}
+          >
+            <h2
+              style={{
+                color: '#1F1F1F',
+                fontSize: sectionTitleSize,
+                fontFamily: 'Manrope',
+                fontWeight: 600,
+                margin: 0,
+              }}
+            >
+              Contributeurs ({contributors.length} personnes)
+            </h2>
+          </div>
+
+          <div 
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              justifyContent: 'flex-end',
+              gap: '0.5rem',
+            }}
+            role="list"
+          >
+            {contributors.map((contributor, index) => (
+              <div 
+                key={contributor.id} 
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+                role="listitem"
+              >
+                <div 
+                  style={{
+                    width: isMobile ? 24 : 27,
+                    height: isMobile ? 24 : 27,
+                    padding: isMobile ? '4px' : '4.98px 4.98px 8.72px 8.72px',
+                    background: index === 0 ? '#FFE8D9' : '#E5E7EB',
+                    borderRadius: isMobile ? 12 : 13.5,
+                    border: index > 0 ? '1px solid white' : 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <span 
+                    style={{
+                      textAlign: 'center',
+                      color: '#0F0F0F',
+                      fontSize: 10,
+                      fontFamily: 'Inter',
+                      fontWeight: 400,
+                      textTransform: 'uppercase',
+                      letterSpacing: 0.2,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {getInitials(contributor.name)}
+                  </span>
+                </div>
+                <div 
+                  style={{
+                    padding: isMobile ? '4px 12px' : '4px 16px',
+                    background: index === 0 ? '#FFE8D9' : '#E5E7EB',
+                    borderRadius: 50,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    flex: 1,
+                  }}
+                >
+                  <span 
+                    style={{
+                      color: index === 0 ? '#D3590B' : '#6B7280',
+                      fontSize: isMobile ? '0.875rem' : '0.9375rem',
+                      fontFamily: 'Inter',
+                      fontWeight: 400,
+                    }}
+                  >
+                    {contributor.role || contributor.name}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Section principale - Tâches */}
+        <div 
+          style={{
+            flex: 2,
             background: 'white',
             border: '1px solid #E5E7EB',
             borderRadius: 10,
@@ -932,190 +1047,63 @@ export default function ProjectDetail() {
           </div>
         </div>
 
-        {/* Panneau latéral - Contributeurs */}
-        <div 
-          style={{
-            width: sidebarWidth,
-            display: sidebarDisplay,
-            background: '#F3F4F6',
-            borderRadius: 10,
-            padding: isMobile ? '1rem' : '1.5rem',
-            flexDirection: 'column',
-            gap: isMobile ? '1rem' : '1.5rem',
-          }}
-          role="complementary"
-          aria-label="Liste des contributeurs"
-        >
-          <div 
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <div 
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-              }}
-            >
-              <span 
-                style={{
-                  color: '#1F1F1F',
-                  fontSize: sectionTitleSize,
-                  fontFamily: 'Manrope',
-                  fontWeight: 600,
-                }}
-              >
-                Contributeurs
-              </span>
-              <span 
-                style={{
-                  color: '#6B7280',
-                  fontSize: sectionSubtitleSize,
-                  fontFamily: 'Inter',
-                  fontWeight: 400,
-                }}
-              >
-                {contributors.length} personnes
-              </span>
-            </div>
-          </div>
-
-          <div 
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.5rem',
-            }}
-            role="list"
-          >
-            {contributors.map((contributor, index) => (
-              <div 
-                key={contributor.id} 
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-                role="listitem"
-              >
-                <div 
-                  style={{
-                    width: isMobile ? 24 : 27,
-                    height: isMobile ? 24 : 27,
-                    padding: isMobile ? '4px' : '4.98px 4.98px 8.72px 8.72px',
-                    background: index === 0 ? '#FFE8D9' : '#E5E7EB',
-                    borderRadius: isMobile ? 12 : 13.5,
-                    border: index > 0 ? '1px solid white' : 'none',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <span 
-                    style={{
-                      textAlign: 'center',
-                      color: '#0F0F0F',
-                      fontSize: 10,
-                      fontFamily: 'Inter',
-                      fontWeight: 400,
-                      textTransform: 'uppercase',
-                      letterSpacing: 0.2,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {getInitials(contributor.name)}
-                  </span>
-                </div>
-                <div 
-                  style={{
-                    padding: isMobile ? '4px 12px' : '4px 16px',
-                    background: index === 0 ? '#FFE8D9' : '#E5E7EB',
-                    borderRadius: 50,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    flex: 1,
-                  }}
-                >
-                  <span 
-                    style={{
-                      color: index === 0 ? '#D3590B' : '#6B7280',
-                      fontSize: isMobile ? '0.875rem' : '0.9375rem',
-                      fontFamily: 'Inter',
-                      fontWeight: 400,
-                    }}
-                  >
-                    {contributor.role || contributor.name}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       {canCreate && (
-  
-      <div 
-        style={{
-          position: 'fixed',
-          bottom: 'clamp(2rem, 5vh, 3rem)',
-          right: 'clamp(1rem, 2vw, 2rem)',
-          display: 'flex',
-          gap: 'clamp(0.5rem, 1vw, 1rem)',
-          flexDirection: isMobile ? 'column' : 'row',
-          alignItems: 'center',
-          zIndex: 1000,
-        }}
-      >
-        <button
-          onClick={() => setIsAITaskModalOpen(true)}
+        <div
           style={{
-            width: isMobile ? '100px' : '94px',
-            height: isMobile ? '50px' : '50px',
-            padding: isMobile ? '13px 24px' : '13px 74px',
-            background: '#D3590B',
-            color: 'white',
-            border: 'none',
-            borderRadius: 10,
-            fontSize: buttonFontSize,
-            fontFamily: 'Inter',
-            fontWeight: 400,
-            cursor: 'pointer',
+            display: 'flex',
+            gap: 'clamp(0.5rem, 1vw, 1rem)',
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            width: '100%',
           }}
-          aria-label="Créer une tâche avec l'intelligence artificielle"
-          onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
-          onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
         >
-          IA
-        </button>
-        
-        <button
-          onClick={() => setIsCreateTaskModalOpen(true)}
-          style={{
-            width: isMobile ? '200px' : '181px',
-            height: '50px',
-            padding: isMobile ? '13px 24px' : '13px 74px',
-            background: '#1F1F1F',
-            color: 'white',
-            border: 'none',
-            borderRadius: 10,
-            fontSize: buttonFontSize,
-            fontFamily: 'Inter',
-            fontWeight: 400,
-            cursor: 'pointer',
-          }}
-          aria-label="Créer une nouvelle tâche"
-          onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
-          onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
-        >
-          + Créer une tâche
-        </button>
-      </div>
+          <button
+            onClick={() => setIsAITaskModalOpen(true)}
+            style={{
+              width: isMobile ? '100px' : '94px',
+              height: isMobile ? '50px' : '50px',
+              padding: isMobile ? '13px 24px' : '13px 74px',
+              background: '#D3590B',
+              color: 'white',
+              border: 'none',
+              borderRadius: 10,
+              fontSize: buttonFontSize,
+              fontFamily: 'Inter',
+              fontWeight: 400,
+              cursor: 'pointer',
+            }}
+            aria-label="Créer une tâche avec l'intelligence artificielle"
+            onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
+            onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
+          >
+            IA
+          </button>
+          
+          <button
+            onClick={() => setIsCreateTaskModalOpen(true)}
+            style={{
+              width: isMobile ? '200px' : '181px',
+              height: '50px',
+              padding: isMobile ? '13px 24px' : '13px 74px',
+              background: '#1F1F1F',
+              color: 'white',
+              border: 'none',
+              borderRadius: 10,
+              fontSize: buttonFontSize,
+              fontFamily: 'Inter',
+              fontWeight: 400,
+              cursor: 'pointer',
+            }}
+            aria-label="Créer une nouvelle tâche"
+            onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
+            onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
+          >
+            + Créer une tâche
+          </button>
+        </div>
       )}
 
       {/* Modal de confirmation de suppression */}
