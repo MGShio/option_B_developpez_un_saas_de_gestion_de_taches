@@ -460,7 +460,7 @@ export const updateProject = async (
     }
 
     // Préparer les données de mise à jour
-    const updateData: any = {};
+    const updateData: Record<string, string | null> = {};
     if (name !== undefined) {
       updateData.name = name.trim();
     }
@@ -786,3 +786,4 @@ export const searchUsers = async (
     sendServerError(res, "Erreur lors de la recherche d'utilisateurs");
   }
 };
+

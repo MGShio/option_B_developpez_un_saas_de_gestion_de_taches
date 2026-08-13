@@ -455,7 +455,7 @@ export const updateTask = async (
     }
 
     // Préparer les données de mise à jour
-    const updateData: any = {};
+    const updateData: Record<string, string | Date | null> = {};
     if (title !== undefined) {
       updateData.title = title.trim();
     }
@@ -577,3 +577,5 @@ export const deleteTask = async (
     sendServerError(res, "Erreur lors de la suppression de la tâche");
   }
 };
+
+

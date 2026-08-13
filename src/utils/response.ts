@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { ApiResponse } from "../types";
+import { ApiResponse, ValidationError } from "../types";
 
 /**
  * Envoie une réponse de succès
@@ -54,9 +54,9 @@ export const sendError = (
 export const sendValidationError = (
   res: Response,
   message: string,
-  errors: any[]
+  errors: ValidationError[]
 ): void => {
-  const response: ApiResponse = {
+  const response: ApiResponse<{ errors: ValidationError[] }> = {
     success: false,
     message,
     error: "Validation failed",

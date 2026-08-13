@@ -7,8 +7,8 @@ import logoOrange from '../images/logoorange.svg';
 import logoBlack from '../images/logoblack.svg';
 import dashboardIconWhite from '../images/dashboardiconwhite.svg';
 import dashboardIconOrange from '../images/dashboardiconorange.svg';
-import folderIcon from '../images/fodlericon.svg';
-import folderIconWhite from '../images/folderinconwhite.svg';
+import folderIcon from '../images/foldericon.svg';
+import folderIconWhite from '../images/foldericonwhite.svg';
 
 export default function MainLayout() {
   const { user, isAuthenticated } = useAuth();
@@ -349,3 +349,4 @@ export default function MainLayout() {
     </div>
   );
 }
+

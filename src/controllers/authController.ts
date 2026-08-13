@@ -359,7 +359,7 @@ export const updateProfile = async (
     }
 
     // Préparer les données de mise à jour
-    const updateData: any = {};
+    const updateData: Record<string, string | null> = {};
     if (name !== undefined) {
       updateData.name = name.trim() || null;
     }
@@ -459,3 +459,5 @@ export const updatePassword = async (
     sendServerError(res, "Erreur lors de la mise à jour du mot de passe");
   }
 };
+
+
