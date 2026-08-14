@@ -83,7 +83,6 @@ export default function ProjectDetail() {
   const canModify = canModifyProject(user, project);
   const canDelete = canDeleteProject(user, project);
   const canCreate = canCreateTasks(user, project);
-  const userRoleLabel = getUserRoleLabel(user, project);
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [activeView, setActiveView] = useState<'list' | 'calendar'>('list');
@@ -512,7 +511,7 @@ export default function ProjectDetail() {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              width: '100%',
+              width: 'auto',
               flexWrap: 'wrap',
               gap: '1rem',
             }}
@@ -529,22 +528,6 @@ export default function ProjectDetail() {
               {project.name}
             </h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-              {user && (
-                <span
-                  style={{
-                    padding: '4px 12px',
-                    background: userRoleLabel === 'Propriétaire' ? '#FFE8D9' : '#E5E7EB',
-                    borderRadius: 50,
-                    fontSize: isMobile ? '0.75rem' : '0.875rem',
-                    fontFamily: 'Inter',
-                    fontWeight: 500,
-                    color: userRoleLabel === 'Propriétaire' ? '#D3590B' : '#6B7280',
-                  }}
-                  aria-label={`Votre rôle: ${userRoleLabel}`}
-                >
-                  {userRoleLabel}
-                </span>
-              )}
               {canModify && (
                 <button
                   onClick={() => {
@@ -573,27 +556,53 @@ export default function ProjectDetail() {
                   Modifier
                 </button>
               )}
-              {canDelete && (
-                <button
-                  onClick={() => setIsConfirmingDelete(true)}
-                  disabled={isDeleting}
-                  style={{
-                    color: '#EF4444',
-                    fontSize: isMobile ? '0.875rem' : '0.9375rem',
-                    fontFamily: 'Inter',
-                    fontWeight: 400,
-                    textDecoration: 'underline',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                  }}
-                  aria-label={`Supprimer le projet ${project.name}`}
-                  onFocus={(e) => !e.currentTarget.disabled && Object.assign(e.currentTarget.style, focusOutlineStyle)}
-                  onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
-                >
-                  Supprimer
-                </button>
+              {canCreate && (
+                <>
+                  <button
+                    onClick={() => setIsAITaskModalOpen(true)}
+                    style={{
+                      width: isMobile ? '100px' : '94px',
+                      height: isMobile ? '50px' : '50px',
+                      padding: isMobile ? '13px 24px' : '13px 74px',
+                      background: '#D3590B',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 10,
+                      fontSize: buttonFontSize,
+                      fontFamily: 'Inter',
+                      fontWeight: 400,
+                      cursor: 'pointer',
+                    }}
+                    aria-label="Créer une tâche avec l'intelligence artificielle"
+                    onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
+                    onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
+                  >
+                    IA
+                  </button>
+                  <button
+                    onClick={() => setIsCreateTaskModalOpen(true)}
+                    style={{
+                      width: isMobile ? '200px' : '181px',
+                      height: '50px',
+                      padding: isMobile ? '13px 24px' : '13px 74px',
+                      background: '#1F1F1F',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 10,
+                      fontSize: buttonFontSize,
+                      fontFamily: 'Inter',
+                      fontWeight: 400,
+                      cursor: 'pointer',
+                    }}
+                    aria-label="Créer une nouvelle tâche"
+                    onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
+                    onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
+                  >
+                    + Créer une tâche
+                  </button>
+                </>
               )}
+
             </div>
           </div>
           <p 
@@ -631,7 +640,7 @@ export default function ProjectDetail() {
             borderRadius: 10,
             padding: isMobile ? '1rem' : '1.5rem',
             display: 'flex',
-            flexDirection: 'column',
+            justifyContent: 'space-between',
             gap: isMobile ? '1rem' : '1.5rem',
           }}
           role="complementary"
@@ -1049,62 +1058,6 @@ export default function ProjectDetail() {
 
       </div>
 
-      {canCreate && (
-        <div
-          style={{
-            display: 'flex',
-            gap: 'clamp(0.5rem, 1vw, 1rem)',
-            flexDirection: isMobile ? 'column' : 'row',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            width: '100%',
-          }}
-        >
-          <button
-            onClick={() => setIsAITaskModalOpen(true)}
-            style={{
-              width: isMobile ? '100px' : '94px',
-              height: isMobile ? '50px' : '50px',
-              padding: isMobile ? '13px 24px' : '13px 74px',
-              background: '#D3590B',
-              color: 'white',
-              border: 'none',
-              borderRadius: 10,
-              fontSize: buttonFontSize,
-              fontFamily: 'Inter',
-              fontWeight: 400,
-              cursor: 'pointer',
-            }}
-            aria-label="Créer une tâche avec l'intelligence artificielle"
-            onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
-            onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
-          >
-            IA
-          </button>
-          
-          <button
-            onClick={() => setIsCreateTaskModalOpen(true)}
-            style={{
-              width: isMobile ? '200px' : '181px',
-              height: '50px',
-              padding: isMobile ? '13px 24px' : '13px 74px',
-              background: '#1F1F1F',
-              color: 'white',
-              border: 'none',
-              borderRadius: 10,
-              fontSize: buttonFontSize,
-              fontFamily: 'Inter',
-              fontWeight: 400,
-              cursor: 'pointer',
-            }}
-            aria-label="Créer une nouvelle tâche"
-            onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
-            onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
-          >
-            + Créer une tâche
-          </button>
-        </div>
-      )}
 
       {/* Modal de confirmation de suppression */}
       {isConfirmingDelete && (
