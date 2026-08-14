@@ -1,43 +1,76 @@
+// Projects.tsx - Page liste des projets
+
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { useAuth, type User } from '../contexts/AuthContext';
 import EditProjectModal from '../components/EditProjectModal';
 import { canDeleteProject, canModifyProject, hasProjectAccess } from '../utils/permissions';
 import { storage } from '../utils/storage';
+
 import { getProjects, deleteProject, type Project } from '../services/projectService';
+
 import { getProjectTasks, type Task } from '../services/taskService';
 import equipeIcon from '../images/equipeicon.svg';
 
 // Couleurs des statuts - Conforme WCAG 2.1 AA
+
+
 const statusColors: Record<string, { bg: string; color: string }> = {
   'En cours': { bg: '#FFF0D7', color: '#E08D00' },
   'Terminé': { bg: '#D1FAE5', color: '#059669' },
   'En attente': { bg: '#FFE0E0', color: '#EF4444' },
 };
 
+
+
+
 export default function Projects() {
+
+
+
   const { user, isAuthenticated } = useAuth();
+
   const navigate = useNavigate();
+
+
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+
   const [searchQuery] = useState('');
+
+
   const [projects, setProjects] = useState<Project[]>([]);
+
+
   const [isLoading, setIsLoading] = useState(true);
+
+
   const [error, setError] = useState<string | null>(null);
+
+
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Gestion du resize pour le responsive
+
   useEffect(() => {
+
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
+
+// RENDER
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Calcul des tailles responsives
+
   const isMobile = windowWidth <= 768;
   const isTablet = windowWidth <= 1024;
   
   // Tailles adaptatives
   const headerWidth = isMobile ? '100%' : isTablet ? '95%' : '80.97vw';
+
   const containerPadding = isMobile ? '1rem' : isTablet ? '1.5rem' : '2.5rem';
   const titleSize = isMobile ? '1.5rem' : '1.75rem';
   const subtitleSize = isMobile ? '1rem' : '1.125rem';
@@ -47,6 +80,8 @@ export default function Projects() {
   const cardGap = isMobile ? '1rem' : '1.5rem';
 
   // Récupérer les projets
+
+
   const fetchProjects = useCallback(async () => {
     if (!user) return;
     
@@ -67,6 +102,7 @@ export default function Projects() {
         projectsData.map(async (project: Project) => {
           try {
             const tasks = await getProjectTasks(token, project.id);
+
             const completedTasks = tasks.filter((t: Task) => t.status === 'Terminé').length;
             return {
               ...project,
@@ -90,6 +126,7 @@ export default function Projects() {
     }
   }, [user, navigate]);
 
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchProjects();
@@ -97,6 +134,9 @@ export default function Projects() {
   }, [isAuthenticated, fetchProjects]);
 
   // Supprimer un projet
+
+
+
   const handleDeleteProject = async (projectId: string) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
       return;
@@ -123,16 +163,20 @@ export default function Projects() {
   };
 
   // Extraire les initiales du nom
+
+
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
   // Obtenir la couleur du statut
+
   const getStatusColor = (status: string) => {
     return statusColors[status] || { bg: '#E5E7EB', color: '#6B7280' };
   };
 
   // Filtrer les projets
+
   const filteredProjects = projects.filter((p: Project) => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -148,12 +192,16 @@ export default function Projects() {
     outlineOffset: '2px',
   };
 
+
+// RENDER
+
+
+
   return (
     <div style={{ 
       width: '100%',
       padding: isMobile ? '1rem' : '0',
     }}>
-      {/* Header */}
       <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -301,6 +349,7 @@ export default function Projects() {
 }
 
 // Composant ProjectCard
+
 function ProjectCard({ 
   project, 
   navigate,
@@ -351,6 +400,11 @@ function ProjectCard({
   const buttonFontSize = isMobile ? '0.75rem' : '0.875rem';
   const badgeFontSize = isMobile ? '0.75rem' : '0.875rem';
   const progressBarHeight = isMobile ? '6px' : '7px';
+
+
+// RENDER
+
+
 
   return (
     <div style={{

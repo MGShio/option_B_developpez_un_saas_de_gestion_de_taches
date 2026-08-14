@@ -1,25 +1,37 @@
+// AuthContext.tsx - Context
+
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+
 import type { ReactNode } from 'react';
 import { storage } from '../utils/storage';
 import { 
+
   login as loginService, 
   register as registerService, 
   logout as logoutService, 
   getCurrentUser,
   updateProfile as updateProfileService,
   updatePassword as updatePasswordService,
+
   type LoginCredentials, 
+
   type RegisterCredentials, 
+
   type AuthResponse,
+
   type UpdateProfileCredentials,
+
   type UpdatePasswordCredentials
 } from '../services/authService';
+
+
 
 export interface User {
   id: string;
   email: string;
   name: string;
 }
+
 
 interface AuthContextType {
   user: User | null;
@@ -34,20 +46,38 @@ interface AuthContextType {
   clearError: () => void;
 }
 
+
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
+
+
+
+
 export function AuthProvider({ children }: AuthProviderProps) {
+
+
   const [user, setUser] = useState<User | null>(null);
+
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+
   const [isLoading, setIsLoading] = useState(true);
+
+
   const [error, setError] = useState<string | null>(null);
 
   // Vérifie le token au démarrage
+
   useEffect(() => {
+
+
     const checkAuth = async () => {
       const token = storage.getToken();
       if (token) {
@@ -67,6 +97,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     checkAuth();
   }, []);
 
+
+
   const login = useCallback(async (credentials: LoginCredentials) => {
     setIsLoading(true);
     setError(null);
@@ -82,6 +114,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsLoading(false);
     }
   }, []);
+
+
 
   const register = useCallback(async (credentials: RegisterCredentials) => {
     setIsLoading(true);
@@ -99,6 +133,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
+
+
   const logout = useCallback(async () => {
     try {
       await logoutService();
@@ -111,6 +147,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setError(null);
     }
   }, []);
+
+
 
   const updateProfile = useCallback(async (credentials: UpdateProfileCredentials) => {
     setIsLoading(true);
@@ -130,6 +168,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
+
+
   const updatePassword = useCallback(async (credentials: UpdatePasswordCredentials) => {
     setIsLoading(true);
     setError(null);
@@ -146,6 +186,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsLoading(false);
     }
   }, []);
+
+
 
   const clearError = useCallback(() => {
     setError(null);
@@ -164,12 +206,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
     clearError,
   };
 
+
+// RENDER
+
+
+
   return (
     <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 }
+
+
+
+
 
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);

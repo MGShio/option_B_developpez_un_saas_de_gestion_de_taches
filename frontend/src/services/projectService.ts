@@ -1,6 +1,11 @@
+// projectService.ts - Service
+
 const API_BASE_URL = 'http://localhost:8000';
 
 // Backend response types
+
+
+
 interface BackendUser {
   id: string;
   email: string;
@@ -9,12 +14,16 @@ interface BackendUser {
   updatedAt?: string;
 }
 
+
+
 interface BackendProjectMember {
   id: string;
   role: string;
   user?: BackendUser;
   joinedAt?: string;
 }
+
+
 
 interface BackendProject {
   id: string;
@@ -29,6 +38,7 @@ interface BackendProject {
 }
 
 // Convert backend project to frontend project
+
 function formatProjectFromBackend(backendProject: any): Project {
   const project: any = {
     id: backendProject.id,
@@ -73,6 +83,7 @@ function formatProjectFromBackend(backendProject: any): Project {
 }
 
 // Generic function to extract projects from backend response
+
 function extractProjectsFromResponse(data: any): BackendProject[] {
   if (data?.data?.projects) {
     return data.data.projects;
@@ -87,6 +98,7 @@ function extractProjectsFromResponse(data: any): BackendProject[] {
 }
 
 // Generic function to extract single project from backend response
+
 function extractProjectFromResponse(data: any): BackendProject {
   if (data?.data?.project) {
     return data.data.project;
@@ -97,6 +109,8 @@ function extractProjectFromResponse(data: any): BackendProject {
   return data;
 }
 
+
+
 export interface User {
   id: string;
   email: string;
@@ -105,12 +119,16 @@ export interface User {
   updatedAt?: string;
 }
 
+
+
 export interface ProjectMember {
   id: string;
   role: string;
   user: User;
   joinedAt?: string;
 }
+
+
 
 export interface Project {
   id: string;
@@ -126,14 +144,20 @@ export interface Project {
   userRole?: 'ADMIN' | 'CONTRIBUTOR' | null; // Rôle de l'utilisateur dans ce projet
 }
 
+
+
 export interface CreateProjectData {
   name: string;
   description?: string;
 }
 
+
+
 export interface UpdateProjectData extends Partial<CreateProjectData> {
   // No status field - Project doesn't have status in backend
 }
+
+
 
 export interface ApiError {
   message: string;
@@ -142,6 +166,7 @@ export interface ApiError {
 
 // Récupérer tous les projets de l'utilisateur
 // GET /projects
+
 export async function getProjects(token: string): Promise<Project[]> {
   const response = await fetch(`${API_BASE_URL}/projects`, {
     method: 'GET',
@@ -169,6 +194,7 @@ export async function getProjects(token: string): Promise<Project[]> {
 
 // Récupérer un projet par ID
 // GET /projects/{projectId}
+
 export async function getProjectById(token: string, projectId: string): Promise<Project> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
     method: 'GET',
@@ -198,6 +224,7 @@ export async function getProjectById(token: string, projectId: string): Promise<
 
 // Créer un nouveau projet
 // POST /projects
+
 export async function createProject(token: string, projectData: CreateProjectData): Promise<Project> {
   const response = await fetch(`${API_BASE_URL}/projects`, {
     method: 'POST',
@@ -220,6 +247,7 @@ export async function createProject(token: string, projectData: CreateProjectDat
 
 // Mettre à jour un projet
 // PATCH /projects/{projectId}
+
 export async function updateProject(token: string, projectId: string, projectData: UpdateProjectData): Promise<Project> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
     method: 'PATCH',
@@ -242,6 +270,7 @@ export async function updateProject(token: string, projectId: string, projectDat
 
 // Supprimer un projet
 // DELETE /projects/{projectId}
+
 export async function deleteProject(token: string, projectId: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
     method: 'DELETE',
@@ -258,6 +287,7 @@ export async function deleteProject(token: string, projectId: string): Promise<v
 
 // Rechercher des projets
 // GET /projects/search?q={query}
+
 export async function searchProjects(token: string, query: string): Promise<Project[]> {
   const response = await fetch(`${API_BASE_URL}/projects/search?q=${encodeURIComponent(query)}`, {
     method: 'GET',
@@ -278,6 +308,7 @@ export async function searchProjects(token: string, query: string): Promise<Proj
 
 // Ajouter un contributeur à un projet
 // POST /projects/{projectId}/contributors
+
 export async function addContributor(token: string, projectId: string, userId: string): Promise<ProjectMember> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/contributors`, {
     method: 'POST',
@@ -299,6 +330,7 @@ export async function addContributor(token: string, projectId: string, userId: s
 
 // Supprimer un contributeur d'un projet
 // DELETE /projects/{projectId}/contributors/{userId}
+
 export async function removeContributor(token: string, projectId: string, userId: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/contributors/${userId}`, {
     method: 'DELETE',

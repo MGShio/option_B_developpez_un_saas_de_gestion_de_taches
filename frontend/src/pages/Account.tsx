@@ -1,20 +1,41 @@
+// Account.tsx - Page compte utilisateur
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { storage } from '../utils/storage';
 
+
+
+
 export default function Account() {
+
+
+
   const { user, isAuthenticated, logout, updateProfile, updatePassword, error, clearError } = useAuth();
+
   const navigate = useNavigate();
+
+
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
   // États pour l'édition du profil
+
+
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+
+
   const [isEditingPassword, setIsEditingPassword] = useState(false);
+
+
   const [isUpdating, setIsUpdating] = useState(false);
+
+
   const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
 
   // Form data pour le profil
+
+
   const [profileForm, setProfileForm] = useState({
     firstName: '',
     lastName: '',
@@ -22,21 +43,31 @@ export default function Account() {
   });
 
   // Form data pour le mot de passe
+
+
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
     confirmNewPassword: '',
   });
+
+
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
   // Gestion du resize pour le responsive
+
   useEffect(() => {
+
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
+
+// RENDER
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Initialiser les données du profil
+
   useEffect(() => {
     if (user) {
       const firstName = user.name?.split(' ').slice(1).join(' ') || '';
@@ -50,9 +81,11 @@ export default function Account() {
   }, [user]);
 
   // Calcul des tailles responsives
+
   const isMobile = windowWidth <= 768;
   const isTablet = windowWidth <= 1024;
   
+
   const containerPadding = isMobile ? '20px' : isTablet ? '40px' : '59px';
   const containerWidth = isMobile ? '100%' : isTablet ? '95%' : '85%';
   const maxContainerWidth = isMobile ? '100%' : '1200px';
@@ -79,6 +112,8 @@ export default function Account() {
   }
 
   // Gestion de la soumission du profil
+
+
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
@@ -101,6 +136,8 @@ export default function Account() {
   };
 
   // Gestion de la soumission du mot de passe
+
+
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
@@ -137,6 +174,7 @@ export default function Account() {
   };
 
   // Annuler l'édition
+
   const handleCancelEdit = () => {
     setIsEditingProfile(false);
     setIsEditingPassword(false);
@@ -285,6 +323,11 @@ export default function Account() {
     fontWeight: '400',
     marginTop: '0.25rem',
   };
+
+
+// RENDER
+
+
 
   return (
     <div style={pageStyle} role="main" aria-label="Mon compte">

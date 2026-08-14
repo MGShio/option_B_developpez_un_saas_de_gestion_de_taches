@@ -1,25 +1,45 @@
+// Login.tsx - Page connexion
+
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 // Import de l'image de fond locale
 import loginBackground from '../../images/Loginbackground.svg';
+
 // Import du logo
 import logoOrange from '../../images/logoorange.svg';
 
+
+
+
 export default function Login() {
+
+
   const [email, setEmail] = useState('');
+
+
   const [password, setPassword] = useState('');
+
+
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+
+
   const { login, isLoading, error, clearError } = useAuth();
+
   const navigate = useNavigate();
 
   // Reset body margin pour éviter les bordures blanches
+
   useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.minHeight = '100vh';
     document.body.style.overflow = 'hidden';
+
+// RENDER
+
     return () => {
       document.body.style.margin = '';
       document.body.style.padding = '';
@@ -29,11 +49,18 @@ export default function Login() {
   }, []);
 
   // Gestion du resize pour le responsive
+
   useEffect(() => {
+
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
+
+// RENDER
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +75,7 @@ export default function Login() {
   };
 
   // Calcul des tailles responsives
+
   const isMobile = windowWidth <= 768;
   const isTablet = windowWidth <= 1024;
   
@@ -213,6 +241,11 @@ export default function Login() {
     outline: '2px solid var(--color-primary)',
     outlineOffset: '2px',
   };
+
+
+// RENDER
+
+
 
   return (
     <div style={containerStyle} role="main" aria-label="Page de connexion">

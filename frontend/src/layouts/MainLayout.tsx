@@ -1,3 +1,5 @@
+// MainLayout.tsx - Layout
+
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,27 +12,47 @@ import dashboardIconOrange from '../images/dashboardiconorange.svg';
 import folderIcon from '../images/foldericon.svg';
 import folderIconWhite from '../images/foldericonwhite.svg';
 
+
+
+
+
 export default function MainLayout() {
+
+
+
   const { user, isAuthenticated } = useAuth();
+
   const navigate = useNavigate();
   const location = useLocation();
+
+
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Gestion du resize pour le responsive
+
   useEffect(() => {
+
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
+
+// RENDER
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Extraire les initiales du nom de l'utilisateur
+
+
   const getInitials = (name: string) => {
     if (!name) return '';
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
   // Calcul des tailles responsives
+
   const isMobile = windowWidth <= 768;
   const isDashboard = location.pathname === '/dashboard';
   const isProjects = location.pathname === '/projects';
@@ -226,9 +248,14 @@ export default function MainLayout() {
     outlineOffset: '2px',
   };
 
+
+// RENDER
+
+
+
   return (
     <div style={layoutStyle}>
-      {/* Header */}
+
       <header style={headerStyle} role="banner">
         {/* Logo */}
         <Link to="/dashboard" style={logoStyle} aria-label="Accueil - Tableau de bord">

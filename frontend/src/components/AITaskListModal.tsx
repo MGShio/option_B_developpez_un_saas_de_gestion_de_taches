@@ -1,4 +1,8 @@
+// AITaskListModal.tsx - Component
+
 import { useState } from 'react';
+
+
 
 interface AITask {
   id: number;
@@ -6,22 +10,32 @@ interface AITask {
   description: string;
 }
 
+
+
+
 export default function AITaskListModal({ onClose }: { onClose: () => void }) {
+
+
   const [aiTasks, setAITasks] = useState<AITask[]>([
     { id: 1, title: 'Nom de la tâche', description: 'Description de la tâche' },
     { id: 2, title: 'Nom de la tâche', description: 'Description de la tâche' },
     { id: 3, title: 'Nom de la tâche', description: 'Description de la tâche' },
   ]);
+
+
   const [newTaskDescription, setNewTaskDescription] = useState('');
+
 
   const handleDeleteTask = (id: number) => {
     setAITasks(aiTasks.filter(task => task.id !== id));
   };
 
+
   const handleAddTasks = () => {
     // Logique pour ajouter les tâches générées par IA
     console.log('Ajout des tâches IA:', aiTasks);
   };
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +49,11 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
       setNewTaskDescription('');
     }
   };
+
+
+// RENDER
+
+
 
   return (
     <div style={{
@@ -93,7 +112,6 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
-          {/* Liste des tâches */}
           <div style={{
             alignSelf: 'stretch',
             flexDirection: 'column',

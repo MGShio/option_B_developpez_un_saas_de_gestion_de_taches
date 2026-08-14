@@ -1,4 +1,9 @@
+// taskService.ts - Service
+
 const API_BASE_URL = 'http://localhost:8000';
+
+
+
 
 export interface User {
   id: string;
@@ -8,6 +13,8 @@ export interface User {
   updatedAt?: string;
 }
 
+
+
 export interface TaskAssignee {
   id: string;
   userId: string;
@@ -15,6 +22,8 @@ export interface TaskAssignee {
   user: User;
   assignedAt?: string;
 }
+
+
 
 export interface Comment {
   id: string;
@@ -25,6 +34,8 @@ export interface Comment {
   createdAt: string;
   updatedAt: string;
 }
+
+
 
 export interface ProjectSummary {
   id: string;
@@ -53,24 +64,38 @@ const PRIORITY_MAP: Record<string, string> = {
 };
 
 // Fonctions de conversion pour l'envoi au backend
+
+
+
 export function toBackendStatus(status: string): string {
   return STATUS_MAP[status] || status;
 }
+
+
+
 
 export function toBackendPriority(priority: string): string {
   return PRIORITY_MAP[priority] || priority;
 }
 
 // Fonctions de conversion pour l'affichage frontend
+
+
+
 export function toFrontendStatus(status: string): string {
   return STATUS_MAP[status] || status;
 }
+
+
+
 
 export function toFrontendPriority(priority: string): string {
   return PRIORITY_MAP[priority] || priority;
 }
 
 // Backend response types
+
+
 interface BackendTaskAssignee {
   id: string;
   userId: string;
@@ -84,6 +109,8 @@ interface BackendTaskAssignee {
   };
   assignedAt?: string;
 }
+
+
 
 interface BackendTask {
   id: string;
@@ -104,6 +131,9 @@ interface BackendTask {
 }
 
 // Function to convert task data from backend format to frontend format
+
+
+
 export function formatTaskFromBackend(backendTask: BackendTask): Task {
   return {
     id: backendTask.id,
@@ -136,6 +166,9 @@ export function formatTaskFromBackend(backendTask: BackendTask): Task {
 }
 
 // Function to convert task data from frontend format to backend format
+
+
+
 export function formatTaskToBackend(frontendTask: Partial<CreateTaskData>): any {
   const result: any = { ...frontendTask };
   
@@ -153,6 +186,8 @@ export function formatTaskToBackend(frontendTask: Partial<CreateTaskData>): any 
   return result;
 }
 
+
+
 export interface Task {
   id: string;
   title: string;
@@ -167,6 +202,8 @@ export interface Task {
   updatedAt: string;
 }
 
+
+
 export interface CreateTaskData {
   title: string;
   description?: string;
@@ -175,9 +212,13 @@ export interface CreateTaskData {
   priority: 'Faible' | 'Moyenne' | 'Haute';
 }
 
+
+
 export interface UpdateTaskData extends Partial<CreateTaskData> {
   status?: 'À faire' | 'En cours' | 'Terminé';
 }
+
+
 
 export interface ApiError {
   message: string;
@@ -185,6 +226,7 @@ export interface ApiError {
 }
 
 // Generic function to extract tasks from backend response
+
 function extractTasksFromResponse(data: any): BackendTask[] {
   // Backend wraps in { success: true, message: '...', data: { tasks: [...] } } or { success: true, message: '...', data: [...] }
   if (data?.data?.tasks) {
@@ -200,6 +242,7 @@ function extractTasksFromResponse(data: any): BackendTask[] {
 }
 
 // Generic function to extract single task from backend response
+
 function extractTaskFromResponse(data: any): BackendTask {
   if (data?.data?.task) {
     return data.data.task;
@@ -212,6 +255,7 @@ function extractTaskFromResponse(data: any): BackendTask {
 
 // Récupérer toutes les tâches assignées à l'utilisateur
 // GET /dashboard/assigned-tasks
+
 export async function getAssignedTasks(token: string): Promise<Task[]> {
   const response = await fetch(`${API_BASE_URL}/dashboard/assigned-tasks`, {
     method: 'GET',
@@ -231,12 +275,14 @@ export async function getAssignedTasks(token: string): Promise<Task[]> {
 }
 
 // Alias for getAssignedTasks
+
 export async function getTasks(token: string): Promise<Task[]> {
   return getAssignedTasks(token);
 }
 
 // Récupérer une tâche par ID
 // GET /projects/{projectId}/tasks/{taskId}
+
 export async function getTaskById(token: string, projectId: string, taskId: string): Promise<Task> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}`, {
     method: 'GET',
@@ -255,8 +301,10 @@ export async function getTaskById(token: string, projectId: string, taskId: stri
   return formatTaskFromBackend(backendTask);
 }
 
+
 // Créer une nouvelle tâche
 // POST /projects/{projectId}/tasks
+
 export async function createTask(token: string, taskData: CreateTaskData): Promise<Task> {
   const response = await fetch(`${API_BASE_URL}/projects/${taskData.projectId}/tasks`, {
     method: 'POST',
@@ -279,6 +327,7 @@ export async function createTask(token: string, taskData: CreateTaskData): Promi
 
 // Mettre à jour une tâche
 // PATCH /projects/{projectId}/tasks/{taskId}
+
 export async function updateTask(token: string, projectId: string, taskId: string, taskData: UpdateTaskData): Promise<Task> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}`, {
     method: 'PATCH',
@@ -301,6 +350,7 @@ export async function updateTask(token: string, projectId: string, taskId: strin
 
 // Supprimer une tâche
 // DELETE /projects/{projectId}/tasks/{taskId}
+
 export async function deleteTask(token: string, projectId: string, taskId: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}`, {
     method: 'DELETE',
@@ -317,6 +367,7 @@ export async function deleteTask(token: string, projectId: string, taskId: strin
 
 // Rechercher des tâches
 // GET /dashboard/assigned-tasks/search?q={query}
+
 export async function searchTasks(token: string, query: string): Promise<Task[]> {
   const response = await fetch(`${API_BASE_URL}/dashboard/assigned-tasks/search?q=${encodeURIComponent(query)}`, {
     method: 'GET',
@@ -337,6 +388,7 @@ export async function searchTasks(token: string, query: string): Promise<Task[]>
 
 // Récupérer les tâches d'un projet
 // GET /projects/{projectId}/tasks
+
 export async function getProjectTasks(token: string, projectId: string): Promise<Task[]> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks`, {
     method: 'GET',
@@ -357,6 +409,7 @@ export async function getProjectTasks(token: string, projectId: string): Promise
 
 // Récupérer les commentaires d'une tâche
 // GET /projects/{projectId}/tasks/{taskId}/comments
+
 export async function getTaskComments(token: string, projectId: string, taskId: string): Promise<Comment[]> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}/comments`, {
     method: 'GET',
@@ -382,6 +435,7 @@ export async function getTaskComments(token: string, projectId: string, taskId: 
 
 // Créer un commentaire sur une tâche
 // POST /projects/{projectId}/tasks/{taskId}/comments
+
 export async function createComment(token: string, projectId: string, taskId: string, content: string): Promise<Comment> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}/comments`, {
     method: 'POST',
@@ -409,6 +463,7 @@ export async function createComment(token: string, projectId: string, taskId: st
 
 // Supprimer un commentaire
 // DELETE /projects/{projectId}/tasks/{taskId}/comments/{commentId}
+
 export async function deleteCommentService(token: string, projectId: string, taskId: string, commentId: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}/comments/${commentId}`, {
     method: 'DELETE',

@@ -1,4 +1,7 @@
+// TaskComments.tsx - Component
+
 /**
+
  * Composant TaskComments - Affiche et gère les commentaires d'une tâche
  * 
  * Ce composant permet de :
@@ -7,10 +10,17 @@
  * - Supprimer un commentaire (si l'utilisateur en est l'auteur ou un admin)
  */
 
+
 import { useState, useEffect } from 'react';
+
+
 import type { Comment } from '../services/taskService';
+
+
 import type { User } from '../contexts/AuthContext';
 import { isProjectAdmin as checkIsProjectAdmin } from '../utils/permissions';
+
+
 
 interface TaskCommentsProps {
   taskId: string;
@@ -24,6 +34,7 @@ interface TaskCommentsProps {
 }
 
 // Icône de commentaire
+
 const CommentIcon = ({ size = 16 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M2 4H14V12H2V4Z" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -32,6 +43,7 @@ const CommentIcon = ({ size = 16 }: { size?: number }) => (
 );
 
 // Icône de poubelle
+
 const TrashIcon = ({ size = 14 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M2.5 3.5H11.5" stroke="#EF4444" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -43,6 +55,7 @@ const TrashIcon = ({ size = 14 }: { size?: number }) => (
 );
 
 // Icône d'envoi
+
 const SendIcon = ({ size = 16 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M1.5 8.5L14 1L1.5 13" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -53,6 +66,7 @@ const SendIcon = ({ size = 16 }: { size?: number }) => (
 /**
  * Formate une date en format lisible
  */
+
 const formatDate = (dateString: string): string => {
   return new Date(dateString).toLocaleDateString('fr-FR', {
     day: 'numeric',
@@ -67,6 +81,7 @@ const formatDate = (dateString: string): string => {
  * Vérifie si l'utilisateur peut supprimer un commentaire
  * (auteur du commentaire ou admin du projet)
  */
+
 const canDeleteComment = (currentUser: User | null, comment: Comment, isProjectAdmin: boolean): boolean => {
   if (!currentUser) return false;
   // L'auteur du commentaire peut le supprimer
@@ -75,6 +90,10 @@ const canDeleteComment = (currentUser: User | null, comment: Comment, isProjectA
   if (isProjectAdmin) return true;
   return false;
 };
+
+
+
+
 
 export default function TaskComments({
   taskId,
@@ -86,12 +105,20 @@ export default function TaskComments({
   onDeleteComment,
   isLoading = false,
 }: TaskCommentsProps) {
+
+
   const [newComment, setNewComment] = useState('');
+
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+
   const [error, setError] = useState<string | null>(null);
 
   // Calculate isProjectAdmin based on project and currentUser
   const isProjectAdmin = checkIsProjectAdmin(currentUser, project);
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,6 +140,8 @@ export default function TaskComments({
     }
   };
 
+
+
   const handleDelete = async (commentId: string) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) {
       return;
@@ -130,6 +159,11 @@ export default function TaskComments({
     outline: '2px solid #D3590B',
     outlineOffset: '2px',
   };
+
+
+// RENDER
+
+
 
   return (
     <div
@@ -265,6 +299,11 @@ export default function TaskComments({
           comments.map((comment) => {
             const canDelete = canDeleteComment(currentUser, comment, isProjectAdmin);
             const isAuthor = comment.authorId === currentUser?.id;
+
+
+// RENDER
+
+
 
             return (
               <div

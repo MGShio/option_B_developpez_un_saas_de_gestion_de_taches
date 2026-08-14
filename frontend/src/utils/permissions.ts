@@ -1,15 +1,21 @@
+// permissions.ts - Utility
+
 /**
+
  * Utilitaires de permissions pour le frontend
  * Ces fonctions permettent de vérifier les droits d'un utilisateur sur un projet
  * en fonction de son rôle (ADMIN, CONTRIBUTOR) et de son statut de propriétaire.
  */
 
+
 import type { Project } from '../services/projectService';
+
 import type { User } from '../contexts/AuthContext';
 
 /**
  * Rôles possibles dans un projet
  */
+
 export type ProjectRole = 'ADMIN' | 'CONTRIBUTOR' | null;
 
 /**
@@ -18,6 +24,7 @@ export type ProjectRole = 'ADMIN' | 'CONTRIBUTOR' | null;
  * @param project - Le projet à vérifier
  * @returns true si l'utilisateur est le propriétaire
  */
+
 export const isProjectOwner = (user: User | null, project: Project | null): boolean => {
   if (!user || !project) return false;
   return user.id === project.ownerId || user.id === project.owner?.id;
@@ -30,6 +37,7 @@ export const isProjectOwner = (user: User | null, project: Project | null): bool
  * @param project - Le projet à vérifier
  * @returns true si l'utilisateur est admin (propriétaire ou rôle ADMIN)
  */
+
 export const isProjectAdmin = (user: User | null, project: Project | null): boolean => {
   if (!user || !project) return false;
   
@@ -48,6 +56,7 @@ export const isProjectAdmin = (user: User | null, project: Project | null): bool
  * @param project - Le projet à vérifier
  * @returns true si l'utilisateur a accès au projet
  */
+
 export const hasProjectAccess = (user: User | null, project: Project | null): boolean => {
   if (!user || !project) return false;
   return isProjectOwner(user, project) || 
@@ -62,6 +71,8 @@ export const hasProjectAccess = (user: User | null, project: Project | null): bo
  * @param project - Le projet à vérifier
  * @returns true si l'utilisateur peut modifier le projet
  */
+
+
 export const canModifyProject = (user: User | null, project: Project | null): boolean => {
   return isProjectAdmin(user, project);
 };
@@ -73,6 +84,7 @@ export const canModifyProject = (user: User | null, project: Project | null): bo
  * @param project - Le projet à vérifier
  * @returns true si l'utilisateur peut supprimer le projet
  */
+
 export const canDeleteProject = (user: User | null, project: Project | null): boolean => {
   return isProjectOwner(user, project);
 };
@@ -84,6 +96,7 @@ export const canDeleteProject = (user: User | null, project: Project | null): bo
  * @param project - Le projet à vérifier
  * @returns true si l'utilisateur peut créer des tâches
  */
+
 export const canCreateTasks = (user: User | null, project: Project | null): boolean => {
   return hasProjectAccess(user, project);
 };
@@ -95,6 +108,8 @@ export const canCreateTasks = (user: User | null, project: Project | null): bool
  * @param project - Le projet à vérifier
  * @returns true si l'utilisateur peut modifier des tâches
  */
+
+
 export const canModifyTasks = (user: User | null, project: Project | null): boolean => {
   return hasProjectAccess(user, project);
 };
@@ -106,6 +121,7 @@ export const canModifyTasks = (user: User | null, project: Project | null): bool
  * @param project - Le projet à vérifier
  * @returns true si l'utilisateur peut gérer les contributeurs
  */
+
 export const canManageContributors = (user: User | null, project: Project | null): boolean => {
   return isProjectAdmin(user, project);
 };
@@ -118,6 +134,8 @@ export const canManageContributors = (user: User | null, project: Project | null
  * @param taskCreatorId - L'ID du créateur de la tâche
  * @returns true si l'utilisateur peut modifier la tâche
  */
+
+
 export const canModifyTask = (user: User | null, project: Project | null, taskCreatorId?: string): boolean => {
   if (!user || !project) return false;
   
@@ -139,6 +157,7 @@ export const canModifyTask = (user: User | null, project: Project | null, taskCr
  * @param taskCreatorId - L'ID du créateur de la tâche
  * @returns true si l'utilisateur peut supprimer la tâche
  */
+
 export const canDeleteTask = (user: User | null, project: Project | null, taskCreatorId?: string): boolean => {
   if (!user || !project) return false;
   
@@ -157,6 +176,7 @@ export const canDeleteTask = (user: User | null, project: Project | null, taskCr
  * @param project - Le projet
  * @returns Le rôle formaté (Propriétaire, Administrateur, Contributeur)
  */
+
 export const getUserRoleLabel = (user: User | null, project: Project | null): string => {
   if (!user || !project) return 'Inconnu';
   
@@ -166,6 +186,7 @@ export const getUserRoleLabel = (user: User | null, project: Project | null): st
   if (project.userRole === 'CONTRIBUTOR') return 'Contributeur';
   
   // Vérifier dans les membres
+
   const member = project.members?.find(m => m.user.id === user.id);
   if (member) {
     return member.role === 'ADMIN' ? 'Administrateur' : 'Contributeur';

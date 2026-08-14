@@ -1,4 +1,7 @@
+// ProjectsWithTasksView.tsx - Component
+
 /**
+
  * Composant ProjectsWithTasksView - Affiche les projets avec leurs tâches
  * 
  * Ce composant permet de visualiser:
@@ -7,9 +10,13 @@
  * - Un aperçu des tâches associées
  */
 
+
 import { useState, useEffect } from 'react';
+
 import type { Project } from '../services/projectService';
+
 import type { Task } from '../services/taskService';
+
 
 interface ProjectsWithTasksViewProps {
   projects: (Project & { tasksCount?: number; completedTasks?: number; progress?: number })[];
@@ -21,6 +28,7 @@ interface ProjectsWithTasksViewProps {
 }
 
 // Couleurs des statuts
+
 const statusColors: Record<string, { bg: string; color: string }> = {
   'À faire': { bg: '#FFE0E0', color: '#EF4444' },
   'En cours': { bg: '#FFF0D7', color: '#E08D00' },
@@ -28,6 +36,7 @@ const statusColors: Record<string, { bg: string; color: string }> = {
 };
 
 // Icône de flèche droite
+
 const ArrowRightIcon = ({ size = 16 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M6 3L11 8L6 13" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -35,6 +44,7 @@ const ArrowRightIcon = ({ size = 16 }: { size?: number }) => (
 );
 
 // Icône de tâche
+
 const TaskIcon = ({ size = 14 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="1" y="3" width="12" height="8" rx="1" stroke="#6B7280" strokeWidth="1.5"/>
@@ -43,6 +53,7 @@ const TaskIcon = ({ size = 14 }: { size?: number }) => (
 );
 
 // Icône de progression
+
 const ProgressIcon = ({ size = 14 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="7" cy="7" r="6" stroke="#6B7280" strokeWidth="1.5"/>
@@ -51,11 +62,14 @@ const ProgressIcon = ({ size = 14 }: { size?: number }) => (
 );
 
 // Extraire les initiales
+
+
 const getInitials = (name: string) => {
   return name.split(' ').map(n => n[0]).join('').toUpperCase();
 };
 
 // Formater une date
+
 const formatDate = (dateString: string): string => {
   return new Date(dateString).toLocaleDateString('fr-FR', {
     day: 'numeric',
@@ -63,6 +77,9 @@ const formatDate = (dateString: string): string => {
     year: 'numeric',
   });
 };
+
+
+
 
 export default function ProjectsWithTasksView({
   projects,
@@ -78,7 +95,13 @@ export default function ProjectsWithTasksView({
     outlineOffset: '2px',
   };
 
+
   if (isLoading) {
+
+// RENDER
+
+
+
     return (
       <div
         style={{
@@ -94,7 +117,13 @@ export default function ProjectsWithTasksView({
     );
   }
 
+
   if (error) {
+
+// RENDER
+
+
+
     return (
       <div
         style={{
@@ -112,6 +141,11 @@ export default function ProjectsWithTasksView({
   }
 
   if (projects.length === 0) {
+
+// RENDER
+
+
+
     return (
       <div
         style={{
@@ -125,6 +159,11 @@ export default function ProjectsWithTasksView({
     );
   }
 
+
+// RENDER
+
+
+
   return (
     <div
       style={{
@@ -137,6 +176,7 @@ export default function ProjectsWithTasksView({
     >
       {projects.map((project) => {
         const tasks = tasksByProject.get(project.id) || [];
+
         const completedTasks = tasks.filter(t => t.status === 'Terminé').length;
         const progress = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
 
@@ -145,6 +185,11 @@ export default function ProjectsWithTasksView({
           { id: project.ownerId, name: project.owner?.name || 'Propriétaire', role: 'Propriétaire' },
           ...(project.members?.map(m => ({ id: m.user.id, name: m.user.name, role: m.role })) || [])
         ];
+
+
+// RENDER
+
+
 
         return (
           <div

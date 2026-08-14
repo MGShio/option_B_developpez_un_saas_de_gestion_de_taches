@@ -1,3 +1,5 @@
+// App.tsx - Application root component
+
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import MainLayout from './layouts/MainLayout';
@@ -10,6 +12,7 @@ import ProjectDetail from './pages/ProjectDetail';
 import Account from './pages/Account';
 import NotFound from './pages/NotFound';
 
+
 const loadingStyle: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'center',
@@ -18,8 +21,13 @@ const loadingStyle: React.CSSProperties = {
 };
 
 // Composant pour les routes protégées
+
 function PrivateRoute({ children }: { children: React.ReactNode }) {
+
+
+
   const { isAuthenticated, isLoading } = useAuth();
+
 
   if (isLoading) {
     return <div style={loadingStyle}>Chargement...</div>;
@@ -33,8 +41,13 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 }
 
 // Composant pour les routes publiques (redirect si déjà connecté)
+
 function PublicRoute({ children }: { children: React.ReactNode }) {
+
+
+
   const { isAuthenticated, isLoading } = useAuth();
+
 
   if (isLoading) {
     return <div style={loadingStyle}>Chargement...</div>;
@@ -47,10 +60,23 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+
+
+
+
 export default function App() {
+
+// RENDER
+
+
+
   return (
+
+
     <AuthProvider>
       <BrowserRouter>
+
+
         <Routes>
           {/* Routes publiques (sans layout) */}
           <Route path="/login" element={

@@ -1,6 +1,11 @@
+// authService.ts - Service
+
 const API_BASE_URL = 'http://localhost:8000';
 
 // Types for backend responses
+
+
+
 interface BackendUser {
   id: string;
   email: string;
@@ -8,6 +13,8 @@ interface BackendUser {
   createdAt?: string;
   updatedAt?: string;
 }
+
+
 
 interface BackendAuthResponse {
   success: boolean;
@@ -18,6 +25,8 @@ interface BackendAuthResponse {
   };
 }
 
+
+
 interface BackendProfileResponse {
   success: boolean;
   message: string;
@@ -27,6 +36,7 @@ interface BackendProfileResponse {
 }
 
 // Convert backend user to frontend user
+
 function formatUserFromBackend(backendUser: BackendUser): { id: string; email: string; name: string } {
   return {
     id: backendUser.id,
@@ -35,14 +45,20 @@ function formatUserFromBackend(backendUser: BackendUser): { id: string; email: s
   };
 }
 
+
+
 export interface LoginCredentials {
   email: string;
   password: string;
 }
 
+
+
 export interface RegisterCredentials extends LoginCredentials {
   name: string;
 }
+
+
 
 export interface AuthResponse {
   token: string;
@@ -53,12 +69,15 @@ export interface AuthResponse {
   };
 }
 
+
+
 export interface ApiError {
   message: string;
   statusCode: number;
 }
 
 // Login
+
 export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
@@ -79,6 +98,7 @@ export async function login(credentials: LoginCredentials): Promise<AuthResponse
 }
 
 // Register
+
 export async function register(credentials: RegisterCredentials): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: 'POST',
@@ -99,6 +119,7 @@ export async function register(credentials: RegisterCredentials): Promise<AuthRe
 }
 
 // Logout
+
 export async function logout(): Promise<void> {
   await fetch(`${API_BASE_URL}/auth/logout`, {
     method: 'POST',
@@ -107,10 +128,13 @@ export async function logout(): Promise<void> {
 }
 
 // Mettre à jour le profil
+
+
 export interface UpdateProfileCredentials {
   name?: string;
   email?: string;
 }
+
 
 export async function updateProfile(token: string, credentials: UpdateProfileCredentials): Promise<{ id: string; email: string; name: string }> {
   const response = await fetch(`${API_BASE_URL}/auth/profile`, {
@@ -132,10 +156,13 @@ export async function updateProfile(token: string, credentials: UpdateProfileCre
 }
 
 // Mettre à jour le mot de passe
+
+
 export interface UpdatePasswordCredentials {
   currentPassword: string;
   newPassword: string;
 }
+
 
 export async function updatePassword(token: string, credentials: UpdatePasswordCredentials): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/auth/password`, {
@@ -154,6 +181,7 @@ export async function updatePassword(token: string, credentials: UpdatePasswordC
 }
 
 // Vérifier le token et récupérer l'utilisateur
+
 export async function getCurrentUser(token: string): Promise<{ id: string; email: string; name: string }> {
   const response = await fetch(`${API_BASE_URL}/auth/profile`, {
     method: 'GET',

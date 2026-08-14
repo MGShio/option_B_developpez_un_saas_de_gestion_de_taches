@@ -1,25 +1,49 @@
+// NewProject.tsx - Page création de projet
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { storage } from '../utils/storage';
+
 import { createProject, type CreateProjectData } from '../services/projectService';
 
+
+
+
 export default function NewProject() {
+
+
+
   const { user, isAuthenticated } = useAuth();
+
   const navigate = useNavigate();
+
+
   const [newProject, setNewProject] = useState<CreateProjectData>({ name: '', description: '' });
+
+
   const [isCreating, setIsCreating] = useState(false);
+
+
   const [error, setError] = useState<string | null>(null);
+
+
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   // Gestion du resize pour le responsive
+
   useEffect(() => {
+
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
+
+// RENDER
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Calcul des tailles responsives
+
   const isMobile = windowWidth <= 768;
   const isTablet = windowWidth <= 1024;
 
@@ -31,9 +55,12 @@ export default function NewProject() {
   const inputSize = isMobile ? '0.875rem' : '0.9375rem';
   const buttonFontSize = isMobile ? '0.875rem' : '1rem';
   const paddingSize = '12px 16px';
+
   const containerPadding = isMobile ? '1rem' : isTablet ? '1.5rem' : '2rem';
   const buttonPadding = '12px 24px';
   const gapSize = isMobile ? '1rem' : '1.5rem';
+
+
 
   const handleCreateProject = async () => {
     if (!newProject.name.trim()) {
@@ -72,6 +99,11 @@ export default function NewProject() {
     outlineOffset: '2px',
   };
 
+
+// RENDER
+
+
+
   return (
     <div 
       style={{
@@ -91,7 +123,6 @@ export default function NewProject() {
         maxWidth: maxContainerWidth,
         margin: '0 auto',
       }}>
-        {/* Header */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',

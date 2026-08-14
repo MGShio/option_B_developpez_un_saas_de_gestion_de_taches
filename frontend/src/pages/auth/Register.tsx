@@ -1,28 +1,54 @@
+// Register.tsx - Page inscription
+
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 // Import de l'image de fond locale
 import registerBackground from '../../images/signinbackground.svg';
+
 // Import du logo
 import logoOrange from '../../images/logoorange.svg';
 
+
+
+
 export default function Register() {
+
+
   const [name, setName] = useState('');
+
+
   const [email, setEmail] = useState('');
+
+
   const [password, setPassword] = useState('');
+
+
   const [confirmPassword, setConfirmPassword] = useState('');
+
+
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+
+
+
   const { register, isLoading, error, clearError } = useAuth();
+
   const navigate = useNavigate();
 
   // Reset body margin pour éviter les bordures blanches
+
   useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.minHeight = '100vh';
     document.body.style.overflow = 'hidden';
+
+// RENDER
+
     return () => {
       document.body.style.margin = '';
       document.body.style.padding = '';
@@ -32,14 +58,21 @@ export default function Register() {
   }, []);
 
   // Gestion du resize pour le responsive
+
   useEffect(() => {
+
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
       setWindowHeight(window.innerHeight);
     };
     window.addEventListener('resize', handleResize);
+
+// RENDER
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +91,7 @@ export default function Register() {
   };
 
   // Calcul des tailles responsives
+
   const isMobile = windowWidth <= 768;
   const isTablet = windowWidth <= 1024;
   
@@ -239,6 +273,11 @@ export default function Register() {
     outline: '2px solid var(--color-primary)',
     outlineOffset: '2px',
   };
+
+
+// RENDER
+
+
 
   return (
     <div style={containerStyle} role="main" aria-label="Page d'inscription">

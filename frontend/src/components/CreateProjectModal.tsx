@@ -1,4 +1,8 @@
+// CreateProjectModal.tsx - Component
+
 import { useState } from 'react';
+
+
 
 export interface ModalCreateProjectData {
   name: string;
@@ -6,30 +10,42 @@ export interface ModalCreateProjectData {
   contributorIds: string[];
 }
 
+
 interface CreateProjectModalProps {
   onClose: () => void;
   onSubmit: (data: ModalCreateProjectData) => void;
   users: { id: string; name: string; role?: string }[];
 }
 
+
+
+
 export default function CreateProjectModal({ onClose, onSubmit, users }: CreateProjectModalProps) {
+
+
   const [newProject, setNewProject] = useState<ModalCreateProjectData>({
     name: '',
     description: '',
     contributorIds: [],
   });
 
+
+
   const [selectedContributors, setSelectedContributors] = useState<string[]>([]);
+
 
   const handleChange = (field: keyof Omit<ModalCreateProjectData, 'contributorIds'>, value: string) => {
     setNewProject(prev => ({ ...prev, [field]: value }));
   };
 
+
   const handleContributorsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+
     const selected = Array.from(e.target.selectedOptions, option => option.value);
     setSelectedContributors(selected);
     setNewProject(prev => ({ ...prev, contributorIds: selected }));
   };
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +54,11 @@ export default function CreateProjectModal({ onClose, onSubmit, users }: CreateP
   };
 
   const isFormValid = newProject.name.trim() && newProject.description.trim();
+
+
+// RENDER
+
+
 
   return (
     <div style={{

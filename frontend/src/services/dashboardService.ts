@@ -1,6 +1,11 @@
+// dashboardService.ts - Service
+
 const API_BASE_URL = 'http://localhost:8000';
 
 // Dashboard statistics types
+
+
+
 export interface DashboardStats {
   totalProjects: number;
   totalTasks: number;
@@ -9,6 +14,8 @@ export interface DashboardStats {
   todoTasks: number;
   assignedTasks: number;
 }
+
+
 
 export interface ProjectWithTaskCount {
   id: string;
@@ -21,6 +28,8 @@ export interface ProjectWithTaskCount {
   createdAt: string;
   updatedAt: string;
 }
+
+
 
 export interface TaskSummary {
   id: string;
@@ -36,6 +45,7 @@ export interface TaskSummary {
  * Get dashboard statistics
  * GET /dashboard/stats
  */
+
 export async function getDashboardStats(token: string): Promise<DashboardStats> {
   const response = await fetch(`${API_BASE_URL}/dashboard/stats`, {
     method: 'GET',
@@ -57,6 +67,7 @@ export async function getDashboardStats(token: string): Promise<DashboardStats> 
  * Get projects with task counts for dashboard
  * GET /projects
  */
+
 export async function getProjectsWithTaskCounts(token: string): Promise<ProjectWithTaskCount[]> {
   const response = await fetch(`${API_BASE_URL}/projects`, {
     method: 'GET',
@@ -98,6 +109,7 @@ export async function getProjectsWithTaskCounts(token: string): Promise<ProjectW
  * Get assigned tasks for dashboard
  * GET /dashboard/assigned-tasks
  */
+
 export async function getAssignedTasksForDashboard(token: string): Promise<TaskSummary[]> {
   const response = await fetch(`${API_BASE_URL}/dashboard/assigned-tasks`, {
     method: 'GET',

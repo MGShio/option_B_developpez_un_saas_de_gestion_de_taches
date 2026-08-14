@@ -1,5 +1,4 @@
-// Utilise sessionStorage pour le token (moins persistant que localStorage, plus sécurisé)
-// Note: Pour une sécurité optimale, privilégier les cookies httpOnly (gérés par le backend)
+// storage.ts - Utility
 
 export const storage = {
   getToken: (): string | null => sessionStorage.getItem('token'),

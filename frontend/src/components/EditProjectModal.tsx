@@ -1,4 +1,8 @@
+// EditProjectModal.tsx - Component
+
 import { useState } from 'react';
+
+
 
 export interface EditProjectData {
   id: string;
@@ -7,6 +11,7 @@ export interface EditProjectData {
   contributorIds: string[];
 }
 
+
 interface EditProjectModalProps {
   project: EditProjectData;
   onClose: () => void;
@@ -14,19 +19,30 @@ interface EditProjectModalProps {
   users: { id: string; name: string; role?: string }[];
 }
 
+
+
+
 export default function EditProjectModal({ project, onClose, onSave, users }: EditProjectModalProps) {
+
+
   const [editedProject, setEditedProject] = useState<EditProjectData>(project);
+
+
   const [selectContributorIds, setSelectContributorIds] = useState<string[]>(project.contributorIds);
+
 
   const handleChange = (field: keyof Omit<EditProjectData, 'contributorIds'>, value: string) => {
     setEditedProject(prev => ({ ...prev, [field]: value }));
   };
 
+
   const handleContributorsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+
     const selected = Array.from(e.target.selectedOptions, option => option.value);
     setSelectContributorIds(selected);
     setEditedProject(prev => ({ ...prev, contributorIds: selected }));
   };
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +51,11 @@ export default function EditProjectModal({ project, onClose, onSave, users }: Ed
   };
 
   const isFormValid = editedProject.name.trim() && editedProject.description.trim();
+
+
+// RENDER
+
+
 
   return (
     <div style={{

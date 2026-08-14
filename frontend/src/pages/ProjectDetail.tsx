@@ -1,13 +1,15 @@
+// ProjectDetail.tsx - Page détails projet
+
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth, type User } from '../contexts/AuthContext';
 import { storage } from '../utils/storage';
-import { getProjectById, deleteProject, type Project } from '../services/projectService';
+import { getProjectById, type Project } from '../services/projectService';
 import { getProjectTasks, updateTask, createTask, type Task, type CreateTaskData, type Comment, getTaskComments, createComment, deleteCommentService } from '../services/taskService';
 import AITaskListModal from '../components/AITaskListModal';
 import EditProjectModal from '../components/EditProjectModal';
 import EditTaskModal from '../components/EditTaskModal';
-import { canModifyProject, canDeleteProject, canCreateTasks, isProjectOwner, isProjectAdmin, hasProjectAccess, getUserRoleLabel } from '../utils/permissions';
+import { canModifyProject, canCreateTasks, isProjectOwner, isProjectAdmin, hasProjectAccess } from '../utils/permissions';
 import TaskComments from '../components/TaskComments';
 
 // Couleurs des statuts
@@ -81,7 +83,6 @@ export default function ProjectDetail() {
   // Vérifier si l'utilisateur est le propriétaire du projet
   const isOwner = isProjectOwner(user, project);
   const canModify = canModifyProject(user, project);
-  const canDelete = canDeleteProject(user, project);
   const canCreate = canCreateTasks(user, project);
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -106,8 +107,6 @@ export default function ProjectDetail() {
   });
   const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<'À faire' | 'En cours' | 'Terminé'>('À faire');
-  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   
   // Comments state
   const [commentsByTask, setCommentsByTask] = useState<Record<string, Comment[]>>({});
@@ -224,26 +223,6 @@ export default function ProjectDetail() {
   }, [isAuthenticated, id, fetchData]);
 
   
-
-  // Supprimer le projet
-  const handleDeleteProject = async () => {
-    setIsDeleting(true);
-    setError(null);
-    try {
-      const token = storage.getToken();
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-      await deleteProject(token, project!.id);
-      navigate('/projects');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors de la suppression du projet');
-    } finally {
-      setIsDeleting(false);
-      setIsConfirmingDelete(false);
-    }
-  };
 
   // Handle adding a comment to a task
   const handleAddComment = async (taskId: string, content: string) => {
@@ -527,7 +506,7 @@ export default function ProjectDetail() {
             >
               {project.name}
             </h1>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '1rem', flexWrap: 'wrap' }}>
               {canModify && (
                 <button
                   onClick={() => {
@@ -561,9 +540,9 @@ export default function ProjectDetail() {
                   <button
                     onClick={() => setIsAITaskModalOpen(true)}
                     style={{
-                      width: isMobile ? '100px' : '94px',
+                      width: isMobile ? '100px' : 'auto',
                       height: isMobile ? '50px' : '50px',
-                      padding: isMobile ? '13px 24px' : '13px 74px',
+                      padding: isMobile ? '13px 24px' : '13px 0.5vw',
                       background: '#D3590B',
                       color: 'white',
                       border: 'none',
@@ -582,9 +561,9 @@ export default function ProjectDetail() {
                   <button
                     onClick={() => setIsCreateTaskModalOpen(true)}
                     style={{
-                      width: isMobile ? '200px' : '181px',
+                      width: isMobile ? '200px' : 'auto',
                       height: '50px',
-                      padding: isMobile ? '13px 24px' : '13px 74px',
+                      padding: isMobile ? '13px 24px' : '13px 0.5vw',
                       background: '#1F1F1F',
                       color: 'white',
                       border: 'none',
@@ -598,7 +577,7 @@ export default function ProjectDetail() {
                     onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
                     onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
                   >
-                    + Créer une tâche
+                    Créer une tâche
                   </button>
                 </>
               )}
@@ -1058,122 +1037,8 @@ export default function ProjectDetail() {
 
       </div>
 
-
       {/* Modal de confirmation de suppression */}
-      {isConfirmingDelete && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 1000,
-          }}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="delete-confirm-title"
-          onClick={(e) => { if (e.target === e.currentTarget) setIsConfirmingDelete(false); }}
-        >
-          <div
-            style={{
-              width: isMobile ? '90%' : '400px',
-              maxWidth: '500px',
-              padding: isMobile ? '1.5rem' : '2rem',
-              background: 'white',
-              borderRadius: '10px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: isMobile ? '1rem' : '1.5rem',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <TrashIcon size={isMobile ? 20 : 24} />
-              <h2
-                id="delete-confirm-title"
-                style={{
-                  color: '#1F1F1F',
-                  fontSize: isMobile ? '1.25rem' : '1.5rem',
-                  fontFamily: 'Manrope',
-                  fontWeight: '600',
-                  margin: 0,
-                }}
-              >
-                Supprimer le projet ?
-              </h2>
-            </div>
-            
-            <p
-              style={{
-                color: '#6B7280',
-                fontSize: isMobile ? '0.875rem' : '1rem',
-                fontFamily: 'Inter',
-                fontWeight: '400',
-                margin: 0,
-              }}
-            >
-              Cette action est irréversible. Toutes les tâches associées à ce projet seront également supprimées.
-            </p>
-            
-            <div
-              style={{
-                display: 'flex',
-                gap: isMobile ? '0.75rem' : '1rem',
-                justifyContent: 'flex-end',
-                flexWrap: 'wrap',
-              }}
-            >
-              <button
-                onClick={() => setIsConfirmingDelete(false)}
-                disabled={isDeleting}
-                style={{
-                  padding: isMobile ? '12px 24px' : '12px 32px',
-                  background: 'white',
-                  color: '#6B7280',
-                  border: '1px solid #E5E7EB',
-                  borderRadius: '8px',
-                  fontSize: buttonFontSize,
-                  fontFamily: 'Inter',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                }}
-                onFocus={(e) => !e.currentTarget.disabled && Object.assign(e.currentTarget.style, focusOutlineStyle)}
-                onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
-                aria-label="Annuler la suppression"
-              >
-                Annuler
-              </button>
-              <button
-                onClick={handleDeleteProject}
-                disabled={isDeleting}
-                style={{
-                  padding: isMobile ? '12px 24px' : '12px 32px',
-                  background: '#EF4444',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: buttonFontSize,
-                  fontFamily: 'Inter',
-                  fontWeight: '500',
-                  cursor: isDeleting ? 'not-allowed' : 'pointer',
-                }}
-                onFocus={(e) => !e.currentTarget.disabled && Object.assign(e.currentTarget.style, focusOutlineStyle)}
-                onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
-                aria-label={`Confirmer la suppression du projet ${project.name}`}
-              >
-                {isDeleting ? 'Suppression...' : 'Supprimer définitivement'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modale de création de tâche */}
+{/* Modale de création de tâche */}
       {isCreateTaskModalOpen && (
         <CreateTaskModal
           onClose={() => setIsCreateTaskModalOpen(false)}

@@ -1,22 +1,37 @@
+// NotFound.tsx - Page non trouvée
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
+
+
 export default function NotFound() {
+
   const navigate = useNavigate();
+
+
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   // Gestion du resize pour le responsive
+
   useEffect(() => {
+
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
+
+// RENDER
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Calcul des tailles responsives
+
   const isMobile = windowWidth <= 768;
   const isTablet = windowWidth <= 1024;
 
   // Tailles adaptatives
+
   const containerPadding = isMobile ? '2rem' : isTablet ? '4rem' : '6.25rem';
   const titleSize = isMobile ? '2rem' : '3rem';
   const subtitleSize = isMobile ? '1rem' : '1.25rem';
@@ -49,6 +64,11 @@ export default function NotFound() {
   const buttonHoverStyle: React.CSSProperties = {
     backgroundColor: '#B54F00',
   };
+
+
+// RENDER
+
+
 
   return (
     <div 

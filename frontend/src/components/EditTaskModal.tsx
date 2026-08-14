@@ -1,4 +1,8 @@
+// EditTaskModal.tsx - Component
+
 import { useState } from 'react';
+
+
 
 export interface EditTaskData {
   id: string;
@@ -9,6 +13,7 @@ export interface EditTaskData {
   status: 'À faire' | 'En cours' | 'Terminé';
 }
 
+
 interface EditTaskModalProps {
   task: EditTaskData;
   onClose: () => void;
@@ -16,24 +21,39 @@ interface EditTaskModalProps {
   users: { id: string; name: string; role?: string }[];
 }
 
+
 const statusOptions = [
   { value: 'À faire', label: 'À faire', bg: '#FFE0E0', color: '#EF4444' },
   { value: 'En cours', label: 'En cours', bg: '#FFF0D7', color: '#E08D00' },
   { value: 'Terminé', label: 'Terminé', bg: '#F1FFF7', color: '#27AE60' },
 ];
 
+
+
+
 export default function EditTaskModal({ task, onClose, onSave, users }: EditTaskModalProps) {
+
+
   const [selectAssigneeIds, setSelectAssigneeIds] = useState<string[]>(task.assigneeIds);
+
+
   const [editedTask, setEditedTask] = useState<EditTaskData>(task);
+
 
   const handleChange = (field: keyof EditTaskData, value: string | string[] | 'À faire' | 'En cours' | 'Terminé') => {
     setEditedTask(prev => ({ ...prev, [field]: value }));
   };
 
+
   const handleSave = () => {
     onSave(editedTask);
     onClose();
   };
+
+
+// RENDER
+
+
 
     return (
     <div style={{
@@ -148,6 +168,7 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
             multiple
             value={selectAssigneeIds}
             onChange={(e) => {
+
               const selected = Array.from(e.target.selectedOptions, option => option.value);
               setSelectAssigneeIds(selected);
               handleChange('assigneeIds', selected);
