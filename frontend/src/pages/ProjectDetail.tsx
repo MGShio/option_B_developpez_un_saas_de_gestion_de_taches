@@ -11,6 +11,7 @@ import EditProjectModal from '../components/EditProjectModal';
 import EditTaskModal from '../components/EditTaskModal';
 import { canModifyProject, canCreateTasks, isProjectOwner, isProjectAdmin, hasProjectAccess } from '../utils/permissions';
 import TaskComments from '../components/TaskComments';
+import starIcon from '../images/star.svg';
 
 // Couleurs des statuts
 const statusColors: Record<string, { bg: string; color: string }> = {
@@ -453,7 +454,7 @@ export default function ProjectDetail() {
           flexWrap: 'wrap',
         }}
       >
-        <button
+                <button
           onClick={() => navigate('/projects')}
           style={{
             width: backButtonSize,
@@ -467,46 +468,51 @@ export default function ProjectDetail() {
             justifyContent: 'center',
             alignItems: 'center',
           }}
-          aria-label="Retour à la liste des projets"
+          aria-label="Retour a la liste des projets"
           onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
           onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
         >
           <BackIcon size={iconSize} />
         </button>
         
-        <div 
+        <div
           style={{
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            gap: isMobile ? '0.75rem' : '1rem',
-            display: 'inline-flex',
+            display: 'flex',
+            gap: isMobile ? '1rem' : '2rem',
+            flexWrap: 'wrap',
             flex: 1,
             minWidth: 0,
           }}
         >
-          <div 
+          {/* GAUCHE: Nom + Modifier + Description */}
+          <div
             style={{
               display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              width: 'auto',
-              flexWrap: 'wrap',
-              gap: '1rem',
+              flexDirection: 'column',
+              gap: isMobile ? '0.75rem' : '1rem',
+              flex: 1,
+              minWidth: 0,
             }}
           >
-            <h1 
+            <div
               style={{
-                color: '#1F1F1F',
-                fontSize: titleSize,
-                fontFamily: 'Manrope',
-                fontWeight: 600,
-                margin: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                flexWrap: 'wrap',
               }}
             >
-              {project.name}
-            </h1>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '1rem', flexWrap: 'wrap' }}>
+              <h1
+                style={{
+                  color: '#1F1F1F',
+                  fontSize: titleSize,
+                  fontFamily: 'Manrope',
+                  fontWeight: 600,
+                  margin: 0,
+                }}
+              >
+                {project.name}
+              </h1>
               {canModify && (
                 <button
                   onClick={() => {
@@ -535,67 +541,75 @@ export default function ProjectDetail() {
                   Modifier
                 </button>
               )}
-              {canCreate && (
-                <>
-                  <button
-                    onClick={() => setIsAITaskModalOpen(true)}
-                    style={{
-                      width: isMobile ? '100px' : 'auto',
-                      height: isMobile ? '50px' : '50px',
-                      padding: isMobile ? '13px 24px' : '13px 0.5vw',
-                      background: '#D3590B',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: 10,
-                      fontSize: buttonFontSize,
-                      fontFamily: 'Inter',
-                      fontWeight: 400,
-                      cursor: 'pointer',
-                    }}
-                    aria-label="Créer une tâche avec l'intelligence artificielle"
-                    onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
-                    onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
-                  >
-                    IA
-                  </button>
-                  <button
-                    onClick={() => setIsCreateTaskModalOpen(true)}
-                    style={{
-                      width: isMobile ? '200px' : 'auto',
-                      height: '50px',
-                      padding: isMobile ? '13px 24px' : '13px 0.5vw',
-                      background: '#1F1F1F',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: 10,
-                      fontSize: buttonFontSize,
-                      fontFamily: 'Inter',
-                      fontWeight: 400,
-                      cursor: 'pointer',
-                    }}
-                    aria-label="Créer une nouvelle tâche"
-                    onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
-                    onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
-                  >
-                    Créer une tâche
-                  </button>
-                </>
-              )}
-
             </div>
+            <p
+              style={{
+                width: descriptionWidth,
+                color: '#6B7280',
+                fontSize: subtitleSize,
+                fontFamily: 'Inter',
+                fontWeight: 400,
+                margin: 0,
+              }}
+            >
+              {project.description || 'Aucune description'}
+            </p>
           </div>
-          <p 
-            style={{
-              width: descriptionWidth,
-              color: '#6B7280',
-              fontSize: subtitleSize,
-              fontFamily: 'Inter',
-              fontWeight: 400,
-              margin: 0,
-            }}
-          >
-            {project.description || 'Aucune description'}
-          </p>
+
+          {/* DROITE: Boutons IA + Creer */}
+          {canCreate && (
+            <div
+              style={{
+                display: 'flex',
+                gap: '1rem',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <button
+                onClick={() => setIsAITaskModalOpen(true)}
+                style={{
+                  width: isMobile ? '100px' : 'auto',
+                  height: isMobile ? '50px' : '50px',
+                  padding: isMobile ? '13px 24px' : '13px 0.5vw',
+                  background: '#D3590B',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 10,
+                  fontSize: buttonFontSize,
+                  fontFamily: 'Inter',
+                  fontWeight: 400,
+                  cursor: 'pointer',
+                }}
+                aria-label="Creer une tache avec l intelligence artificielle"
+                onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
+                onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
+              >
+                <img src={starIcon} alt="IA" style={{ width: isMobile ? 14 : 16, height: isMobile ? 14 : 16 }} />
+              </button>
+              <button
+                onClick={() => setIsCreateTaskModalOpen(true)}
+                style={{
+                  width: isMobile ? '200px' : 'auto',
+                  height: '50px',
+                  padding: isMobile ? '13px 24px' : '13px 0.5vw',
+                  background: '#1F1F1F',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 10,
+                  fontSize: buttonFontSize,
+                  fontFamily: 'Inter',
+                  fontWeight: 400,
+                  cursor: 'pointer',
+                }}
+                aria-label="Creer une nouvelle tache"
+                onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
+                onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
+              >
+                Creer une tache
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -673,7 +687,7 @@ export default function ProjectDetail() {
                     height: isMobile ? 24 : 27,
                     padding: isMobile ? '4px' : '4.98px 4.98px 8.72px 8.72px',
                     background: index === 0 ? '#FFE8D9' : '#E5E7EB',
-                    borderRadius: isMobile ? 12 : 13.5,
+                    borderRadius: '50%',
                     border: index > 0 ? '1px solid white' : 'none',
                     display: 'flex',
                     flexDirection: 'column',
@@ -1122,6 +1136,7 @@ function TaskCard({
 }) {
   const colors = statusColors[task.status] || { bg: '#E5E7EB', color: '#6B7280' };
   
+  const [showComments, setShowComments] = useState(false);
   const assignees = task.assignees?.map(a => ({ id: a.userId, name: a.user.name })) || [];
 
   const cardPadding = isMobile ? '1rem' : isTablet ? '1.5rem' : '2rem';
@@ -1376,14 +1391,32 @@ function TaskCard({
         </div>
       </div>
 
-      <div 
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1rem',
-        }}
-      >
-        {project && currentUser && (
+      <div>
+        <button
+          onClick={() => setShowComments(!showComments)}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '100%',
+            background: 'none',
+            border: 'none',
+            padding: '0.5rem 0',
+            cursor: 'pointer',
+            fontSize: metaSize,
+            fontFamily: 'Inter',
+            fontWeight: 600,
+            color: '#1F1F1F',
+          }}
+          onFocus={(e) => Object.assign(e.currentTarget.style, { outline: '2px solid var(--color-primary)', outlineOffset: '2px' })}
+          onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
+        >
+          <span>Commentaires</span>
+          <span style={{ transform: showComments ? 'rotate(180deg)' : 'none' }}>
+            <DownArrowIcon size={16} />
+          </span>
+        </button>
+        {showComments && project && currentUser && (
           <TaskComments
             taskId={task.id}
             projectId={project.id}
