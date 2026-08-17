@@ -1176,89 +1176,107 @@ function TaskCard({
       role="article"
       aria-label={`Tâche: ${task.title}`}
     >
-      <div 
+      <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          flexWrap: 'wrap',
           gap: '1rem',
+          width: '100%',
         }}
       >
-        <div 
+        <div
           style={{
             display: 'flex',
-            alignItems: 'flex-start',
+            flexDirection: 'column',
             gap: '0.5rem',
-            flexWrap: 'wrap',
+            flex: 1,
+            minWidth: 0,
           }}
         >
-          <h3 
+          <div
             style={{
-              color: 'black',
-              fontSize: titleSize,
-              fontFamily: 'Manrope',
-              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              flexWrap: 'wrap',
+            }}
+          >
+            <h3
+              style={{
+                color: 'black',
+                fontSize: titleSize,
+                fontFamily: 'Manrope',
+                fontWeight: 600,
+                margin: 0,
+              }}
+            >
+              {task.title}
+            </h3>
+            <div
+              style={{
+                padding: '4px 16px',
+                background: colors.bg,
+                borderRadius: 50,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              role="status"
+              aria-label={`Statut: ${task.status}`}
+            >
+              <span
+                style={{
+                  color: colors.color,
+                  fontSize: badgeSize,
+                  fontFamily: 'Inter',
+                  fontWeight: 400,
+                }}
+              >
+                {task.status}
+              </span>
+            </div>
+          </div>
+          <p
+            style={{
+              color: '#6B7280',
+              fontSize: descriptionSize,
+              fontFamily: 'Inter',
+              fontWeight: 400,
               margin: 0,
             }}
           >
-            {task.title}
-          </h3>
-          <div 
+            {task.description || 'Aucune description'}
+          </p>
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'flex-start',
+          }}
+        >
+          <button
+            onClick={onEdit}
             style={{
-              padding: '4px 16px',
-              background: colors.bg,
-              borderRadius: 50,
+              width: buttonSize,
+              height: buttonSize,
+              padding: buttonPadding,
+              background: 'white',
+              border: '1px solid #E5E7EB',
+              borderRadius: 10,
+              cursor: 'pointer',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
             }}
-            role="status"
-            aria-label={`Statut: ${task.status}`}
-          >
-            <span 
-              style={{
-                color: colors.color,
-                fontSize: badgeSize,
-                fontFamily: 'Inter',
-                fontWeight: 400,
-              }}
-            >
-              {task.status}
-            </span>
-          </div>
-            <p 
-        style={{
-          color: '#6B7280',
-          fontSize: descriptionSize,
-          fontFamily: 'Inter',
-          fontWeight: 400,
-          margin: 0,
-        }}
-      >
-        {task.description || 'Aucune description'}
-      </p>
+            aria-label={`Modifier la tâche ${task.title}`}
+            onFocus={(e) => Object.assign(e.currentTarget.style, { outline: '2px solid var(--color-primary)', outlineOffset: '2px' })}
+            onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}>
+            <PlusIcon size={isMobile ? 14 : 16} />
+          </button>
         </div>
-        <button
-          onClick={onEdit}
-          style={{
-            width: buttonSize,
-            height: buttonSize,
-            padding: buttonPadding,
-            background: 'white',
-            border: '1px solid #E5E7EB',
-            borderRadius: 10,
-            cursor: 'pointer',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-          aria-label={`Modifier la tâche ${task.title}`}
-          onFocus={(e) => Object.assign(e.currentTarget.style, { outline: '2px solid var(--color-primary)', outlineOffset: '2px' })}
-          onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
-        >
-          <PlusIcon size={isMobile ? 14 : 16} />
-        </button>
       </div>
 
       
