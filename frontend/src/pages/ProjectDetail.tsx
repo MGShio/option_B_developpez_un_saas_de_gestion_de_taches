@@ -641,12 +641,12 @@ export default function ProjectDetail() {
           maxWidth: '1440px',
           margin: '0 auto',
           width: '100%',
+          alignItems: 'flex-start',
         }}
       >
         {/* Section Contributeurs */}
         <div 
           style={{
-            flex: 1,
             background: '#F3F4F6',
             border: '1px solid #E5E7EB',
             borderRadius: 10,
@@ -654,6 +654,7 @@ export default function ProjectDetail() {
             display: 'flex',
             justifyContent: 'space-between',
             gap: isMobile ? '1rem' : '1.5rem',
+            width: '100%',
           }}
           role="complementary"
           aria-label="Liste des contributeurs"
@@ -759,7 +760,6 @@ export default function ProjectDetail() {
         {/* Section principale - Tâches */}
         <div 
           style={{
-            flex: 2,
             background: 'white',
             border: '1px solid #E5E7EB',
             borderRadius: 10,
@@ -767,6 +767,7 @@ export default function ProjectDetail() {
             display: 'flex',
             flexDirection: 'column',
             gap: 'clamp(1rem, 1.5vw, 1.5rem)',
+            width: '100%',
           }}
         >
           {/* Header des tâches */}
@@ -1022,6 +1023,10 @@ export default function ProjectDetail() {
               display: 'flex',
               flexDirection: 'column',
               gap: isMobile ? '1rem' : '1.5rem',
+              width: '100%',
+              maxWidth: '1215px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
             }}
             id={activeView === 'list' ? 'list-view' : 'calendar-view'}
             role="tabpanel"
