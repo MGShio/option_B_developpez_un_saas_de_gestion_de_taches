@@ -809,68 +809,6 @@ export default function ProjectDetail() {
                     flexWrap: 'wrap',
                   }}
                 >
-                  <div 
-                    style={{
-                      width: filterWidth,
-                      padding: isMobile ? '12px 16px' : '23px 32px',
-                      background: 'white',
-                      borderRadius: 8,
-                      border: '1px solid #E5E7EB',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <span 
-                      style={{
-                        color: '#6B7280',
-                        fontSize: isMobile ? '0.875rem' : '0.9375rem',
-                        fontFamily: 'Inter',
-                        fontWeight: 400,
-                      }}
-                    >
-                      Statut
-                    </span>
-                    <DownArrowIcon size={isMobile ? 14 : 16} />
-                  </div>
-                  
-                  <div 
-                    style={{
-                      width: searchWidth,
-                      padding: isMobile ? '12px 16px' : '23px 32px',
-                      background: 'white',
-                      borderRadius: 8,
-                      border: '1px solid #E5E7EB',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <input
-                      type="text"
-                      placeholder="Rechercher une tâche"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      style={{
-                        color: '#6B7280',
-                        fontSize: isMobile ? '0.875rem' : '0.9375rem',
-                        fontFamily: 'Inter',
-                        fontWeight: 400,
-                        border: 'none',
-                        outline: 'none',
-                        background: 'transparent',
-                        width: '100%',
-                      }}
-                      aria-label="Rechercher une tâche"
-                      onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
-                      onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
-                    />
-                    <SearchIcon size={isMobile ? 14 : 14} />
-                  </div>
-                </div>
-              )}
-            </div>
-
             {/* Onglets de vue */}
             <div 
               style={{
@@ -939,6 +877,68 @@ export default function ProjectDetail() {
                 </span>
               </button>
             </div>
+                  <div 
+                    style={{
+                      width: filterWidth,
+                      padding: isMobile ? '12px 16px' : '23px 32px',
+                      background: 'white',
+                      borderRadius: 8,
+                      border: '1px solid #E5E7EB',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <span 
+                      style={{
+                        color: '#6B7280',
+                        fontSize: isMobile ? '0.875rem' : '0.9375rem',
+                        fontFamily: 'Inter',
+                        fontWeight: 400,
+                      }}
+                    >
+                      Statut
+                    </span>
+                    <DownArrowIcon size={isMobile ? 14 : 16} />
+                  </div>
+                  
+                  <div 
+                    style={{
+                      width: searchWidth,
+                      padding: isMobile ? '12px 16px' : '23px 32px',
+                      background: 'white',
+                      borderRadius: 8,
+                      border: '1px solid #E5E7EB',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Rechercher une tâche"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      style={{
+                        color: '#6B7280',
+                        fontSize: isMobile ? '0.875rem' : '0.9375rem',
+                        fontFamily: 'Inter',
+                        fontWeight: 400,
+                        border: 'none',
+                        outline: 'none',
+                        background: 'transparent',
+                        width: '100%',
+                      }}
+                      aria-label="Rechercher une tâche"
+                      onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
+                      onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
+                    />
+                    <SearchIcon size={isMobile ? 14 : 14} />
+                  </div>
+                </div>
+              )}
+            </div>
+
             
             {isMobile && (
               <div 
