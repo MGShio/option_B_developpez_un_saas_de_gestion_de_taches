@@ -11,6 +11,8 @@ import EditProjectModal from '../components/EditProjectModal';
 import EditTaskModal from '../components/EditTaskModal';
 import { canModifyProject, canCreateTasks, isProjectOwner, isProjectAdmin, hasProjectAccess } from '../utils/permissions';
 import TaskComments from '../components/TaskComments';
+import checkmarkIcon from '../images/checkmark.svg';
+import calendarIcon from '../images/calendaricon.svg';
 import starIcon from '../images/star.svg';
 
 // Couleurs des statuts
@@ -883,7 +885,7 @@ export default function ProjectDetail() {
                 style={{
                   padding: isMobile ? '12px 16px' : '14px 16px',
                   background: activeView === 'list' ? '#FFE8D9' : 'white',
-                  border: activeView === 'list' ? '1px solid #D3590B' : '1px solid #E5E7EB',
+                  border: activeView === 'list' ? '#D3590B' : '#E5E7EB',
                   borderRadius: 8,
                   cursor: 'pointer',
                   display: 'flex',
@@ -895,7 +897,7 @@ export default function ProjectDetail() {
                 onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
                 onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
               >
-                <ListIcon size={isMobile ? 14 : 16} />
+                <img src={checkmarkIcon} alt="Checkmark" style={{ width: isMobile ? 14 : 16, height: isMobile ? 14 : 16 }} />
                 <span 
                   style={{
                     color: activeView === 'list' ? '#D3590B' : '#6B7280',
@@ -912,18 +914,22 @@ export default function ProjectDetail() {
                 style={{
                   padding: isMobile ? '12px 16px' : '14px 16px',
                   background: activeView === 'calendar' ? '#FFE8D9' : 'white',
-                  border: activeView === 'calendar' ? '1px solid #D3590B' : '1px solid #E5E7EB',
+                  border: activeView === 'calendar' ? '#D3590B' : '#E5E7EB',
                   borderRadius: 8,
                   cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: isMobile ? '0.5rem' : '0.75rem',
                 }}
                 role="tab"
                 aria-selected={activeView === 'calendar'}
                 onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
                 onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
               >
+                <img src={calendarIcon} alt="Calendar" style={{ width: isMobile ? 14 : 16, height: isMobile ? 14 : 16 }} />
                 <span 
                   style={{
-                    color: activeView === 'calendar' ? '#D3590B' : '#6B7280',
+                    color: activeView === 'calendar' ? '#D3590B' : '#D3590B',
                     fontSize: isMobile ? '0.875rem' : '0.9375rem',
                     fontFamily: 'Inter',
                     fontWeight: 400,
