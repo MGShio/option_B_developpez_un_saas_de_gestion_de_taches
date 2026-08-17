@@ -15,6 +15,7 @@ import checkmarkIcon from '../images/checkmark.svg';
 import calendarIcon from '../images/calendaricon.svg';
 import calendaricongreyIcon from '../images/calendaricongrey.svg';
 import starIcon from '../images/star.svg';
+import displaycomIcon from '../images/displaycom.svg';
 
 // Couleurs des statuts
 const statusColors: Record<string, { bg: string; color: string }> = {
@@ -72,6 +73,15 @@ const TrashIcon = ({ size = 16 }: { size?: number }) => (
     <path d="M5.5 2.5H10.5" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
+
+const OptionsIcon = ({ size = 16 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 96 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="8" cy="8" r="8" fill="#1F1F1F"/>
+    <circle cx="48" cy="8" r="8" fill="#1F1F1F"/>
+    <circle cx="88" cy="8" r="8" fill="#1F1F1F"/>
+  </svg>
+);
+
 
 export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
@@ -431,7 +441,7 @@ export default function ProjectDetail() {
   const headerGap = isMobile ? '1rem' : '1.5rem';
   const descriptionWidth = isMobile ? '100%' : isTablet ? '70%' : '60%';
   const tasksContainerPadding = isMobile ? '1rem' : isTablet ? '1.5rem' : '2rem';
-  const filterWidth = isMobile ? '100%' : '152px';
+  const filterWidth = isMobile ? '100%' : '102px';
   const searchWidth = isMobile ? '100%' : '283px';
   const sidebarDisplay = isMobile ? 'none' : 'flex';
   const sidebarWidth = isMobile ? '100%' : '250px';
@@ -519,8 +529,7 @@ export default function ProjectDetail() {
               >
                 {project.name}
               </h1>
-              {canModify && (
-                <button
+              <button
                   onClick={() => {
                     setEditingProject({
                       id: project.id,
@@ -546,7 +555,6 @@ export default function ProjectDetail() {
                 >
                   Modifier
                 </button>
-              )}
             </div>
             <p
               style={{
@@ -666,9 +674,10 @@ export default function ProjectDetail() {
                 fontFamily: 'Manrope',
                 fontWeight: 600,
                 margin: 0,
+                
               }}
             >
-              Contributeurs ({contributors.length} personnes)
+              Contributeurs <span style={{ color: '#6B7280', fontSize: isMobile ? '0.75rem' : '0.875rem', marginLeft: '0.5rem' }}>{contributors.length} personnes</span>
             </h2>
           </div>
 
@@ -1160,7 +1169,7 @@ function TaskCard({
   const badgeSize = isMobile ? '0.75rem' : '0.875rem';
   const avatarSize = isMobile ? 24 : 27;
   const buttonSize = isMobile ? 48 : 57;
-  const buttonPadding = isMobile ? 16 : 24;
+  const buttonPadding = isMobile ? 16 : 18;
 
   return (
     <div 
@@ -1274,7 +1283,7 @@ function TaskCard({
             aria-label={`Modifier la tâche ${task.title}`}
             onFocus={(e) => Object.assign(e.currentTarget.style, { outline: '2px solid var(--color-primary)', outlineOffset: '2px' })}
             onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}>
-            <PlusIcon size={isMobile ? 14 : 16} />
+            <OptionsIcon size={isMobile ? 14 : 16} />
           </button>
         </div>
       </div>
@@ -1449,9 +1458,7 @@ function TaskCard({
           onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
         >
           <span>Commentaires ({comments.length || 0})</span>
-          <span style={{ transform: showComments ? 'rotate(180deg)' : 'none' }}>
-            <DownArrowIcon size={16} />
-          </span>
+          <img src={displaycomIcon} alt="Commentaires" style={{ width: 16, height: 16, transform: showComments ? 'rotate(180deg)' : 'none' }} />
         </button>
         {showComments && project && currentUser && (
           <TaskComments
