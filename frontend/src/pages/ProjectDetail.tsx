@@ -13,6 +13,7 @@ import { canModifyProject, canCreateTasks, isProjectOwner, isProjectAdmin, hasPr
 import TaskComments from '../components/TaskComments';
 import checkmarkIcon from '../images/checkmark.svg';
 import calendarIcon from '../images/calendaricon.svg';
+import calendaricongreyIcon from '../images/calendaricongrey.svg';
 import starIcon from '../images/star.svg';
 
 // Couleurs des statuts
@@ -1226,6 +1227,17 @@ function TaskCard({
               {task.status}
             </span>
           </div>
+            <p 
+        style={{
+          color: '#6B7280',
+          fontSize: descriptionSize,
+          fontFamily: 'Inter',
+          fontWeight: 400,
+          margin: 0,
+        }}
+      >
+        {task.description || 'Aucune description'}
+      </p>
         </div>
         <button
           onClick={onEdit}
@@ -1249,17 +1261,7 @@ function TaskCard({
         </button>
       </div>
 
-      <p 
-        style={{
-          color: '#6B7280',
-          fontSize: descriptionSize,
-          fontFamily: 'Inter',
-          fontWeight: 400,
-          margin: 0,
-        }}
-      >
-        {task.description || 'Aucune description'}
-      </p>
+      
 
       
 
@@ -1303,8 +1305,11 @@ function TaskCard({
                 fontSize: metaSize,
                 fontFamily: 'Inter',
                 fontWeight: 400,
+                display: 'flex',
+                gap: '0.5rem',
               }}
             >
+              <img src={calendaricongreyIcon} alt="Calendar" style={{ width: isMobile ? 14 : 16, height: isMobile ? 14 : 16 }} />
               {new Date(task.dueDate).toLocaleDateString('fr-FR', {
                 day: 'numeric',
                 month: 'long',
