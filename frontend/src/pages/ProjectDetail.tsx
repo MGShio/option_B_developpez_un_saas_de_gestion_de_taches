@@ -572,6 +572,27 @@ export default function ProjectDetail() {
               }}
             >
               <button
+                onClick={() => setIsCreateTaskModalOpen(true)}
+                style={{
+                  width: isMobile ? '200px' : 'auto',
+                  height: '50px',
+                  padding: isMobile ? '13px 24px' : '13px 0.5vw',
+                  background: '#1F1F1F',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 10,
+                  fontSize: buttonFontSize,
+                  fontFamily: 'Inter',
+                  fontWeight: 400,
+                  cursor: 'pointer',
+                }}
+                aria-label="Creer une nouvelle tache"
+                onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
+                onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
+              >
+                Creer une tache
+              </button>
+              <button
                 onClick={() => setIsAITaskModalOpen(true)}
                 style={{
                   width: isMobile ? '100px' : 'auto',
@@ -596,27 +617,6 @@ export default function ProjectDetail() {
                 onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
               >
                 <img src={starIcon} alt="IA" style={{ width: isMobile ? 14 : 16, height: isMobile ? 14 : 16 }}  /> IA
-              </button>
-              <button
-                onClick={() => setIsCreateTaskModalOpen(true)}
-                style={{
-                  width: isMobile ? '200px' : 'auto',
-                  height: '50px',
-                  padding: isMobile ? '13px 24px' : '13px 0.5vw',
-                  background: '#1F1F1F',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: 10,
-                  fontSize: buttonFontSize,
-                  fontFamily: 'Inter',
-                  fontWeight: 400,
-                  cursor: 'pointer',
-                }}
-                aria-label="Creer une nouvelle tache"
-                onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
-                onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
-              >
-                Creer une tache
               </button>
             </div>
           )}
@@ -1261,16 +1261,16 @@ function TaskCard({
         {task.description || 'Aucune description'}
       </p>
 
-      {showBorder && <div style={{ width: '100%', height: 1, background: '#E5E7EB' }} />}
+      
 
       <div 
         style={{
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          flexDirection: 'column',
+          alignItems: 'left',
           flexWrap: 'wrap',
           gap: '1rem',
-        }}
+                  }}
       >
         <div 
           style={{
@@ -1352,7 +1352,6 @@ function TaskCard({
                   style={{
                     width: avatarSize,
                     height: avatarSize,
-                    padding: isMobile ? '4px' : '4.98px 4.98px 8.72px 8.72px',
                     background: '#E5E7EB',
                     borderRadius: avatarSize / 2,
                     border: '1px solid white',
@@ -1404,6 +1403,8 @@ function TaskCard({
         </div>
       </div>
 
+      {showBorder && <div style={{ width: '100%', height: 1, background: '#E5E7EB' }} />}
+
       <div>
         <button
           onClick={() => setShowComments(!showComments)}
@@ -1424,7 +1425,7 @@ function TaskCard({
           onFocus={(e) => Object.assign(e.currentTarget.style, { outline: '2px solid var(--color-primary)', outlineOffset: '2px' })}
           onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
         >
-          <span>Commentaires</span>
+          <span>Commentaires ({comments.length || 0})</span>
           <span style={{ transform: showComments ? 'rotate(180deg)' : 'none' }}>
             <DownArrowIcon size={16} />
           </span>
