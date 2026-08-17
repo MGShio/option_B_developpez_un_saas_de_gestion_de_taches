@@ -16,6 +16,7 @@ import calendarIcon from '../images/calendaricon.svg';
 import calendaricongreyIcon from '../images/calendaricongrey.svg';
 import starIcon from '../images/star.svg';
 import displaycomIcon from '../images/displaycom.svg';
+import retourIcon from '../images/retour.svg';
 
 // Couleurs des statuts
 const statusColors: Record<string, { bg: string; color: string }> = {
@@ -460,19 +461,18 @@ export default function ProjectDetail() {
       {/* Header */}
       <div 
         style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: headerGap,
+          maxWidth: '1540px',
+          margin: '0 auto',
           marginBottom: isMobile ? '1.5rem' : '2.5rem',
-          flexWrap: 'wrap',
-          maxWidth: '1440px',
-          marginLeft: 'auto',
-          marginRight: 'auto',
+          position: 'relative',
         }}
       >
-                <button
+        <button
           onClick={() => navigate('/projects')}
           style={{
+            position: 'absolute',
+            left: -23,
+            top: 0,
             width: backButtonSize,
             height: backButtonSize,
             padding: backButtonPadding,
@@ -483,31 +483,29 @@ export default function ProjectDetail() {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            zIndex: 1,
           }}
           aria-label="Retour a la liste des projets"
           onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
           onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
         >
-          <BackIcon size={iconSize} />
+          <img src={retourIcon} alt="Retour" style={{ width: iconSize, height: iconSize }} />
         </button>
         
         <div
           style={{
             display: 'flex',
-            gap: isMobile ? '1rem' : '2rem',
-            flexWrap: 'wrap',
-            flex: 1,
-            minWidth: 0,
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: '1rem',
+            paddingLeft: 50,
           }}
         >
-          {/* GAUCHE: Nom + Modifier + Description */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               gap: isMobile ? '0.75rem' : '1rem',
-              flex: 1,
-              minWidth: 0,
             }}
           >
             <div
@@ -569,15 +567,13 @@ export default function ProjectDetail() {
               {project.description || 'Aucune description'}
             </p>
           </div>
-
-          {/* DROITE: Boutons IA + Creer */}
           {canCreate && (
             <div
               style={{
                 display: 'flex',
                 gap: '1rem',
                 alignItems: 'flex-start',
-                justifyContent: 'flex-end',
+                marginLeft: 'auto',
               }}
             >
               <button
@@ -625,7 +621,7 @@ export default function ProjectDetail() {
                 onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
                 onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
               >
-                <img src={starIcon} alt="IA" style={{ width: isMobile ? 14 : 16, height: isMobile ? 14 : 16 }}  /> IA
+                <img src={starIcon} alt="IA" style={{ width: isMobile ? 14 : 16, height: isMobile ? 14 : 16 }} /> IA
               </button>
             </div>
           )}
@@ -785,6 +781,7 @@ export default function ProjectDetail() {
                   display: 'flex',
                   flexDirection: 'column',
                   gap: isMobile ? '0.25rem' : '0.5rem',
+                  marginLeft: '30px',
                 }}
               >
                 <h2 
@@ -923,6 +920,7 @@ export default function ProjectDetail() {
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
+                      marginRight: '30px',
                     }}
                   >
                     <input
