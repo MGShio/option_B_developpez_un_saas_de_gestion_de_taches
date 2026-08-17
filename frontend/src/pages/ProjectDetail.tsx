@@ -452,6 +452,9 @@ export default function ProjectDetail() {
           gap: headerGap,
           marginBottom: isMobile ? '1.5rem' : '2.5rem',
           flexWrap: 'wrap',
+          maxWidth: '1440px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
         }}
       >
                 <button
@@ -580,12 +583,17 @@ export default function ProjectDetail() {
                   fontFamily: 'Inter',
                   fontWeight: 400,
                   cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  paddingLeft: isMobile ? '13px' : '1vw',
+                  paddingRight: isMobile ? '13px' : '1vw',
                 }}
                 aria-label="Creer une tache avec l intelligence artificielle"
                 onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
                 onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
               >
-                <img src={starIcon} alt="IA" style={{ width: isMobile ? 14 : 16, height: isMobile ? 14 : 16 }} />
+                <img src={starIcon} alt="IA" style={{ width: isMobile ? 14 : 16, height: isMobile ? 14 : 16 }}  /> IA
               </button>
               <button
                 onClick={() => setIsCreateTaskModalOpen(true)}
@@ -685,7 +693,6 @@ export default function ProjectDetail() {
                   style={{
                     width: isMobile ? 24 : 27,
                     height: isMobile ? 24 : 27,
-                    padding: isMobile ? '4px' : '4.98px 4.98px 8.72px 8.72px',
                     background: index === 0 ? '#FFE8D9' : '#E5E7EB',
                     borderRadius: '50%',
                     border: index > 0 ? '1px solid white' : 'none',
