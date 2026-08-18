@@ -1639,7 +1639,6 @@ function CreateTaskModal({
               placeholder=""
               rows={3}
               style={{
-                padding: isMobile ? '12px 14px' : '19px 17px',
                 background: 'white',
                 borderRadius: 4,
                 border: '1px solid #E5E7EB',
@@ -1649,7 +1648,6 @@ function CreateTaskModal({
                 color: '#0F0F0F',
                 outline: 'none',
                 resize: 'vertical',
-                minHeight: isMobile ? '100px' : '120px',
               }}
               onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
               onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
@@ -1668,69 +1666,73 @@ function CreateTaskModal({
             >
               Échéance*
             </label>
-            <div style={{
-              position: 'relative',
-              height: isMobile ? '44px' : 'auto',
-            }}>
-              <input
-                id="task-dueDate"
-                type="date"
-                value={newTask.dueDate}
-                onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  opacity: 0,
-                  cursor: 'pointer',
-                  fontSize: 0,
-                  padding: 0,
-                  margin: 0,
-                  border: 'none',
-                  background: 'transparent',
-                }}
-                aria-required="true"
+            <input
+              id="task-dueDate"
+              type="date"
+              value={newTask.dueDate}
+              onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
+              style={{
+                position: 'absolute',
+                opacity: 0,
+                width: 0,
+                height: 0,
+                padding: 0,
+                margin: 0,
+                border: 'none',
+              }}
+              aria-required="true"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const dateInput = document.getElementById('task-dueDate') as HTMLInputElement;
+                if (dateInput) {
+                  if (!dateInput.value) {
+                    const today = new Date().toISOString().split('T')[0];
+                    dateInput.value = today;
+                    setNewTask({ ...newTask, dueDate: today });
+                  }
+                  if (dateInput.showPicker) {
+                    dateInput.showPicker();
+                  } else {
+                    dateInput.click();
+                  }
+                }
+              }}
+              style={{
+                height: isMobile ? '44px' : '53px',
+                width: '100%',
+                padding: isMobile ? '12px 14px' : '19px 17px',
+                background: 'white',
+                borderRadius: 4,
+                border: '1px solid #E5E7EB',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                cursor: 'pointer',
+                fontSize: inputSize,
+                fontFamily: 'Inter',
+                fontWeight: 400,
+                color: newTask.dueDate ? '#1F1F1F' : '#6B7280',
+              }}
+              onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
+              onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
+            >
+              <span>
+                {newTask.dueDate
+                  ? new Date(newTask.dueDate).toLocaleDateString('fr-FR', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })
+                  : ''}
+              </span>
+              <img
+                src={calendaricongreyIcon}
+                alt="Calendrier"
+                style={{ width: isMobile ? 14 : 16, height: isMobile ? 14 : 16 }}
               />
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  padding: isMobile ? '0 14px' : '0 17px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  background: 'white',
-                  borderRadius: 4,
-                  border: '1px solid #E5E7EB',
-                  pointerEvents: 'none',
-                }}
-              >
-                <span
-                  style={{
-                    color: newTask.dueDate ? '#0F0F0F' : '#6B7280',
-                    fontSize: inputSize,
-                    fontFamily: 'Inter',
-                    fontWeight: 400,
-                    flex: 1,
-                  }}
-                >
-                  {newTask.dueDate ? new Date(newTask.dueDate).toLocaleDateString('fr-FR') : ''}
-                </span>
-                <img 
-                  src={calendaricongreyIcon} 
-                  alt="Calendrier" 
-                  style={{
-                    width: isMobile ? 14 : 16,
-                    height: isMobile ? 14 : 16,
-                    pointerEvents: 'none',
-                  }}
-                />
-              </div>
-            </div>
+            </button>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -1852,9 +1854,6 @@ function CreateTaskModal({
                         background: selectedAssignees.includes(user.id) ? '#F3F4F6' : 'white',
                         fontSize: inputSize,
                         color: '#1F1F1F',
-                        ':hover': {
-                          background: '#F3F4F6',
-                        },
                       }}
                       role="option"
                       aria-selected={selectedAssignees.includes(user.id)}
