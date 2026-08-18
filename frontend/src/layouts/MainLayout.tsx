@@ -15,9 +15,7 @@ import folderIconWhite from '../images/foldericonwhite.svg';
 
 
 
-
 export default function MainLayout() {
-
 
 
   const { user, isAuthenticated } = useAuth();
@@ -161,7 +159,7 @@ export default function MainLayout() {
   const userAvatarStyle: React.CSSProperties = {
     width: avatarSize,
     height: avatarSize,
-    backgroundColor: '#FFE8D9', // Orange clair pour l'avatar
+    backgroundColor: isAccount ? '#D3590B' : '#FFE8D9',
     borderRadius: '50%',
     display: 'flex',
     flexDirection: 'column',
@@ -173,7 +171,7 @@ export default function MainLayout() {
 
   const avatarTextStyle: React.CSSProperties = {
     textAlign: 'center',
-    color: '#0F0F0F',
+    color: isAccount ? '#FFFFFF' : '#0F0F0F',
     fontSize: avatarInitialsFontSize,
     fontFamily: 'Inter',
     fontWeight: 400,
@@ -249,8 +247,8 @@ export default function MainLayout() {
   };
 
 
-// RENDER
 
+// RENDER
 
 
   return (
@@ -376,4 +374,3 @@ export default function MainLayout() {
     </div>
   );
 }
-
