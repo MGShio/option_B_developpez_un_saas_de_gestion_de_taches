@@ -1,6 +1,11 @@
 // AITaskListModal.tsx - Component
 
 import { useState } from 'react';
+import binIcon from '../images/bin.svg';
+import pencilIcon from '../images/pencil.svg';
+import starOrangeIcon from '../images/Starorange.svg';
+import starIcon from '../images/Star.svg';
+
 
 
 
@@ -56,7 +61,9 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
 
 
   return (
-    <div style={{
+    <div
+      onClick={onClose}
+      style={{
       position: 'fixed',
       top: 0,
       left: 0,
@@ -68,7 +75,9 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
       alignItems: 'center',
       zIndex: 1000,
     }}>
-      <div style={{
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
         width: 598,
         paddingTop: 79,
         paddingBottom: 39,
@@ -102,13 +111,21 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
             display: 'inline-flex',
           }}>
             <div style={{
-              color: '#1F1F1F',
-              fontSize: 24,
-              fontFamily: 'Manrope',
-              fontWeight: 600,
-              wordWrap: 'break-word',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: 8,
+              display: 'inline-flex',
             }}>
-              Vos tâches...
+              <img src={starOrangeIcon} alt="Étoile orange" style={{ width: 24, height: 24 }} />
+              <div style={{
+                color: '#1F1F1F',
+                fontSize: 24,
+                fontFamily: 'Manrope',
+                fontWeight: 600,
+                wordWrap: 'break-word',
+              }}>
+                Vos tâches...
+              </div>
             </div>
           </div>
 
@@ -197,6 +214,7 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
                         fontWeight: 400,
                       }}
                     >
+                      <img src={binIcon} alt="Supprimer" style={{ width: 14, height: 14 }} />
                       Supprimer
                     </button>
                     <div style={{
@@ -217,12 +235,7 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
                         cursor: 'pointer',
                       }}
                     >
-                      <div style={{
-                        width: 11,
-                        height: 11,
-                        background: '#6B7280',
-                        borderRadius: 2,
-                      }} />
+                      <img src={pencilIcon} alt="Modifier" style={{ width: 14, height: 14 }} />
                       <div style={{
                         color: '#6B7280',
                         fontSize: 12,
@@ -338,13 +351,17 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
                     style={{
                       width: 24,
                       height: 24,
-                      position: 'relative',
-                      background: '#D3590B',
-                      borderRadius: 9999,
+                      background: 'none',
                       border: 'none',
                       cursor: 'pointer',
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
-                  />
+                  >
+                    <img src={starIcon} alt="Étoile" style={{ width: 24, height: 24 }} />
+                  </button>
                 </div>
               </div>
             </form>

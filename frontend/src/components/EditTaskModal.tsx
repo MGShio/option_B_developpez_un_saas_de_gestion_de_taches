@@ -47,7 +47,6 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
   const labelSize = isMobile ? '0.875rem' : '0.9375rem';
   const buttonFontSize = isMobile ? '0.875rem' : '1rem';
 
-  const [selectAssigneeIds, setSelectAssigneeIds] = useState<string[]>(task.assigneeIds);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [editedTask, setEditedTask] = useState<EditTaskData>(task);
 
@@ -77,7 +76,9 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
   };
 
   return (
-    <div style={{
+    <div
+      onClick={onClose}
+      style={{
       position: 'fixed',
       top: 0,
       left: 0,
@@ -89,7 +90,9 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
       alignItems: 'center',
       zIndex: 1000,
     }}>
-      <div style={{
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
         background: 'white',
         padding: isMobile ? '1.5rem' : '2rem',
         borderRadius: 10,
@@ -292,9 +295,9 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
                 onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
               >
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', width: '100%', alignItems: 'center' }}>
-                  {selectAssigneeIds.length > 0 ? (
+                  {editedTask.assigneeIds.length > 0 ? (
                     users
-                      .filter(user => selectAssigneeIds.includes(user.id))
+                      .filter(user => editedTask.assigneeIds.includes(String(user.id)))
                       .map(user => (
                         <div
                           key={user.id}
@@ -313,8 +316,7 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              const newSelected = selectAssigneeIds.filter(id => id !== user.id);
-                              setSelectAssigneeIds(newSelected);
+                              const newSelected = editedTask.assigneeIds.filter(id => id !== String(user.id));
                               handleChange('assigneeIds', newSelected);
                             }}
                             style={{
@@ -362,21 +364,20 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
                       key={user.id}
                       onClick={(e) => {
                         e.stopPropagation();
-                        const newSelectedAssignees = selectAssigneeIds.includes(user.id)
-                          ? selectAssigneeIds.filter(id => id !== user.id)
-                          : [...selectAssigneeIds, user.id];
-                        setSelectAssigneeIds(newSelectedAssignees);
+                        const newSelectedAssignees = editedTask.assigneeIds.includes(String(user.id))
+                          ? editedTask.assigneeIds.filter(id => id !== String(user.id))
+                          : [...editedTask.assigneeIds, String(user.id)];
                         handleChange('assigneeIds', newSelectedAssignees);
                       }}
                       style={{
                         padding: '12px 14px',
                         cursor: 'pointer',
-                        background: selectAssigneeIds.includes(user.id) ? '#F3F4F6' : 'white',
+                        background: editedTask.assigneeIds.includes(String(user.id)) ? '#F3F4F6' : 'white',
                         fontSize: inputSize,
                         color: '#1F1F1F',
                       }}
                       role="option"
-                      aria-selected={selectAssigneeIds.includes(user.id)}
+                      aria-selected={editedTask.assigneeIds.includes(String(user.id))}
                     >
                       {user.name}
                     </div>
