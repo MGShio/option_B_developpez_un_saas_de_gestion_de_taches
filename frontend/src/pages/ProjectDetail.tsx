@@ -1508,6 +1508,7 @@ function CreateTaskModal({
   isMobile: boolean;
   focusOutlineStyle: React.CSSProperties;
 }) {
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const isFormValid = newTask.title.trim() && newTask.dueDate && selectedAssignees.length > 0;
   const modalWidth = isMobile ? '95%' : '598px';
   const modalPadding = isMobile ? '1.5rem' : '79px 73px';
@@ -1515,6 +1516,18 @@ function CreateTaskModal({
   const labelSize = isMobile ? '0.875rem' : '0.9375rem';
   const inputSize = isMobile ? '0.875rem' : '0.9375rem';
   const buttonFontSize = isMobile ? '0.875rem' : '1rem';
+
+  // Close user dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest && !target.closest('.assignee-dropdown')) {
+        setIsUserDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <div 
@@ -1590,7 +1603,7 @@ function CreateTaskModal({
               onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
               placeholder=""
               style={{
-                height: isMobile ? '44px' : '53px',
+                height: isMobile ? '44px' : 'auto',
                 padding: isMobile ? '12px 14px' : '19px 17px',
                 background: 'white',
                 borderRadius: 4,
@@ -1655,27 +1668,69 @@ function CreateTaskModal({
             >
               Échéance*
             </label>
-            <input
-              id="task-dueDate"
-              type="date"
-              value={newTask.dueDate}
-              onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
-              style={{
-                height: isMobile ? '44px' : '53px',
-                padding: isMobile ? '12px 14px' : '19px 17px',
-                background: 'white',
-                borderRadius: 4,
-                border: '1px solid #E5E7EB',
-                fontSize: inputSize,
-                fontFamily: 'Inter',
-                fontWeight: 400,
-                color: '#0F0F0F',
-                outline: 'none',
-              }}
-              aria-required="true"
-              onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
-              onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
-            />
+            <div style={{
+              position: 'relative',
+              height: isMobile ? '44px' : 'auto',
+            }}>
+              <input
+                id="task-dueDate"
+                type="date"
+                value={newTask.dueDate}
+                onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  opacity: 0,
+                  cursor: 'pointer',
+                  fontSize: 0,
+                  padding: 0,
+                  margin: 0,
+                  border: 'none',
+                  background: 'transparent',
+                }}
+                aria-required="true"
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  padding: isMobile ? '0 14px' : '0 17px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  background: 'white',
+                  borderRadius: 4,
+                  border: '1px solid #E5E7EB',
+                  pointerEvents: 'none',
+                }}
+              >
+                <span
+                  style={{
+                    color: newTask.dueDate ? '#0F0F0F' : '#6B7280',
+                    fontSize: inputSize,
+                    fontFamily: 'Inter',
+                    fontWeight: 400,
+                    flex: 1,
+                  }}
+                >
+                  {newTask.dueDate ? new Date(newTask.dueDate).toLocaleDateString('fr-FR') : ''}
+                </span>
+                <img 
+                  src={calendaricongreyIcon} 
+                  alt="Calendrier" 
+                  style={{
+                    width: isMobile ? 14 : 16,
+                    height: isMobile ? 14 : 16,
+                    pointerEvents: 'none',
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -1690,48 +1745,125 @@ function CreateTaskModal({
             >
               Assigné à :
             </label>
-            <div 
-              style={{
-                height: isMobile ? '44px' : '53px',
-                padding: isMobile ? '12px 14px' : '19px 17px',
-                background: 'white',
-                borderRadius: 4,
-                border: '1px solid #E5E7EB',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <select
-                id="task-assignees"
-                multiple
-                value={selectedAssignees}
-                onChange={(e) => {
-                  const selected = Array.from(e.target.selectedOptions, option => option.value);
-                  setSelectedAssignees(selected);
-                }}
+            <div className="assignee-dropdown" style={{
+              position: 'relative',
+            }}>
+              <div
                 style={{
-                  border: 'none',
-                  outline: 'none',
-                  background: 'transparent',
-                  fontSize: inputSize,
-                  fontFamily: 'Inter',
-                  fontWeight: 400,
-                  color: '#6B7280',
-                  width: '100%',
+                  height: isMobile ? '44px' : 'auto',
+                  padding: isMobile ? '12px 14px' : '19px 17px',
+                  background: 'white',
+                  borderRadius: 4,
+                  border: '1px solid #E5E7EB',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
                   cursor: 'pointer',
                 }}
-                aria-label="Sélectionner les personnes assignées"
+                onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setIsUserDropdownOpen(!isUserDropdownOpen);
+                  }
+                }}
                 onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle)}
                 onBlur={(e) => Object.assign(e.currentTarget.style, { outline: 'none', outlineOffset: '0' })}
               >
-                {users.map(user => (
-                  <option key={user.id} value={user.id}>
-                    {user.name}
-                  </option>
-                ))}
-              </select>
-              <DownArrowIcon size={isMobile ? 14 : 16} />
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', width: '100%', alignItems: 'center' }}>
+                  {selectedAssignees.length > 0 ? (
+                    users
+                      .filter(user => selectedAssignees.includes(user.id))
+                      .map(user => (
+                        <div
+                          key={user.id}
+                          style={{
+                            background: '#E5E7EB',
+                            padding: '4px 8px',
+                            borderRadius: 4,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                            fontSize: inputSize,
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <span style={{ color: '#1F1F1F' }}>{user.name}</span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedAssignees(selectedAssignees.filter(id => id !== user.id));
+                            }}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              color: '#6B7280',
+                              fontSize: '1rem',
+                              lineHeight: 1,
+                              padding: 0,
+                              margin: 0,
+                            }}
+                            aria-label={`Retirer ${user.name}`}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))
+                  ) : (
+                    <span style={{ color: '#6B7280', fontSize: inputSize }}>Choisir un ou plusieurs collaborateurs</span>
+                  )}
+                </div>
+                <DownArrowIcon size={isMobile ? 14 : 16} />
+              </div>
+              {isUserDropdownOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    right: 0,
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    background: 'white',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: 4,
+                    marginTop: '4px',
+                    zIndex: 100,
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  }}
+                  role="listbox"
+                >
+                  {users.map(user => (
+                    <div
+                      key={user.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const newSelectedAssignees = selectedAssignees.includes(user.id)
+                          ? selectedAssignees.filter(id => id !== user.id)
+                          : [...selectedAssignees, user.id];
+                        setSelectedAssignees(newSelectedAssignees);
+                      }}
+                      style={{
+                        padding: '12px 14px',
+                        cursor: 'pointer',
+                        background: selectedAssignees.includes(user.id) ? '#F3F4F6' : 'white',
+                        fontSize: inputSize,
+                        color: '#1F1F1F',
+                        ':hover': {
+                          background: '#F3F4F6',
+                        },
+                      }}
+                      role="option"
+                      aria-selected={selectedAssignees.includes(user.id)}
+                    >
+                      {user.name}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -1761,7 +1893,7 @@ function CreateTaskModal({
                   onClick={() => setSelectedStatus(option.value)}
                   style={{
                     padding: isMobile ? '4px 12px' : '4px 16px',
-                    background: option.value === selectedStatus ? option.color : '#E5E7EB',
+                    background: (option.value === 'À faire' && option.value !== selectedStatus) ? '#E5E7EB' : option.color,
                     borderRadius: 50,
                     border: 'none',
                     cursor: 'pointer',
@@ -1774,7 +1906,7 @@ function CreateTaskModal({
                 >
                   <span 
                     style={{
-                      color: option.value === selectedStatus ? option.textColor : '#6B7280',
+                      color: (option.value === 'À faire' && option.value !== selectedStatus) ? '#6B7280' : option.textColor,
                       fontSize: inputSize,
                       fontFamily: 'Inter',
                       fontWeight: 400,
@@ -1791,9 +1923,9 @@ function CreateTaskModal({
             type="submit"
             disabled={!isFormValid}
             style={{
-              width: isMobile ? '100%' : '181px',
+              width: isMobile ? '100%' : 'auto',
               height: isMobile ? '48px' : '50px',
-              padding: isMobile ? '13px 24px' : '13px 74px',
+              padding: isMobile ? '13px 24px' : '13px 24px',
               background: isFormValid ? '#1F1F1F' : '#E5E7EB',
               color: isFormValid ? 'white' : '#9CA3AF',
               border: 'none',
@@ -1802,7 +1934,7 @@ function CreateTaskModal({
               fontFamily: 'Inter',
               fontWeight: 400,
               cursor: isFormValid ? 'pointer' : 'not-allowed',
-              alignSelf: isMobile ? 'stretch' : 'flex-end',
+              alignSelf: 'flex-start',
             }}
             aria-disabled={!isFormValid}
             onFocus={(e) => !e.currentTarget.disabled && Object.assign(e.currentTarget.style, focusOutlineStyle)}
