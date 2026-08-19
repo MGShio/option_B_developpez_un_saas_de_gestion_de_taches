@@ -1,7 +1,6 @@
 // taskService.ts - Service
 
-const API_BASE_URL = 'http://localhost:8000';
-
+import { API_BASE_URL } from '../config';
 
 
 
@@ -66,11 +65,9 @@ const PRIORITY_MAP: Record<string, string> = {
 // Fonctions de conversion pour l'envoi au backend
 
 
-
 export function toBackendStatus(status: string): string {
   return STATUS_MAP[status] || status;
 }
-
 
 
 
@@ -81,11 +78,9 @@ export function toBackendPriority(priority: string): string {
 // Fonctions de conversion pour l'affichage frontend
 
 
-
 export function toFrontendStatus(status: string): string {
   return STATUS_MAP[status] || status;
 }
-
 
 
 
@@ -133,7 +128,6 @@ interface BackendTask {
 // Function to convert task data from backend format to frontend format
 
 
-
 export function formatTaskFromBackend(backendTask: BackendTask): Task {
   return {
     id: backendTask.id,
@@ -168,7 +162,6 @@ export function formatTaskFromBackend(backendTask: BackendTask): Task {
 // Function to convert task data from frontend format to backend format
 
 
-
 export function formatTaskToBackend(frontendTask: Partial<CreateTaskData>): any {
   const result: any = { ...frontendTask };
   
@@ -185,6 +178,7 @@ export function formatTaskToBackend(frontendTask: Partial<CreateTaskData>): any 
   
   return result;
 }
+
 
 
 

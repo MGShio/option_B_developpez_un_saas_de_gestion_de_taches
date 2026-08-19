@@ -10,8 +10,8 @@ import { canDeleteProject, canModifyProject, hasProjectAccess } from '../utils/p
 import { storage } from '../utils/storage';
 
 import { getProjects, deleteProject, createProject, addContributor, type Project } from '../services/projectService';
-
 import { getProjectTasks, type Task } from '../services/taskService';
+import { getAllUsers } from '../services/userService';
 import equipeIcon from '../images/equipeicon.svg';
 
 // Couleurs des statuts - Conforme WCAG 2.1 AA
@@ -54,6 +54,10 @@ export default function Projects() {
 
   const [selectContributorIds, setSelectContributorIds] = useState<string[]>([]);
 
+  const [allUsers, setAllUsers] = useState<{ id: string; name: string; role?: string }[]>([]);
+
+  const [isUsersLoading, setIsUsersLoading] = useState(false);
+
   // Gestion du resize pour le responsive
 
   useEffect(() => {
@@ -82,10 +86,27 @@ export default function Projects() {
   const cardPadding = isMobile ? '1rem' : isTablet ? '1.25rem' : '2rem';
   const cardGap = isMobile ? '1rem' : '1.5rem';
 
-  // Prepare users list for dropdown
+  // Prepare users list for dropdown - include all users + current user as owner
   const usersList = [
     { id: user?.id || '', name: user?.name || '', role: 'Propriétaire' },
+    ...allUsers.filter(u => u.id !== user?.id), // Avoid duplicate
   ];
+
+  // Fetch all users for contributors selection
+  const fetchAllUsers = useCallback(async () => {
+    if (!user) return;
+    
+    setIsUsersLoading(true);
+    try {
+      const users = await getAllUsers();
+      setAllUsers(users.map(u => ({ id: u.id, name: u.name, email: u.email })));
+    } catch (err) {
+      console.error('Erreur lors de la récupération des utilisateurs:', err);
+      // Ne pas bloquer l'application si la récupération des utilisateurs échoue
+    } finally {
+      setIsUsersLoading(false);
+    }
+  }, [user]);
 
   // Récupérer les projets
 
@@ -134,12 +155,13 @@ export default function Projects() {
     }
   }, [user, navigate]);
 
-
+  // Fetch projects and users on mount
   useEffect(() => {
     if (isAuthenticated) {
       fetchProjects();
+      fetchAllUsers();
     }
-  }, [isAuthenticated, fetchProjects]);
+  }, [isAuthenticated, fetchProjects, fetchAllUsers]);
 
   // Create a new project
   const handleCreateProject = async (data: ModalCreateProjectData) => {
@@ -308,6 +330,7 @@ export default function Projects() {
               color: 'var(--color-white)',
             })}
             aria-label="Créer un nouveau projet"
+            disabled={isUsersLoading}
           >
             + Créer un projet
           </button>

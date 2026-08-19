@@ -1,9 +1,8 @@
 // projectService.ts - Service
 
-const API_BASE_URL = 'http://localhost:8000';
+import { API_BASE_URL } from '../config';
 
 // Backend response types
-
 
 
 interface BackendUser {
