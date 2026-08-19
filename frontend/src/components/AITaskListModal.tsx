@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import binIcon from '../images/bin.svg';
+import bingreyIcon from '../images/bingrey.svg';
 import pencilIcon from '../images/pencil.svg';
 import starOrangeIcon from '../images/Starorange.svg';
 import starIcon from '../images/Star.svg';
@@ -212,7 +213,7 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
                         fontWeight: 400,
                       }}
                     >
-                      <img src={binIcon} alt="Supprimer" style={{ width: 14, height: 14 }} />
+                      <img src={task.id === 1 ? binIcon : bingreyIcon} alt="Supprimer" style={{ width: 14, height: 14 }} />
                       Supprimer
                     </button>
                     <div style={{
@@ -252,6 +253,7 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
 
         {/* Bouton Ajouter et champ de saisie */}
         <div style={{
+          width: '100%',
           flexDirection: 'column',
           justifyContent: 'flex-start',
           alignItems: 'center',
@@ -289,17 +291,18 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
             </div>
           </button>
           <div style={{
+            width: 'calc(100% + 400px)',
+            height: 1,
+            background: '#E5E7EB',
+            marginLeft: -73,
+          }} />
+          <div style={{
             flexDirection: 'column',
             justifyContent: 'flex-start',
             alignItems: 'center',
             gap: 24,
             display: 'flex',
           }}>
-            <div style={{
-              width: 600,
-              height: 1,
-              background: '#E5E7EB',
-            }} />
             <form onSubmit={handleSubmit} style={{
               justifyContent: 'flex-start',
               alignItems: 'center',
@@ -337,7 +340,7 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
                       background: 'transparent',
                       border: 'none',
                       outline: 'none',
-                      color: 'black',
+                      color: '#000000',
                       fontSize: 12,
                       fontFamily: 'Inter',
                       fontWeight: 400,
