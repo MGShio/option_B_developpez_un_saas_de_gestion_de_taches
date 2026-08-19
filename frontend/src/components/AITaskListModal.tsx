@@ -59,7 +59,6 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
 // RENDER
 
 
-
   return (
     <div
       onClick={onClose}
@@ -95,7 +94,6 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
       }}>
         {/* Titre */}
         <div style={{
-          width: 494,
           height: 523,
           flexDirection: 'column',
           justifyContent: 'flex-start',
@@ -263,10 +261,9 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
           <button
             onClick={handleAddTasks}
             style={{
-              width: 181,
               height: 50,
-              paddingLeft: 74,
-              paddingRight: 74,
+              paddingLeft: 15,
+              paddingRight: 15,
               paddingTop: 13,
               paddingBottom: 13,
               background: '#1F1F1F',
@@ -341,7 +338,7 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
                       border: 'none',
                       outline: 'none',
                       color: 'black',
-                      fontSize: 10,
+                      fontSize: 12,
                       fontFamily: 'Inter',
                       fontWeight: 400,
                     }}
@@ -360,7 +357,17 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
                       justifyContent: 'center',
                     }}
                   >
-                    <img src={starIcon} alt="Étoile" style={{ width: 24, height: 24 }} />
+                    <div style={{
+                      width: 25,
+                      height: 25,
+                      background: '#F97316',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <img src={starIcon} alt="Étoile" style={{ width: 10, height: 10 }} />
+                    </div>
                   </button>
                 </div>
               </div>
@@ -388,3 +395,4 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
     </div>
   );
 }
+
