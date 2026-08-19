@@ -100,7 +100,24 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
         maxWidth: '900px',
         maxHeight: '90vh',
         overflowY: 'auto',
+        position: 'relative',
       }}>
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: 20,
+            right: 20,
+            background: 'none',
+            border: 'none',
+            fontSize: 24,
+            cursor: 'pointer',
+            color: '#6B7280',
+          }}
+        >
+          ×
+        </button>
+
         <h2 style={{
           margin: 0,
           color: '#1F1F1F',
@@ -467,3 +484,4 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
     </div>
   );
 }
+
