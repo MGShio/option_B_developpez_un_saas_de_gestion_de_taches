@@ -5,10 +5,11 @@ import { useNavigate } from 'react-router-dom';
 
 import { useAuth, type User } from '../contexts/AuthContext';
 import EditProjectModal from '../components/EditProjectModal';
+import CreateProjectModal, { type ModalCreateProjectData } from '../components/CreateProjectModal';
 import { canDeleteProject, canModifyProject, hasProjectAccess } from '../utils/permissions';
 import { storage } from '../utils/storage';
 
-import { getProjects, deleteProject, type Project } from '../services/projectService';
+import { getProjects, deleteProject, createProject, addContributor, type Project } from '../services/projectService';
 
 import { getProjectTasks, type Task } from '../services/taskService';
 import equipeIcon from '../images/equipeicon.svg';
@@ -24,9 +25,7 @@ const statusColors: Record<string, { bg: string; color: string }> = {
 
 
 
-
 export default function Projects() {
-
 
 
   const { user, isAuthenticated } = useAuth();
@@ -50,6 +49,10 @@ export default function Projects() {
 
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const [selectContributorIds, setSelectContributorIds] = useState<string[]>([]);
 
   // Gestion du resize pour le responsive
 
@@ -78,6 +81,11 @@ export default function Projects() {
   const gridGap = isMobile ? '1rem' : '1.5rem';
   const cardPadding = isMobile ? '1rem' : isTablet ? '1.25rem' : '2rem';
   const cardGap = isMobile ? '1rem' : '1.5rem';
+
+  // Prepare users list for dropdown
+  const usersList = [
+    { id: user?.id || '', name: user?.name || '', role: 'Propriétaire' },
+  ];
 
   // Récupérer les projets
 
@@ -133,8 +141,47 @@ export default function Projects() {
     }
   }, [isAuthenticated, fetchProjects]);
 
-  // Supprimer un projet
+  // Create a new project
+  const handleCreateProject = async (data: ModalCreateProjectData) => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const token = storage.getToken();
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+      
+      // Create the project first
+      const newProject = await createProject(token, {
+        name: data.name,
+        description: data.description,
+      });
+      
+      // Add contributors if any
+      for (const contributorId of data.contributorIds) {
+        if (contributorId !== newProject.ownerId) {
+          await addContributor(token, newProject.id, contributorId);
+        }
+      }
+      
+      // Refresh the projects list
+      await fetchProjects();
+      setIsCreateModalOpen(false);
+      setSelectContributorIds([]);
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur lors de la création du projet');
+      console.error('Erreur:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  // Supprimer un projet
 
 
   const handleDeleteProject = async (projectId: string) => {
@@ -161,6 +208,7 @@ export default function Projects() {
       setDeletingId(null);
     }
   };
+
 
   // Extraire les initiales du nom
 
@@ -196,9 +244,8 @@ export default function Projects() {
 // RENDER
 
 
-
-  return (
-    <div style={{ 
+  return ((
+    <div style={{
       width: '100%',
       padding: isMobile ? '1rem' : '0',
     }}>
@@ -236,7 +283,7 @@ export default function Projects() {
           </div>
           
           <button
-            onClick={() => navigate('/projects/new')}
+            onClick={() => setIsCreateModalOpen(true)}
             style={{
               width: isMobile ? '100%' : 'auto',
               maxWidth: isMobile ? '300px' : '200px',
@@ -266,7 +313,7 @@ export default function Projects() {
           </button>
         </div>
 
-      {isLoading ? (
+      {isLoading && !isCreateModalOpen ? (
         <div style={{
           textAlign: 'center', 
           padding: isMobile ? '2rem' : '4rem', 
@@ -275,8 +322,8 @@ export default function Projects() {
         }} aria-live="polite">
           Chargement des projets...
         </div>
-      ) : error ? (
-        <div style={{ 
+      ) : error && !isCreateModalOpen ? (
+        <div style={{
           textAlign: 'center', 
           padding: isMobile ? '2rem' : '4rem', 
           color: '#EF4444',
@@ -344,19 +391,31 @@ export default function Projects() {
           </div>
         </div>
       )}
+      
+      {/* Create Project Modal */}
+      {isCreateModalOpen && (
+        <CreateProjectModal
+          onClose={() => {
+            setIsCreateModalOpen(false);
+            setSelectContributorIds([]);
+          }}
+          onSubmit={handleCreateProject}
+          users={usersList}
+        />
+      )}
     </div>
-  );
+  ));
 }
 
 // Composant ProjectCard
 
 function ProjectCard({ 
   project, 
-  navigate,
-  getInitials,
-  getStatusColor,
-  isMobile,
-  isTablet
+  navigate, 
+  getInitials, 
+  getStatusColor, 
+  isMobile, 
+  isTablet 
 }: { 
   project: Project & {
     tasksCount?: number;
@@ -403,7 +462,6 @@ function ProjectCard({
 
 
 // RENDER
-
 
 
   return (
@@ -627,9 +685,6 @@ function ProjectCard({
     </div>
   );
 }
-
-
-
 
 
 

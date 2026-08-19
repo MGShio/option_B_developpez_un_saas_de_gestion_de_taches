@@ -7,7 +7,6 @@ import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
-import NewProject from './pages/NewProject';
 import ProjectDetail from './pages/ProjectDetail';
 import Account from './pages/Account';
 import NotFound from './pages/NotFound';
@@ -23,7 +22,6 @@ const loadingStyle: React.CSSProperties = {
 // Composant pour les routes protégées
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
-
 
 
   const { isAuthenticated, isLoading } = useAuth();
@@ -45,7 +43,6 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 function PublicRoute({ children }: { children: React.ReactNode }) {
 
 
-
   const { isAuthenticated, isLoading } = useAuth();
 
 
@@ -62,20 +59,15 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 
 
 
-
-
 export default function App() {
 
 // RENDER
 
 
-
   return (
-
 
     <AuthProvider>
       <BrowserRouter>
-
 
         <Routes>
           {/* Routes publiques (sans layout) */}
@@ -103,11 +95,6 @@ export default function App() {
                 <Projects />
               </PrivateRoute>
             } />
-            <Route path="projects/new" element={
-              <PrivateRoute>
-                <NewProject />
-              </PrivateRoute>
-            } />
             <Route path="projects/:id" element={
               <PrivateRoute>
                 <ProjectDetail />
@@ -127,3 +114,4 @@ export default function App() {
     </AuthProvider>
   );
 }
+

@@ -128,7 +128,7 @@ export default function EditProjectModal({ project, onClose, onSave, users }: Ed
           fontFamily: 'Manrope',
           fontWeight: 600,
         }}>
-          Modifier le projet
+          Modifier un projet
         </h2>
         
         <form onSubmit={handleSubmit}>
@@ -145,7 +145,7 @@ export default function EditProjectModal({ project, onClose, onSave, users }: Ed
                 fontFamily: 'Inter',
                 fontWeight: 400,
               }}>
-                Nom du projet *
+                 Titre *
               </label>
               <input
                 type="text"

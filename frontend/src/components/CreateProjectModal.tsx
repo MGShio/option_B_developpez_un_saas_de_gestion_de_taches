@@ -147,13 +147,13 @@ export default function CreateProjectModal({ onClose, onSubmit, users }: CreateP
                 fontFamily: 'Inter',
                 fontWeight: 400,
               }}>
-                Nom du projet *
+                Titre *
               </label>
               <input
                 type="text"
                 value={newProject.name}
                 onChange={(e) => handleChange('name', e.target.value)}
-                placeholder="Nom du projet"
+                placeholder="Titre"
                 style={{
                   padding: isMobile ? '12px 14px' : '19px 17px',
                   background: 'white',

@@ -1934,6 +1934,7 @@ function CreateTaskModal({
               fontWeight: 400,
               cursor: isFormValid ? 'pointer' : 'not-allowed',
               alignSelf: 'flex-start',
+              marginTop: '25px',
             }}
             aria-disabled={!isFormValid}
             onFocus={(e) => !e.currentTarget.disabled && Object.assign(e.currentTarget.style, focusOutlineStyle)}
