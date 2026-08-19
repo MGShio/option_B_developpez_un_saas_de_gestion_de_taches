@@ -732,7 +732,7 @@ export const searchUsers = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { query } = req.query;
+    const { query, limit = 10 } = req.query;
     const authReq = req as AuthRequest;
 
     if (!authReq.user) {
@@ -740,21 +740,25 @@ export const searchUsers = async (
       return;
     }
 
-    if (!query || typeof query !== "string") {
-      sendError(res, "Paramètre de recherche requis", "MISSING_QUERY", 400);
+    const searchQuery = query && typeof query === "string" ? query.trim() : "";
+    const limitNumber = typeof limit === "string" ? parseInt(limit, 10) : 10;
+
+    // Si la requête est vide ou trop courte, retourner tous les utilisateurs
+    if (searchQuery.length < 2) {
+      const users = await prisma.user.findMany({
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+        take: Math.min(limitNumber, 100),
+        orderBy: [{ name: "asc" }, { email: "asc" }],
+      });
+      sendSuccess(res, "Utilisateurs trouvés", { users });
       return;
     }
 
-    const searchQuery = query.trim();
-    if (searchQuery.length < 2) {
-      sendError(
-        res,
-        "La recherche doit contenir au moins 2 caractères",
-        "INVALID_QUERY",
-        400
-      );
-      return;
-    }
+    // Recherche normale avec filtre
 
     const users = await prisma.user.findMany({
       where: {
@@ -762,11 +766,13 @@ export const searchUsers = async (
           {
             email: {
               contains: searchQuery,
+              mode: "insensitive",
             },
           },
           {
             name: {
               contains: searchQuery,
+              mode: "insensitive",
             },
           },
         ],
@@ -776,7 +782,7 @@ export const searchUsers = async (
         email: true,
         name: true,
       },
-      take: 10, // Limiter à 10 résultats
+      take: Math.min(limitNumber, 100),
       orderBy: [{ name: "asc" }, { email: "asc" }],
     });
 
