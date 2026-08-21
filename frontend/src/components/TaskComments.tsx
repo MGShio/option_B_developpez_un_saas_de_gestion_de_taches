@@ -14,11 +14,11 @@
 import { useState, useEffect } from 'react';
 
 
-import type { Comment } from '../services/taskService';
+import type { Comment } from '@//services/taskService';
 
 
-import type { User } from '../contexts/AuthContext';
-import { isProjectAdmin as checkIsProjectAdmin } from '../utils/permissions';
+import type { User } from '@/contexts/AuthContext';
+import { isProjectAdmin as checkIsProjectAdmin } from '@//utils/permissions';
 
 
 

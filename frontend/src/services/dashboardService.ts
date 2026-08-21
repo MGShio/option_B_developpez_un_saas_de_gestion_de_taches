@@ -1,6 +1,6 @@
 // dashboardService.ts - Service
 
-import { API_BASE_URL } from '../config';
+import { API_BASE_URL } from '@//config';
 
 // Dashboard statistics types
 

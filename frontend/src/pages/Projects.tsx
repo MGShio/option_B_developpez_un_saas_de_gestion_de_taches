@@ -1,18 +1,19 @@
+'use client';
 // Projects.tsx - Page liste des projets
 
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
-import { useAuth, type User } from '../contexts/AuthContext';
-import EditProjectModal from '../components/EditProjectModal';
-import CreateProjectModal, { type ModalCreateProjectData } from '../components/CreateProjectModal';
-import { canDeleteProject, canModifyProject, hasProjectAccess } from '../utils/permissions';
-import { storage } from '../utils/storage';
+import { useAuth, type User } from '@/contexts/AuthContext';
+import EditProjectModal from '@//components/EditProjectModal';
+import CreateProjectModal, { type ModalCreateProjectData } from '@//components/CreateProjectModal';
+import { canDeleteProject, canModifyProject, hasProjectAccess } from '@//utils/permissions';
+import { storage } from '@//utils/storage';
 
-import { getProjects, deleteProject, createProject, addContributor, type Project } from '../services/projectService';
-import { getProjectTasks, type Task } from '../services/taskService';
-import { getAllUsers } from '../services/userService';
-import equipeIcon from '../images/equipeicon.svg';
+import { getProjects, deleteProject, createProject, addContributor, type Project } from '@//services/projectService';
+import { getProjectTasks, type Task } from '@//services/taskService';
+import { getAllUsers } from '@//services/userService';
+const equipeIcon = '/images/equipeicon.svg';
 
 // Couleurs des statuts - Conforme WCAG 2.1 AA
 
@@ -30,10 +31,10 @@ export default function Projects() {
 
   const { user, isAuthenticated } = useAuth();
 
-  const navigate = useNavigate();
+  const router = useRouter();;
 
 
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1440);
 
 
   const [searchQuery] = useState('');
@@ -118,11 +119,7 @@ export default function Projects() {
     setError(null);
     
     try {
-      const token = storage.getToken();
-      if (!token) {
-        navigate('/login');
-        return;
-      }
+      const token = storage.getToken() || "";
       
       const projectsData = await getProjects(token);
       
@@ -153,7 +150,7 @@ export default function Projects() {
     } finally {
       setIsLoading(false);
     }
-  }, [user, navigate]);
+  }, [user, router]);
 
   // Fetch projects and users on mount
   useEffect(() => {
@@ -171,11 +168,7 @@ export default function Projects() {
     setError(null);
     
     try {
-      const token = storage.getToken();
-      if (!token) {
-        navigate('/login');
-        return;
-      }
+      const token = storage.getToken() || "";
       
       // Create the project first
       const newProject = await createProject(token, {
@@ -215,11 +208,7 @@ export default function Projects() {
     setError(null);
     
     try {
-      const token = storage.getToken();
-      if (!token) {
-        navigate('/login');
-        return;
-      }
+      const token = storage.getToken() || "";
       
       await deleteProject(token, projectId);
       setProjects(prev => prev.filter(p => p.id !== projectId));
@@ -251,10 +240,6 @@ export default function Projects() {
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (!isAuthenticated) {
-    navigate('/login');
-    return null;
-  }
 
   // Focus outline style pour l'accessibilite
   const focusOutlineStyle: React.CSSProperties = {
@@ -403,7 +388,7 @@ export default function Projects() {
                 <ProjectCard
                   key={project.id}
                   project={project}
-                  navigate={navigate}
+                  navigate={(path) => router.push(path)}
                   getInitials={getInitials}
                   getStatusColor={getStatusColor}
                   isMobile={isMobile}
@@ -433,8 +418,7 @@ export default function Projects() {
 // Composant ProjectCard
 
 function ProjectCard({ 
-  project, 
-  navigate, 
+  project, navigate, 
   getInitials, 
   getStatusColor, 
   isMobile, 

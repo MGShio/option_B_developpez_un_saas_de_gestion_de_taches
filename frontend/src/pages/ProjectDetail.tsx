@@ -1,22 +1,23 @@
+'use client';
 // ProjectDetail.tsx - Page détails projet
 
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth, type User } from '../contexts/AuthContext';
-import { storage } from '../utils/storage';
-import { getProjectById, type Project } from '../services/projectService';
-import { getProjectTasks, updateTask, createTask, type Task, type CreateTaskData, type Comment, getTaskComments, createComment, deleteCommentService } from '../services/taskService';
-import AITaskListModal from '../components/AITaskListModal';
-import EditProjectModal from '../components/EditProjectModal';
-import EditTaskModal from '../components/EditTaskModal';
-import { canModifyProject, canCreateTasks, isProjectOwner, isProjectAdmin, hasProjectAccess } from '../utils/permissions';
-import TaskComments from '../components/TaskComments';
-import checkmarkIcon from '../images/checkmark.svg';
-import calendarIcon from '../images/calendaricon.svg';
-import calendaricongreyIcon from '../images/calendaricongrey.svg';
-import starIcon from '../images/star.svg';
-import displaycomIcon from '../images/displaycom.svg';
-import retourIcon from '../images/retour.svg';
+import { useRouter } from 'next/navigation';
+import { useAuth, type User } from '@/contexts/AuthContext';
+import { storage } from '@//utils/storage';
+import { getProjectById, type Project } from '@//services/projectService';
+import { getProjectTasks, updateTask, createTask, type Task, type CreateTaskData, type Comment, getTaskComments, createComment, deleteCommentService } from '@//services/taskService';
+import AITaskListModal from '@//components/AITaskListModal';
+import EditProjectModal from '@//components/EditProjectModal';
+import EditTaskModal from '@//components/EditTaskModal';
+import { canModifyProject, canCreateTasks, isProjectOwner, isProjectAdmin, hasProjectAccess } from '@//utils/permissions';
+import TaskComments from '@//components/TaskComments';
+const checkmarkIcon = '/images/checkmark.svg';
+const calendarIcon = '/images/calendaricon.svg';
+const calendaricongreyIcon = '/images/calendaricongrey.svg';
+const starIcon = '/images/Star.svg';
+const displaycomIcon = '/images/displaycom.svg';
+const retourIcon = '/images/retour.svg';
 
 // Couleurs des statuts
 const statusColors: Record<string, { bg: string; color: string }> = {
@@ -24,6 +25,12 @@ const statusColors: Record<string, { bg: string; color: string }> = {
   'En cours': { bg: '#FFF0D7', color: '#E08D00' },
   'Terminé': { bg: '#D1FAE5', color: '#059669' },
 };
+
+
+
+interface ProjectDetailProps {
+  id: string;
+}
 
 // Icônes
 const BackIcon = ({ size = 24 }: { size?: number }) => (
@@ -84,11 +91,11 @@ const OptionsIcon = ({ size = 16 }: { size?: number }) => (
 );
 
 
-export default function ProjectDetail() {
-  const { id } = useParams<{ id: string }>();
+export default function ProjectDetail({ id }: ProjectDetailProps) {
+
   const { isAuthenticated, user } = useAuth();
-  const navigate = useNavigate();
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const router = useRouter();;
+  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1440);
   
   const [project, setProject] = useState<Project | null>(null);
 
@@ -165,11 +172,7 @@ export default function ProjectDetail() {
     setError(null);
     
     try {
-      const token = storage.getToken();
-      if (!token) {
-        navigate('/login');
-        return;
-      }
+      const token = storage.getToken() || "";
       
       // Récupérer le projet
       const projectData = await getProjectById(token, id);
@@ -188,7 +191,7 @@ export default function ProjectDetail() {
       
       if (!userHasAccess) {
         setError('Accès refusé: vous devez être propriétaire ou membre de ce projet');
-        navigate('/projects');
+        router.push('/projects');
         return;
       }
       
@@ -208,12 +211,12 @@ export default function ProjectDetail() {
     } finally {
       setIsLoading(false);
     }
-  }, [id, navigate, user]);
+  }, [id, router, user]);
     // Fetch comments for a specific task
   const fetchCommentsForTask = useCallback(async (taskId: string) => {
     if (!id || !project || !user || !taskId) return;
     
-    const token = storage.getToken();
+    const token = storage.getToken() || "";
     if (!token) return;
     
     setLoadingCommentsByTask(prev => ({ ...prev, [taskId]: true }));
@@ -243,11 +246,7 @@ export default function ProjectDetail() {
   const handleAddComment = async (taskId: string, content: string) => {
     if (!id || !user) return;
     
-    const token = storage.getToken();
-    if (!token) {
-      navigate('/login');
-      return;
-    }
+    const token = storage.getToken() || "";
     
     try {
       const newComment = await createComment(token, id, taskId, content);
@@ -266,11 +265,7 @@ export default function ProjectDetail() {
   const handleDeleteComment = async (taskId: string, commentId: string) => {
     if (!id || !user) return;
     
-    const token = storage.getToken();
-    if (!token) {
-      navigate('/login');
-      return;
-    }
+    const token = storage.getToken() || "";
     
     try {
       await deleteCommentService(token, id, taskId, commentId);
@@ -301,11 +296,7 @@ export default function ProjectDetail() {
   // Changer le statut d'une tâche
   const handleStatusChange = async (taskId: string, newStatus: string) => {
     try {
-      const token = storage.getToken();
-      if (!token) {
-        navigate('/login');
-        return;
-      }
+      const token = storage.getToken() || "";
       
       await updateTask(token, id!, taskId, { status: newStatus as Task['status'] });
       setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus as Task['status'] } : t));
@@ -322,11 +313,7 @@ export default function ProjectDetail() {
     }
     
     try {
-      const token = storage.getToken();
-      if (!token) {
-        navigate('/login');
-        return;
-      }
+      const token = storage.getToken() || "";
       
       const taskData: CreateTaskData = {
         ...newTask,
@@ -353,10 +340,6 @@ export default function ProjectDetail() {
     { label: 'Terminé', value: 'Terminé' as const, color: '#D1FAE5', textColor: '#059669' },
   ];
 
-  if (!isAuthenticated) {
-    navigate('/login');
-    return null;
-  }
 
   if (isLoading) {
     return (
@@ -468,7 +451,7 @@ export default function ProjectDetail() {
         }}
       >
         <button
-          onClick={() => navigate('/projects')}
+          onClick={() => router.push('/projects')}
           style={{
             position: 'absolute',
             left: -23,

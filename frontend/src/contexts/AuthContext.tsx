@@ -1,9 +1,10 @@
 // AuthContext.tsx - Context
+'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 import type { ReactNode } from 'react';
-import { storage } from '../utils/storage';
+import { storage } from '@/utils/storage';
 import { 
 
   login as loginService, 
@@ -22,8 +23,7 @@ import {
   type UpdateProfileCredentials,
 
   type UpdatePasswordCredentials
-} from '../services/authService';
-
+} from '@/services/authService';
 
 
 export interface User {
@@ -220,12 +220,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 
 
-
+// Default context for when not inside AuthProvider (e.g., during prerendering)
+const defaultAuthContext: AuthContextType = {
+  user: null,
+  isAuthenticated: false,
+  isLoading: false,
+  error: null,
+  login: async () => {},
+  register: async () => {},
+  logout: async () => {},
+  updateProfile: async () => {},
+  updatePassword: async () => {},
+  clearError: () => {},
+};
 
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth doit être utilisé dans un AuthProvider');
+    return defaultAuthContext;
   }
   return context;
 }

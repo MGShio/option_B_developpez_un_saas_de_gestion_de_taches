@@ -1,60 +1,49 @@
 // MainLayout.tsx - Layout
+'use client';
 
 import { useState, useEffect } from 'react';
-import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Import des logos et icônes
-import logoOrange from '../images/logoorange.svg';
-import logoBlack from '../images/logoblack.svg';
-import dashboardIconWhite from '../images/dashboardiconwhite.svg';
-import dashboardIconOrange from '../images/dashboardiconorange.svg';
-import folderIcon from '../images/foldericon.svg';
-import folderIconWhite from '../images/foldericonwhite.svg';
+const logoOrange = '/images/logoorange.svg';
+const logoBlack = '/images/logoblack.svg';
+const dashboardIconWhite = '/images/dashboardiconwhite.svg';
+const dashboardIconOrange = '/images/dashboardiconorange.svg';
+const folderIcon = '/images/foldericon.svg';
+const folderIconWhite = '/images/foldericonwhite.svg';
 
 
-
-
-export default function MainLayout() {
-
+export default function MainLayout({ children }: { children: React.ReactNode }) {
 
   const { user, isAuthenticated } = useAuth();
 
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const pathname = usePathname();
 
-
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
+  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1440);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Gestion du resize pour le responsive
-
   useEffect(() => {
-
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
-
-// RENDER
-
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Extraire les initiales du nom de l'utilisateur
-
-
   const getInitials = (name: string) => {
     if (!name) return '';
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
   // Calcul des tailles responsives
-
   const isMobile = windowWidth <= 768;
-  const isDashboard = location.pathname === '/dashboard';
-  const isProjects = location.pathname === '/projects';
-  const isAccount = location.pathname === '/account';
+  const isDashboard = pathname === '/dashboard';
+  const isProjects = pathname === '/projects';
+  const isAccount = pathname === '/account';
   const isTablet = windowWidth <= 1024;
   
   // Padding horizontal (selon maquette: 100px de chaque côté à 1440px)
@@ -246,31 +235,25 @@ export default function MainLayout() {
     outlineOffset: '2px',
   };
 
-
-
-// RENDER
-
-
   return (
     <div style={layoutStyle}>
-
       <header style={headerStyle} role="banner">
         {/* Logo */}
-        <Link to="/dashboard" style={logoStyle} aria-label="Accueil - Tableau de bord">
+        <Link href="/dashboard" style={logoStyle} aria-label="Accueil - Tableau de bord">
           <img src={logoOrange} alt="Logo Abricot" style={{ height: '100%', width: 'auto' }} />
         </Link>
 
         {/* Navigation desktop */}
         <nav style={navStyle} role="navigation" aria-label="Navigation principale">
           <Link
-            to="/dashboard"
+            href="/dashboard"
             style={{ ...navButtonStyle, ...(isDashboard ? navButtonActiveStyle : navButtonInactiveStyle) }}
           >
             <img src={isDashboard ? dashboardIconWhite : dashboardIconOrange} alt="" style={iconStyle} />
             Tableau de bord
           </Link>
           <Link
-            to="/projects"
+            href="/projects"
             style={{ ...navButtonStyle, ...(isProjects ? navButtonActiveStyle : navButtonInactiveStyle) }}
           >
             <img src={isProjects ? folderIconWhite : folderIcon} alt="" style={iconStyle} />
@@ -297,7 +280,7 @@ export default function MainLayout() {
             {/* Menu mobile déroulant */}
             <div id="mobile-menu" style={mobileMenuStyle}>
               <Link
-                to="/dashboard"
+                href="/dashboard"
                 style={{ ...navButtonStyle, ...(isDashboard ? navButtonActiveStyle : navButtonInactiveStyle), width: '100%' }}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -305,7 +288,7 @@ export default function MainLayout() {
                 Tableau de bord
               </Link>
               <Link
-                to="/projects"
+                href="/projects"
                 style={{ ...navButtonStyle, ...(isProjects ? navButtonActiveStyle : navButtonInactiveStyle), width: '100%' }}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -313,7 +296,7 @@ export default function MainLayout() {
                 Projets
               </Link>
               <Link
-                to="/account"
+                href="/account"
                 style={{ ...navButtonStyle, ...navButtonInactiveStyle, width: '100%' }}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -323,11 +306,11 @@ export default function MainLayout() {
 
             {/* Avatar desktop */}
             <div 
-              onClick={() => navigate('/account')}
+              onClick={() => router.push('/account')}
               style={{ ...userAvatarStyle, display: isMobile ? 'none' : 'flex' }}
               role="button"
               tabIndex={0}
-              onKeyPress={(e) => { if (e.key === 'Enter') navigate('/account'); }}
+              onKeyDown={(e) => { if (e.key === 'Enter') router.push('/account'); }}
               aria-label={`Compte de ${user.name}`}
             >
               <span style={avatarTextStyle}>
@@ -338,7 +321,7 @@ export default function MainLayout() {
         ) : (
           <div style={{ marginLeft: 'auto', paddingRight: avatarPaddingRight }}>
             <Link
-              to="/login"
+              href="/login"
               style={{
                 ...navButtonStyle,
                 backgroundColor: secondaryColor,
@@ -359,7 +342,7 @@ export default function MainLayout() {
 
       {/* Contenu principal */}
       <main style={mainStyle} role="main">
-        <Outlet />
+        {children}
       </main>
 
       {/* Footer */}

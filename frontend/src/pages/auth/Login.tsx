@@ -1,14 +1,17 @@
+'use client';
+
 // Login.tsx - Page connexion
 
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Import de l'image de fond locale
-import loginBackground from '../../images/Loginbackground.svg';
+const loginBackground = '/images/Loginbackground.svg';
 
 // Import du logo
-import logoOrange from '../../images/logoorange.svg';
+const logoOrange = '/images/logoorange.svg';
 
 
 
@@ -22,13 +25,13 @@ export default function Login() {
   const [password, setPassword] = useState('');
 
 
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1440);
 
 
 
   const { login, isLoading, error, clearError } = useAuth();
 
-  const navigate = useNavigate();
+  const router = useRouter();
 
   // Reset body margin pour éviter les bordures blanches
 
@@ -68,7 +71,7 @@ export default function Login() {
     
     try {
       await login({ email, password });
-      navigate('/dashboard');
+      router.push('/dashboard');
     } catch (err) {
       console.error('Login failed:', err);
     }
@@ -170,7 +173,7 @@ export default function Login() {
   };
 
   const inputStyle: React.CSSProperties = {
-    width: '85%',
+    width: 'auto',
     padding: inputPadding,
     border: '1px solid var(--color-border)',
     borderRadius: '0.375rem',
@@ -336,7 +339,7 @@ export default function Login() {
 
           <div style={forgotPasswordStyle}>
             <Link 
-              to="/forgot-password" 
+              href="/forgot-password" 
               style={linkStyle}
               onMouseEnter={(e) => Object.assign(e.currentTarget.style, linkHoverStyle, linkStyle)}
               onMouseLeave={(e) => Object.assign(e.currentTarget.style, linkStyle)}
@@ -352,7 +355,7 @@ export default function Login() {
         <p style={footerStyle}>
           Pas encore de compte ?{' '}
           <Link 
-            to="/register" 
+            href="/register" 
             style={linkStyle}
             onMouseEnter={(e) => Object.assign(e.currentTarget.style, linkHoverStyle, linkStyle)}
             onMouseLeave={(e) => Object.assign(e.currentTarget.style, linkStyle)}

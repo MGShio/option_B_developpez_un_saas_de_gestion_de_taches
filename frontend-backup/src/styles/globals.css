@@ -1,0 +1,20 @@
+:root {
+  --color-primary: #D3590B;
+  --color-secondary: #1F1F1F;
+  --color-background: #F9FAFB;
+  --color-border: #E5E7EB;
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+  
+  --font-heading: 'Manrope', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+html {
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+}
+
+body {
+  color: var(--color-secondary);
+}

@@ -1,16 +1,17 @@
+'use client';
 // Account.tsx - Page compte utilisateur
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 
 export default function Account() {
 
   const { user, isAuthenticated, logout, updateProfile, updatePassword, error, clearError } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();;
 
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1440);
   
   // États pour l'édition du profil
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -77,10 +78,6 @@ export default function Account() {
     outlineOffset: '2px',
   };
 
-  if (!isAuthenticated || !user) {
-    navigate('/login');
-    return null;
-  }
 
   // Gestion de la soumission du profil
   const handleProfileSubmit = async (e: React.FormEvent) => {
@@ -301,7 +298,7 @@ export default function Account() {
               Mon compte
             </h1>
             <p style={subtitleStyle}>
-              {user.name}
+              {user?.name || ''}
             </p>
           </div>
         </div>

@@ -1,0 +1,185 @@
+"use client";
+
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { storage } from '@/utils/storage';
+import { loginService, registerService, logoutService, updateProfileService, updatePasswordService, type LoginCredentials, type RegisterCredentials, type UpdateProfileCredentials, type UpdatePasswordCredentials, type User } from '@/services/authService';
+
+// Types
+export type AuthContextType = {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+  login: (credentials: LoginCredentials) => Promise<void>;
+  register: (credentials: RegisterCredentials) => Promise<void>;
+  logout: () => Promise<void>;
+  updateProfile: (data: UpdateProfileCredentials) => Promise<void>;
+  updatePassword: (credentials: UpdatePasswordCredentials) => Promise<void>;
+  clearError: () => void;
+};
+
+// Contexte
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Fournisseur
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Vérifier l'état d'authentification au montage
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = storage.getToken();
+      if (token) {
+        try {
+          // Pour simplifier, on considère que si on a un token, on est authentifié
+          // Dans une vraie app, on ferait un appel API pour vérifier
+          const userData = storage.getUser();
+          if (userData) {
+            setUser(userData);
+          }
+        } catch (err) {
+          storage.removeToken();
+          storage.removeUser();
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setIsLoading(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  const login = useCallback(async (credentials: LoginCredentials) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await loginService(credentials);
+      storage.setToken(response.token);
+      storage.setUser(response.user);
+      setUser(response.user);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erreur de connexion';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const register = useCallback(async (credentials: RegisterCredentials) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await registerService(credentials);
+      storage.setToken(response.token);
+      storage.setUser(response.user);
+      setUser(response.user);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de l\'inscription';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const logout = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await logoutService();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la deconnexion';
+      setError(errorMessage);
+    } finally {
+      storage.removeToken();
+      storage.removeUser();
+      setUser(null);
+      setIsLoading(false);
+    }
+  }, []);
+
+  const updateProfile = useCallback(async (data: UpdateProfileCredentials) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const token = storage.getToken();
+      if (!token) {
+        throw new Error('Non authentifie');
+      }
+      const updatedUser = await updateProfileService(token, data);
+      storage.setUser(updatedUser);
+      setUser(updatedUser);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la mise a jour du profil';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const updatePassword = useCallback(async (credentials: UpdatePasswordCredentials) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const token = storage.getToken();
+      if (!token) {
+        throw new Error('Non authentifie');
+      }
+      await updatePasswordService(token, credentials);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erreur lors du changement de mot de passe';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
+  const value: AuthContextType = {
+    user,
+    isAuthenticated: !!user,
+    isLoading,
+    error,
+    login,
+    register,
+    logout,
+    updateProfile,
+    updatePassword,
+    clearError,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+// Hook
+const defaultContext: AuthContextType = {
+  user: null,
+  isAuthenticated: false,
+  isLoading: true,
+  error: null,
+  login: async () => { throw new Error('AuthProvider not initialized'); },
+  register: async () => { throw new Error('AuthProvider not initialized'); },
+  logout: async () => { throw new Error('AuthProvider not initialized'); },
+  updateProfile: async () => { throw new Error('AuthProvider not initialized'); },
+  updatePassword: async () => { throw new Error('AuthProvider not initialized'); },
+  clearError: () => {},
+};
+
+export function useAuth(): AuthContextType {
+  const context = useContext(AuthContext);
+  return context === undefined ? defaultContext : context;
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth doit etre utilise dans un AuthProvider');
+  }
+  return context;
+}

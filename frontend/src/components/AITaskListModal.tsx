@@ -1,11 +1,11 @@
 // AITaskListModal.tsx - Component
 
 import { useState } from 'react';
-import binIcon from '../images/bin.svg';
-import bingreyIcon from '../images/bingrey.svg';
-import pencilIcon from '../images/pencil.svg';
-import starOrangeIcon from '../images/Starorange.svg';
-import starIcon from '../images/Star.svg';
+const binIcon = '/images/bin.svg';
+const bingreyIcon = '/images/bingrey.svg';
+const pencilIcon = '/images/pencil.svg';
+const starOrangeIcon = '/images/Starorange.svg';
+const starIcon = '/images/Star.svg';
 
 
 

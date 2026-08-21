@@ -1,19 +1,20 @@
+'use client';
 // Dashboard.tsx - Page tableau de bord
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { storage } from '../utils/storage';
-import { getAssignedTasks, searchTasks, type Task } from '../services/taskService';
-import { getDashboardStats, getProjectsWithTaskCounts, type DashboardStats, type ProjectWithTaskCount, type TaskSummary } from '../services/dashboardService';
-import { getProjects, createProject, type Project } from '../services/projectService';
-import CreateProjectModal, { type ModalCreateProjectData } from '../components/CreateProjectModal';
-import ProjectsWithTasksView from '../components/ProjectsWithTasksView';
-import checkmarkIcon from '../images/checkmark.svg';
-import calendarIcon from '../images/calendaricon.svg';
-import folderIconGrey from '../images/foldericongrey.svg';
-import calendarIconGrey from '../images/calendaricongrey.svg';
-import textBubbleGrey from '../images/textbubblegrey.svg';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
+import { storage } from '@//utils/storage';
+import { getAssignedTasks, searchTasks, type Task } from '@//services/taskService';
+import { getDashboardStats, getProjectsWithTaskCounts, type DashboardStats, type ProjectWithTaskCount, type TaskSummary } from '@//services/dashboardService';
+import { getProjects, createProject, type Project } from '@//services/projectService';
+import CreateProjectModal, { type ModalCreateProjectData } from '@//components/CreateProjectModal';
+import ProjectsWithTasksView from '@//components/ProjectsWithTasksView';
+const checkmarkIcon = '/images/checkmark.svg';
+const calendarIcon = '/images/calendaricon.svg';
+const folderIconGrey = '/images/foldericongrey.svg';
+const calendarIconGrey = '/images/calendaricongrey.svg';
+const textBubbleGrey = '/images/textbubblegrey.svg';
 
 
 // Couleurs des statuts - Conforme WCAG 2.1 AA
@@ -70,8 +71,8 @@ const TextBubbleGrey = () => (
 
 export default function Dashboard() {
   const { user, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const router = useRouter();;
+  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1440);
   const [activeView, setActiveView] = useState<'list' | 'kanban' | 'projects'>('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -80,8 +81,8 @@ export default function Dashboard() {
 
   // Handler for project click
   const handleProjectClick = useCallback((projectId: string) => {
-    navigate('/projects/' + projectId);
-  }, [navigate]);
+    router.push('/projects/' + projectId);
+  }, [router]);
 
   // Compute tasks by project for ProjectsWithTasksView
   const tasksByProject = useMemo(() => {
@@ -140,11 +141,7 @@ export default function Dashboard() {
     setError(null);
     
     try {
-      const token = storage.getToken();
-      if (!token) {
-        navigate('/login');
-        return;
-      }
+      const token = storage.getToken() || "";
       
       // Récupérer les tâches assignées
       const tasksData = await getAssignedTasks(token);
@@ -165,7 +162,7 @@ export default function Dashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, [user, navigate]);
+  }, [user, router]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -183,7 +180,7 @@ export default function Dashboard() {
     }
     
     try {
-      const token = storage.getToken();
+      const token = storage.getToken() || "";
       if (!token) return;
       
       const results = await searchTasks(token, query);
@@ -203,11 +200,7 @@ export default function Dashboard() {
     setError(null);
     
     try {
-      const token = storage.getToken();
-      if (!token) {
-        navigate('/login');
-        return;
-      }
+      const token = storage.getToken() || "";
       
       const createdProject = await createProject(token, newProject);
       setProjects(prev => [...prev, createdProject]);
@@ -225,10 +218,6 @@ export default function Dashboard() {
     return project ? project.name : 'Projet inconnu';
   };
 
-  if (!isAuthenticated) {
-    navigate('/login');
-    return null;
-  }
 
   // Focus outline style pour l'accessibilite
   const focusOutlineStyle: React.CSSProperties = {
@@ -586,7 +575,7 @@ export default function Dashboard() {
                   key={task.id} 
                   task={task} 
                   projectName={getProjectName(task.projectId)} 
-                  onView={() => navigate(`/projects/${task.projectId}`)} 
+                  onView={() => router.push(`/projects/${task.projectId}`)} 
                   isMobile={isMobile} 
                   isTablet={isTablet} 
                 />
@@ -863,7 +852,7 @@ function KanbanView({
   isMobile: boolean; 
   isTablet: boolean; 
 }) { 
-  const navigate = useNavigate();
+  const router = useRouter();;
   
   // Regrouper les tâches par statut
   const tasksByStatus: Record<string, Task[]> = {
@@ -1120,7 +1109,7 @@ function KanbanView({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/projects/${task.projectId}`);
+                            router.push(`/projects/${task.projectId}`);
                           }}
                           style={{
                             width: isMobile ? '100%' : 'min(7.5625rem, 9vw)',

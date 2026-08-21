@@ -1,8 +1,8 @@
 // EditTaskModal.tsx - Component
 
 import { useState, useEffect, useRef } from 'react';
-import calendaricongreyIcon from '../images/calendaricongrey.svg';
-import DownArrowIcon from '../images/displaycom.svg';
+const calendaricongreyIcon = '/images/calendaricongrey.svg';
+const DownArrowIcon = '/images/displaycom.svg';
 
 // Define the icon component
 const DownArrowIconComponent = ({ size = 16 }: { size?: number }) => (

@@ -1,7 +1,7 @@
 // EditProjectModal.tsx - Component
 
 import { useState, useEffect } from 'react';
-import DownArrowIcon from '../images/displaycom.svg';
+const DownArrowIcon = '/images/displaycom.svg';
 
 
 // Define the icon component

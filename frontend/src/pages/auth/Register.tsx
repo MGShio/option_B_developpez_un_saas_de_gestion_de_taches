@@ -1,14 +1,17 @@
+'use client';
+
 // Register.tsx - Page inscription
 
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Import de l'image de fond locale
-import registerBackground from '../../images/signinbackground.svg';
+const registerBackground = '/images/signinbackground.svg';
 
 // Import du logo
-import logoOrange from '../../images/logoorange.svg';
+const logoOrange = '/images/logoorange.svg';
 
 
 
@@ -28,16 +31,16 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
 
 
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1440);
 
 
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+  const [windowHeight, setWindowHeight] = useState(typeof window !== "undefined" ? window.innerHeight : 900);
 
 
 
   const { register, isLoading, error, clearError } = useAuth();
 
-  const navigate = useNavigate();
+  const router = useRouter();
 
   // Reset body margin pour éviter les bordures blanches
 
@@ -84,7 +87,7 @@ export default function Register() {
     
     try {
       await register({ name, email, password });
-      navigate('/dashboard');
+      router.push('/dashboard');
     } catch (err) {
       console.error('Registration failed:', err);
     }
@@ -413,7 +416,7 @@ export default function Register() {
         <p style={footerStyle}>
           Déjà inscrit ?{' '}
           <Link 
-            to="/login" 
+            href="/login" 
             style={linkStyle}
             onMouseEnter={(e) => Object.assign(e.currentTarget.style, linkHoverStyle, linkStyle)}
             onMouseLeave={(e) => Object.assign(e.currentTarget.style, linkStyle)}
