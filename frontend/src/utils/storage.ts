@@ -1,7 +1,7 @@
 // storage.ts - Utility
 // Gestion sécurisée du stockage des données sensibles
 
-import { STORAGE_KEYS } from '@//config';
+import { STORAGE_KEYS } from '@/config';
 
 /**
  * Utilitaire de stockage sécurisé

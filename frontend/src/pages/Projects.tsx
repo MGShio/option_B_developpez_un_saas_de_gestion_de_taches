@@ -5,14 +5,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useAuth, type User } from '@/contexts/AuthContext';
-import EditProjectModal from '@//components/EditProjectModal';
-import CreateProjectModal, { type ModalCreateProjectData } from '@//components/CreateProjectModal';
-import { canDeleteProject, canModifyProject, hasProjectAccess } from '@//utils/permissions';
-import { storage } from '@//utils/storage';
+import EditProjectModal from '@/components/EditProjectModal';
+import CreateProjectModal, { type ModalCreateProjectData } from '@/components/CreateProjectModal';
+import { canDeleteProject, canModifyProject, hasProjectAccess } from '@/utils/permissions';
+import { storage } from '@/utils/storage';
 
-import { getProjects, deleteProject, createProject, addContributor, type Project } from '@//services/projectService';
-import { getProjectTasks, type Task } from '@//services/taskService';
-import { getAllUsers } from '@//services/userService';
+import { getProjects, deleteProject, createProject, addContributor, type Project } from '@/services/projectService';
+import { getProjectTasks, type Task } from '@/services/taskService';
+import { getAllUsers } from '@/services/userService';
 const equipeIcon = '/images/equipeicon.svg';
 
 // Couleurs des statuts - Conforme WCAG 2.1 AA

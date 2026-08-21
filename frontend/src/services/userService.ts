@@ -1,7 +1,7 @@
 // userService.ts - Service pour la gestion des utilisateurs
 
-import { API_BASE_URL } from '@//config';
-import { storage } from '@//utils/storage';
+import { API_BASE_URL } from '@/config';
+import { storage } from '@/utils/storage';
 
 
 export interface User {

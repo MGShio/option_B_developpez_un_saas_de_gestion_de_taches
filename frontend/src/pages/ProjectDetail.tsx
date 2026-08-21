@@ -4,14 +4,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth, type User } from '@/contexts/AuthContext';
-import { storage } from '@//utils/storage';
-import { getProjectById, type Project } from '@//services/projectService';
-import { getProjectTasks, updateTask, createTask, type Task, type CreateTaskData, type Comment, getTaskComments, createComment, deleteCommentService } from '@//services/taskService';
-import AITaskListModal from '@//components/AITaskListModal';
-import EditProjectModal from '@//components/EditProjectModal';
-import EditTaskModal from '@//components/EditTaskModal';
-import { canModifyProject, canCreateTasks, isProjectOwner, isProjectAdmin, hasProjectAccess } from '@//utils/permissions';
-import TaskComments from '@//components/TaskComments';
+import { storage } from '@/utils/storage';
+import { getProjectById, type Project } from '@/services/projectService';
+import { getProjectTasks, updateTask, createTask, type Task, type CreateTaskData, type Comment, getTaskComments, createComment, deleteCommentService } from '@/services/taskService';
+import AITaskListModal from '@/components/AITaskListModal';
+import EditProjectModal from '@/components/EditProjectModal';
+import EditTaskModal from '@/components/EditTaskModal';
+import { canModifyProject, canCreateTasks, isProjectOwner, isProjectAdmin, hasProjectAccess } from '@/utils/permissions';
+import TaskComments from '@/components/TaskComments';
 const checkmarkIcon = '/images/checkmark.svg';
 const calendarIcon = '/images/calendaricon.svg';
 const calendaricongreyIcon = '/images/calendaricongrey.svg';
@@ -30,6 +30,7 @@ const statusColors: Record<string, { bg: string; color: string }> = {
 
 interface ProjectDetailProps {
   id: string;
+  initialProject?: Project | null;
 }
 
 // Icônes
@@ -91,13 +92,13 @@ const OptionsIcon = ({ size = 16 }: { size?: number }) => (
 );
 
 
-export default function ProjectDetail({ id }: ProjectDetailProps) {
+export default function ProjectDetail({ id, initialProject }: ProjectDetailProps) {
 
   const { isAuthenticated, user } = useAuth();
   const router = useRouter();;
   const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1440);
   
-  const [project, setProject] = useState<Project | null>(null);
+  const [project, setProject] = useState<Project | null>(initialProject || null);
 
   // Vérifier si l'utilisateur a accès au projet (propriétaire ou membre de l'équipe)
   const hasAccess = hasProjectAccess(user, project);
@@ -165,7 +166,7 @@ export default function ProjectDetail({ id }: ProjectDetailProps) {
   };
 
   // Récupérer les données du projet et ses tâches
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (skipProjectFetch: boolean = false) => {
     if (!id) return;
     
     setIsLoading(true);
@@ -174,9 +175,12 @@ export default function ProjectDetail({ id }: ProjectDetailProps) {
     try {
       const token = storage.getToken() || "";
       
-      // Récupérer le projet
-      const projectData = await getProjectById(token, id);
-      setProject(projectData);
+      // Récupérer le projet (ou utiliser celui déjà chargé)
+      let projectData = project;
+      if (!skipProjectFetch || !project) {
+        projectData = await getProjectById(token, id);
+        setProject(projectData);
+      }
       
       // Vérifier si l'utilisateur a accès au projet
       const userHasAccess = hasProjectAccess(user, projectData);
@@ -236,9 +240,9 @@ export default function ProjectDetail({ id }: ProjectDetailProps) {
 
   useEffect(() => {
     if (isAuthenticated && id) {
-      fetchData();
+      fetchData(!!initialProject);
     }
-  }, [isAuthenticated, id, fetchData]);
+  }, [isAuthenticated, id, fetchData, initialProject]);
 
   
 

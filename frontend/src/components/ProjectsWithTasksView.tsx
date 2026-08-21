@@ -13,9 +13,9 @@
 
 import { useState, useEffect } from 'react';
 
-import type { Project } from '@//services/projectService';
+import type { Project } from '@/services/projectService';
 
-import type { Task } from '@//services/taskService';
+import type { Task } from '@/services/taskService';
 
 
 interface ProjectsWithTasksViewProps {

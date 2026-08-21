@@ -8,7 +8,7 @@
  */
 
 
-import type { Project } from '@//services/projectService';
+import type { Project } from '@/services/projectService';
 
 import type { User } from '@/contexts/AuthContext';
 

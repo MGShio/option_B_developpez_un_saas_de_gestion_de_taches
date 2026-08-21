@@ -4,12 +4,12 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { storage } from '@//utils/storage';
-import { getAssignedTasks, searchTasks, type Task } from '@//services/taskService';
-import { getDashboardStats, getProjectsWithTaskCounts, type DashboardStats, type ProjectWithTaskCount, type TaskSummary } from '@//services/dashboardService';
-import { getProjects, createProject, type Project } from '@//services/projectService';
-import CreateProjectModal, { type ModalCreateProjectData } from '@//components/CreateProjectModal';
-import ProjectsWithTasksView from '@//components/ProjectsWithTasksView';
+import { storage } from '@/utils/storage';
+import { getAssignedTasks, searchTasks, type Task } from '@/services/taskService';
+import { getDashboardStats, getProjectsWithTaskCounts, type DashboardStats, type ProjectWithTaskCount, type TaskSummary } from '@/services/dashboardService';
+import { getProjects, createProject, type Project } from '@/services/projectService';
+import CreateProjectModal, { type ModalCreateProjectData } from '@/components/CreateProjectModal';
+import ProjectsWithTasksView from '@/components/ProjectsWithTasksView';
 const checkmarkIcon = '/images/checkmark.svg';
 const calendarIcon = '/images/calendaricon.svg';
 const folderIconGrey = '/images/foldericongrey.svg';
