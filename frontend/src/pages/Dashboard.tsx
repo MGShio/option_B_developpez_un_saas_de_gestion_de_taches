@@ -246,7 +246,7 @@ export default function Dashboard() {
             color: 'var(--color-secondary)',
             fontSize: titleSize,
             fontFamily: 'var(--font-heading)',
-            fontWeight: '600',
+            fontWeight: '600', whiteSpace: 'nowrap',
             marginBottom: isMobile ? '0.75rem' : '0',
           }}>
             Tableau de bord
@@ -259,45 +259,12 @@ export default function Dashboard() {
           }}>
             Bonjour {user?.name}, voici un aperçu de vos projets et tâches
           </p>
-          <button
-          onClick={() => setActiveView('projects')}
-          style={{
-            padding: isMobile ? '0.75rem 1rem' : '0.875rem 1rem',
-            background: activeView === 'projects' ? '#FFE8D9' : 'white',
-            border: activeView === 'projects' ? '0.0625rem solid var(--color-primary)' : '0.0625rem solid var(--color-border)',
-            borderRadius: '0.5rem',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: isMobile ? '0.5rem' : '0.875rem',
-            fontSize: isMobile ? '0.875rem' : '0.9375rem',
-            fontFamily: 'Inter',
-            fontWeight: '400',
-            transition: 'all 0.2s ease',
-          }}
-          onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, {
-            background: activeView === 'projects' ? '#FFE8D9' : 'white',
-            border: activeView === 'projects' ? '0.0625rem solid var(--color-primary)' : '0.0625rem solid var(--color-border)',
-          })}
-          onBlur={(e) => Object.assign(e.currentTarget.style, {
-            background: activeView === 'projects' ? '#FFE8D9' : 'white',
-            border: activeView === 'projects' ? '0.0625rem solid var(--color-primary)' : '0.0625rem solid var(--color-border)',
-          })}
-          aria-pressed={activeView === 'projects'}
-          aria-label="Mes projets avec tâches assignées"
-        >
-          <img src={folderIconGrey} alt="Mes projets" style={{ width: '1rem', height: '1rem', userSelect: 'none' }} />
-          <span style={{ color: activeView === 'projects' ? 'var(--color-primary)' : '#6B7280' }}>
-            Mes projets
-          </span>
-        </button>
-      </div>
+        </div>
+        
         <button
           onClick={() => setIsCreateModalOpen(true)}
           style={{
             height: isMobile ? 'min(3rem, 6.5vh)' : 'min(3.125rem, 4vh)',
-            paddingTop: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
-            paddingBottom: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
             paddingLeft: isMobile ? '1.5rem' : 'clamp(2rem, 5vw, 4.625rem)',
             paddingRight: isMobile ? '1.5rem' : 'clamp(2rem, 5vw, 4.625rem)',
             background: 'var(--color-secondary)',
@@ -313,8 +280,6 @@ export default function Dashboard() {
           }}
           onFocus={(e) => Object.assign(e.currentTarget.style, focusOutlineStyle, {
             height: isMobile ? 'min(3rem, 6.5vh)' : 'min(3.125rem, 4vh)',
-            paddingTop: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
-            paddingBottom: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
             paddingLeft: isMobile ? '1.5rem' : 'clamp(2rem, 5vw, 4.625rem)',
             paddingRight: isMobile ? '1.5rem' : 'clamp(2rem, 5vw, 4.625rem)',
             background: 'var(--color-secondary)',
@@ -332,8 +297,6 @@ export default function Dashboard() {
           })}
           onBlur={(e) => Object.assign(e.currentTarget.style, {
             height: isMobile ? 'min(3rem, 6.5vh)' : 'min(3.125rem, 4vh)',
-            paddingTop: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
-            paddingBottom: isMobile ? '0.75rem' : 'clamp(0.75rem, 2vw, 0.8125rem)',
             paddingLeft: isMobile ? '1.5rem' : 'clamp(2rem, 5vw, 4.625rem)',
             paddingRight: isMobile ? '1.5rem' : 'clamp(2rem, 5vw, 4.625rem)',
             background: 'var(--color-secondary)',
@@ -462,7 +425,7 @@ export default function Dashboard() {
               color: 'white',
               border: 'none',
               borderRadius: '0.25rem',
-              paddingTop: isMobile ? '0.5rem' : '0.5rem', paddingBottom: isMobile ? '0.5rem' : '0.5rem', paddingLeft: isMobile ? '1rem' : 'clamp(1rem, 2vw, 1.5rem)', paddingRight: isMobile ? '1rem' : 'clamp(1rem, 2vw, 1.5rem)',
+              paddingLeft: isMobile ? '1rem' : 'clamp(1rem, 2vw, 1.5rem)', paddingRight: isMobile ? '1rem' : 'clamp(1rem, 2vw, 1.5rem)',
               cursor: 'pointer',
               fontSize: isMobile ? '0.75rem' : '0.875rem',
             }}
@@ -476,7 +439,7 @@ export default function Dashboard() {
           tasks={tasks} 
           getProjectName={getProjectName} 
           isMobile={isMobile} 
-          isTablet={isTablet}
+          isTablet={isTablet} 
         />
       ) : (
         /* Vue Liste */
@@ -524,7 +487,7 @@ export default function Dashboard() {
             {/* Search Bar */}
             <div style={{
               width: isMobile ? '100%' : 'min(22.3125rem, 25vw)',
-              paddingTop: isMobile ? '0.75rem' : 'clamp(1rem, 2vw, 1.4375rem)', paddingBottom: isMobile ? '0.75rem' : 'clamp(1rem, 2vw, 1.4375rem)', paddingLeft: isMobile ? '1rem' : 'clamp(1.5rem, 3vw, 2rem)', paddingRight: isMobile ? '1rem' : 'clamp(1.5rem, 3vw, 2rem)',
+              paddingLeft: isMobile ? '1rem' : 'clamp(1.5rem, 3vw, 2rem)', paddingRight: isMobile ? '1rem' : 'clamp(1.5rem, 3vw, 2rem)',
               background: 'white',
               borderRadius: '0.5rem',
               border: '0.0625rem solid var(--color-border)',
@@ -586,7 +549,6 @@ export default function Dashboard() {
       )}
 
 
-
       {/* Modale de création de projet */}
       {isCreateModalOpen && (
         <CreateProjectModal
@@ -603,13 +565,14 @@ export default function Dashboard() {
   );
 }
 
+
 // Composant TaskCard réutilisable
 function TaskCard({ 
   task, 
   projectName, 
   onView, 
   isMobile, 
-  isTablet
+  isTablet 
 }: { 
   task: Task; 
   projectName: string; 
@@ -624,10 +587,11 @@ function TaskCard({
   const cardPaddingY = isMobile ? '1rem' : isTablet ? '1.25rem' : '1.5625rem';
   const titleWidth = isMobile ? '100%' : 'min(9.5625rem, 12vw)';
   const metaGap = isMobile ? '0.75rem' : '0.9375rem';
+  const taskTitleSize = isMobile ? `1rem` : `1.125rem`;
   const statusButtonPadding = isMobile ? '0.25rem 0.75rem' : '0.25rem 1rem';
   const statusButtonFontSize = isMobile ? '0.75rem' : '0.875rem';
   const viewButtonWidth = isMobile ? '100%' : 'min(7.5625rem, 9vw)';
-  const viewButtonPadding = isMobile ? '0.75rem' : '0.8125rem 0';
+  const viewButtonPadding = isMobile ? '0 1rem' : '0 1rem';
 
   return (
     <div style={{
@@ -651,12 +615,10 @@ function TaskCard({
           flexDirection: 'column',
           gap: isMobile ? '0.5rem' : '0.4375rem',
         }}>
-          <h3 style={{
-            color: 'var(--color-black)',
-            fontSize: isMobile ? '1rem' : '1.125rem',
+          <h3 style={{ color: 'var(--color-secondary)', fontSize: taskTitleSize,
             fontFamily: 'var(--font-heading)',
-            fontWeight: '600',
-          }}>
+            fontWeight: '600'
+            }}>
             {task.title}
           </h3>
           <p style={{
@@ -819,7 +781,7 @@ function TaskCard({
             style={{
               flex: 1,
               height: 'min(2.75rem, 2.8vh)',
-              padding: '0.75rem',
+              padding: '0 1rem',
               background: 'var(--color-secondary)',
               color: 'var(--color-white)',
               border: 'none',
@@ -845,7 +807,7 @@ function KanbanView({
   tasks, 
   getProjectName, 
   isMobile, 
-  isTablet
+  isTablet 
 }: { 
   tasks: Task[]; 
   getProjectName: (projectId: string) => string; 
@@ -923,11 +885,9 @@ function KanbanView({
               gap: 8,
               display: 'inline-flex',
             }}>
-              <h3 style={{
-                color: 'var(--color-secondary)',
-                fontSize: statusTitleSize,
+              <h3 style={{ color: 'var(--color-secondary)', fontSize: statusTitleSize,
                 fontFamily: 'var(--font-heading)',
-                fontWeight: '600',
+                fontWeight: '600'
               }}>
                 {status}
               </h3>
@@ -1114,7 +1074,7 @@ function KanbanView({
                           style={{
                             width: isMobile ? '100%' : 'min(7.5625rem, 9vw)',
                             height: isMobile ? 'min(2.75rem, 6.5vh)' : 'min(3.125rem, 4vh)',
-                            padding: isMobile ? '0.75rem' : '0.8125rem',
+                            padding: '0 1rem',
                             background: 'var(--color-secondary)',
                             color: 'var(--color-white)',
                             border: 'none',
@@ -1141,6 +1101,7 @@ function KanbanView({
     </div>
   );
 }
+
 
 
 
