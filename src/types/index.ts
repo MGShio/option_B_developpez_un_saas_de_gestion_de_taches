@@ -54,7 +54,8 @@ export interface UpdateProjectRequest {
 }
 
 export interface AddContributorRequest {
-  email: string;
+  email?: string;
+  userId?: string;
   role?: "ADMIN" | "CONTRIBUTOR";
 }
 

@@ -26,6 +26,14 @@ const statusColors: Record<string, { bg: string; color: string }> = {
   'Terminé': { bg: '#D1FAE5', color: '#059669' },
 };
 
+// Libellés des statuts
+const TASK_STATUS_LABELS: Record<string, string> = {
+  'À faire': 'À faire',
+  'En cours': 'En cours',
+  'Terminé': 'Terminé',
+};
+
+
 
 
 interface ProjectDetailProps {
@@ -677,7 +685,7 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
           >
             {contributors.map((contributor, index) => (
               <div 
-                key={contributor.id} 
+                key={`${contributor.id}-${index}`} 
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -1032,7 +1040,7 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
             ) : (
               filteredTasks.map((task, index) => (
                 <TaskCard
-                  key={task.id}
+                  key={`${task.id}-${index}`}
                   task={task}
                   project={project}
                   currentUser={user}
@@ -1155,7 +1163,7 @@ function TaskCard({
   const cardPadding = isMobile ? '1rem' : isTablet ? '1.5rem' : '2rem';
   const titleSize = isMobile ? '1rem' : '1.125rem';
   const descriptionSize = isMobile ? '0.875rem' : '0.9375rem';
-  const metaSize = isMobile ? '0.75rem' : '0.8125rem';
+  const metaSize = isMobile ? '0.75rem' : '0.875rem';
   const badgeSize = isMobile ? '0.75rem' : '0.875rem';
   const avatarSize = isMobile ? 24 : 27;
   const buttonSize = isMobile ? 48 : 57;
@@ -1222,7 +1230,7 @@ function TaskCard({
                 alignItems: 'center',
               }}
               role="status"
-              aria-label={`Statut: ${task.status}`}
+              aria-label={`Statut: ${TASK_STATUS_LABELS[task.status] || task.status}`}
             >
               <span
                 style={{
@@ -1232,7 +1240,7 @@ function TaskCard({
                   fontWeight: 400,
                 }}
               >
-                {task.status}
+                {TASK_STATUS_LABELS[task.status] || task.status}
               </span>
             </div>
           </div>
@@ -1361,9 +1369,9 @@ function TaskCard({
               flexWrap: 'wrap',
             }}
           >
-            {assignees.slice(0, 2).map((assignee) => (
+            {assignees.slice(0, 2).map((assignee, index) => (
               <div 
-                key={assignee.id} 
+                key={`${assignee.id}-${index}`} 
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -1825,9 +1833,9 @@ function CreateTaskModal({
                   }}
                   role="listbox"
                 >
-                  {users.map(user => (
+                  {users.map((user, index) => (
                     <div
-                      key={user.id}
+                      key={`${user.id}-${index}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         const newSelectedAssignees = selectedAssignees.includes(user.id)
@@ -1873,9 +1881,9 @@ function CreateTaskModal({
               role="radiogroup"
               aria-label="Sélectionner le statut de la tâche"
             >
-              {statusOptions.map((option) => (
+              {statusOptions.map((option, index) => (
                 <button
-                  key={option.value}
+                  key={`${option.value}-${index}`}
                   onClick={() => setSelectedStatus(option.value)}
                   style={{
                     padding: isMobile ? '4px 12px' : '4px 16px',

@@ -558,7 +558,7 @@ export const addContributor = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const { email, role = "CONTRIBUTOR" }: AddContributorRequest = req.body;
+    const { email, userId, role = "CONTRIBUTOR" }: AddContributorRequest = req.body;
     const authReq = req as AuthRequest;
 
     if (!authReq.user) {
@@ -579,10 +579,12 @@ export const addContributor = async (
     }
 
     // Vérifier que l'utilisateur existe
-    const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
-    });
-
+    let user;
+    if (userId) {
+      user = await prisma.user.findUnique({ where: { id: userId } });
+    } else if (email) {
+      user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
+    }
     if (!user) {
       sendError(res, "Utilisateur non trouvé", "USER_NOT_FOUND", 404);
       return;

@@ -147,7 +147,7 @@ export const canDeleteProject = async (
   userId: string,
   projectId: string
 ): Promise<boolean> => {
-  return await isProjectOwner(userId, projectId);
+  return await isProjectAdmin(userId, projectId);
 };
 
 /**
@@ -181,3 +181,4 @@ export const getUserProjectRole = async (
     return null;
   }
 };
+

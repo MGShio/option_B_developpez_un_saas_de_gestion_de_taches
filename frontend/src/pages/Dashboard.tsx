@@ -24,6 +24,14 @@ const statusColors: Record<string, { bg: string; color: string; border: string }
   'Terminé': { bg: '#D1FAE5', color: '#059669', border: '#A7F3D0' },
 };
 
+// Libellés des statuts
+const TASK_STATUS_LABELS: Record<string, string> = {
+  'À faire': 'À faire',
+  'En cours': 'En cours',
+  'Terminé': 'Terminé',
+};
+
+
 // Composant Separator réutilisable
 const Separator = () => (
   <div 
@@ -127,7 +135,7 @@ export default function Dashboard() {
   const sectionSubtitleSize = isMobile ? '0.875rem' : '1rem';
   const taskTitleSize = isMobile ? '1rem' : '1.125rem';
   const taskDescriptionSize = isMobile ? '0.875rem' : '0.9375rem';
-  const metaTextSize = isMobile ? '0.75rem' : '0.8125rem';
+  const metaTextSize = isMobile ? '0.75rem' : '0.875rem';
   const statusBadgeSize = isMobile ? '0.75rem' : '0.875rem';
   const buttonFontSize = isMobile ? '0.875rem' : '1rem';
   const inputHeight = isMobile ? 'min(2.75rem, 6.5vh)' : 'min(3.3125rem, 4vh)';
@@ -510,6 +518,7 @@ export default function Dashboard() {
                   outline: 'none',
                   background: 'transparent',
                   width: '100%',
+                  minHeight: '63px',
                 }}
                 aria-label="Rechercher une tâche"
                 autoComplete="off"
@@ -649,7 +658,7 @@ function TaskCard({
             <FolderIconGrey />
             <span style={{
               color: '#6B7280',
-              fontSize: isMobile ? '0.75rem' : '0.8125rem',
+              fontSize: isMobile ? '0.75rem' : '0.875rem',
               fontFamily: 'var(--font-body)',
               fontWeight: '400',
             }}>
@@ -668,7 +677,7 @@ function TaskCard({
             <CalendarIconGrey />
             <span style={{
               color: '#6B7280',
-              fontSize: isMobile ? '0.75rem' : '0.8125rem',
+              fontSize: isMobile ? '0.75rem' : '0.875rem',
               fontFamily: 'var(--font-body)',
               fontWeight: '400',
               marginLeft: '0.5rem',
@@ -690,7 +699,7 @@ function TaskCard({
             <TextBubbleGrey />
             <span style={{
               color: '#6B7280',
-              fontSize: isMobile ? '0.75rem' : '0.8125rem',
+              fontSize: isMobile ? '0.75rem' : '0.875rem',
               fontFamily: 'var(--font-body)',
               fontWeight: '400',
             }}>
@@ -716,14 +725,14 @@ function TaskCard({
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-          }} role="status" aria-label={`Statut : ${task.status}`}>
+          }} role="status" aria-label={`Statut : ${TASK_STATUS_LABELS[task.status] || task.status}`}>
             <span style={{
               color: colors.color,
               fontSize: statusButtonFontSize,
               fontFamily: 'var(--font-body)',
               fontWeight: '400',
             }}>
-              {task.status}
+              {TASK_STATUS_LABELS[task.status] || task.status}
             </span>
           </div>
 
@@ -766,14 +775,14 @@ function TaskCard({
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-          }} role="status" aria-label={`Statut : ${task.status}`}>
+          }} role="status" aria-label={`Statut : ${TASK_STATUS_LABELS[task.status] || task.status}`}>
             <span style={{
               color: colors.color,
               fontSize: statusButtonFontSize,
               fontFamily: 'var(--font-body)',
               fontWeight: '400',
             }}>
-              {task.status}
+              {TASK_STATUS_LABELS[task.status] || task.status}
             </span>
           </div>
 
@@ -835,7 +844,7 @@ function KanbanView({
   const columnPadding = isMobile ? '1rem' : isTablet ? '1.25rem' : '1.5rem';
   const statusIndicatorSize = isMobile ? '0.75rem' : '0.875rem';
   const statusTitleSize = isMobile ? '1rem' : '1.125rem';
-  const countSize = isMobile ? '0.75rem' : '0.8125rem';
+  const countSize = isMobile ? '0.75rem' : '0.875rem';
 
   // Tailles adaptatives pour les cartes Kanban
   const kanbanCardPaddingX = isMobile ? '1.5rem' : isTablet ? '2rem' : '2.5rem';
@@ -844,7 +853,7 @@ function KanbanView({
   const kanbanHeaderGap = isMobile ? '0.5rem' : '2rem';
   const kanbanTitleSize = isMobile ? '1rem' : '1.125rem';
   const kanbanDescriptionSize = isMobile ? '0.875rem' : '0.9375rem';
-  const kanbanMetaSize = isMobile ? '0.75rem' : '0.8125rem';
+  const kanbanMetaSize = isMobile ? '0.75rem' : '0.875rem';
   const kanbanMetaGap = isMobile ? '0.5rem' : '0.9375rem';
   const kanbanStatusPadding = isMobile ? '0.25rem 0.75rem' : '0.25rem 1rem';
   const kanbanStatusFontSize = isMobile ? '0.75rem' : '0.875rem';
@@ -951,7 +960,7 @@ function KanbanView({
                         gap: kanbanCardGap,
                       }}
                       role="article"
-                      aria-label={`Tâche : ${task.title}, statut : ${task.status}`}
+                      aria-label={`Tâche : ${task.title}, statut : ${TASK_STATUS_LABELS[task.status] || task.status}`}
                     >
                       {/* En-tête avec titre et statut */}
                       <div style={{
@@ -991,7 +1000,7 @@ function KanbanView({
                             fontFamily: 'var(--font-body)',
                             fontWeight: '400',
                           }}>
-                            {task.status}
+                            {TASK_STATUS_LABELS[task.status] || task.status}
                           </span>
                         </div>
                       </div>
