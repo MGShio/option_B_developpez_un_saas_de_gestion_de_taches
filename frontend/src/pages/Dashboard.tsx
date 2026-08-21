@@ -256,7 +256,8 @@ export default function Dashboard() {
             fontSize: subtitleSize,
             fontFamily: 'var(--font-body)',
             fontWeight: '400',
-          }}>
+                            whiteSpace: 'nowrap',
+                          }}>
             Bonjour {user?.name}, voici un aperçu de vos projets et tâches
           </p>
         </div>
@@ -954,16 +955,22 @@ function KanbanView({
                     >
                       {/* En-tête avec titre et statut */}
                       <div style={{
-                        alignSelf: 'stretch',
+                        display: 'flex',
                         justifyContent: 'space-between',
-                        display: 'inline-flex',
                         alignItems: 'center',
+                        width: '100%',
+                        minWidth: 0,
                       }}>
                         <h4 style={{
                           color: 'var(--color-black)',
                           fontSize: kanbanTitleSize,
                           fontFamily: 'var(--font-heading)',
                           fontWeight: '600',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          flex: 1,
+                          minWidth: 0,
                         }}>
                           {task.title}
                         </h4>
@@ -976,6 +983,7 @@ function KanbanView({
                           alignItems: 'center',
                           display: 'flex',
                           height: 'fit-content',
+                          flexShrink: 0,
                         }}>
                           <span style={{
                             color: taskColors.color,
