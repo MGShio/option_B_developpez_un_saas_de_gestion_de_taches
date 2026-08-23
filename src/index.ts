@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes";
 import projectRoutes from "./routes/projectRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
+import userRoutes from "./routes/userRoutes";
 import { searchUsers } from "./controllers/projectController";
 
 // Middleware
@@ -63,6 +64,7 @@ app.use(
 app.use("/auth", authRoutes);
 app.use("/projects", projectRoutes);
 app.use("/dashboard", dashboardRoutes);
+app.use("/users", userRoutes);
 
 // Route pour la recherche d'utilisateurs
 app.get("/users/search", authenticateToken, searchUsers);
@@ -99,6 +101,10 @@ app.get("/", (req, res) => {
         delete: "DELETE /projects/:id",
         addContributor: "POST /projects/:id/contributors",
         removeContributor: "DELETE /projects/:id/contributors/:userId",
+      },
+      users: {
+        getAll: "GET /users",
+        search: "GET /users/search",
       },
       tasks: {
         create: "POST /projects/:id/tasks",

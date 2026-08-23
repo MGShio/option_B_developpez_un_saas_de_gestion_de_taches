@@ -194,7 +194,7 @@ export default function Register() {
   };
 
   const inputStyle: React.CSSProperties = {
-    width: '85%',
+    width: '100%',
     padding: inputPadding,
     border: '1px solid var(--color-border)',
     borderRadius: '0.375rem',

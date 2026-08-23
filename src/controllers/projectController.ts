@@ -54,8 +54,8 @@ import {
  *                 type: array
  *                 items:
  *                   type: string
- *                   format: email
- *                 description: Liste des emails des contributeurs
+ *                   format: uuid
+ *                 description: Liste des IDs des contributeurs
  *                 example: ["user1@example.com", "user2@example.com"]
  *     responses:
  *       201:
@@ -143,9 +143,7 @@ export const createProject = async (
     if (contributors && contributors.length > 0) {
       const contributorUsers = await prisma.user.findMany({
         where: {
-          email: {
-            in: contributors.map((email) => email.toLowerCase()),
-          },
+          id: { in: contributors },
         },
         select: {
           id: true,

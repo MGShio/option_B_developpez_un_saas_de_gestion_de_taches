@@ -222,11 +222,11 @@ export const validateCreateProjectData = (data: {
         message: "Les contributeurs doivent être un tableau",
       });
     } else {
-      data.contributors.forEach((email, index) => {
-        if (!isValidEmail(email)) {
+      data.contributors.forEach((userId, index) => {
+        if (!userId || userId.trim().length === 0) {
           errors.push({
             field: `contributors[${index}]`,
-            message: "Format d'email invalide",
+            message: "L'ID du contributeur est requis",
           });
         }
       });

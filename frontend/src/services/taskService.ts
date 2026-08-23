@@ -204,6 +204,7 @@ export interface CreateTaskData {
   projectId: string;
   dueDate: string;
   priority: 'Faible' | 'Moyenne' | 'Haute';
+  assigneeIds?: string[];
 }
 
 

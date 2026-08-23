@@ -14,14 +14,12 @@ interface BackendUser {
 }
 
 
-
 interface BackendProjectMember {
   id: string;
   role: string;
   user?: BackendUser;
   joinedAt?: string;
 }
-
 
 
 interface BackendProject {
@@ -119,14 +117,12 @@ export interface User {
 }
 
 
-
 export interface ProjectMember {
   id: string;
   role: string;
   user: User;
   joinedAt?: string;
 }
-
 
 
 export interface Project {
@@ -144,18 +140,16 @@ export interface Project {
 }
 
 
-
 export interface CreateProjectData {
   name: string;
   description?: string;
+  contributorIds?: string[];
 }
-
 
 
 export interface UpdateProjectData extends Partial<CreateProjectData> {
   // No status field - Project doesn't have status in backend
 }
-
 
 
 export interface ApiError {
@@ -223,15 +217,21 @@ export async function getProjectById(token: string, projectId: string): Promise<
 
 // Créer un nouveau projet
 // POST /projects
-
 export async function createProject(token: string, projectData: CreateProjectData): Promise<Project> {
+  // Transformer contributorIds en contributors pour le backend
+  const backendData = {
+    name: projectData.name,
+    description: projectData.description,
+    contributors: projectData.contributorIds || [],
+  };
+  
   const response = await fetch(`${API_BASE_URL}/projects`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     },
-    body: JSON.stringify(projectData),
+    body: JSON.stringify(backendData),
   });
 
   if (!response.ok) {
@@ -246,7 +246,6 @@ export async function createProject(token: string, projectData: CreateProjectDat
 
 // Mettre à jour un projet
 // PATCH /projects/{projectId}
-
 export async function updateProject(token: string, projectId: string, projectData: UpdateProjectData): Promise<Project> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
     method: 'PATCH',
@@ -269,7 +268,6 @@ export async function updateProject(token: string, projectId: string, projectDat
 
 // Supprimer un projet
 // DELETE /projects/{projectId}
-
 export async function deleteProject(token: string, projectId: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
     method: 'DELETE',
@@ -286,7 +284,6 @@ export async function deleteProject(token: string, projectId: string): Promise<v
 
 // Rechercher des projets
 // GET /projects/search?q={query}
-
 export async function searchProjects(token: string, query: string): Promise<Project[]> {
   const response = await fetch(`${API_BASE_URL}/projects/search?q=${encodeURIComponent(query)}`, {
     method: 'GET',
@@ -307,7 +304,6 @@ export async function searchProjects(token: string, query: string): Promise<Proj
 
 // Ajouter un contributeur à un projet
 // POST /projects/{projectId}/contributors
-
 export async function addContributor(token: string, projectId: string, userId: string): Promise<ProjectMember> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/contributors`, {
     method: 'POST',
@@ -329,7 +325,6 @@ export async function addContributor(token: string, projectId: string, userId: s
 
 // Supprimer un contributeur d'un projet
 // DELETE /projects/{projectId}/contributors/{userId}
-
 export async function removeContributor(token: string, projectId: string, userId: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/contributors/${userId}`, {
     method: 'DELETE',

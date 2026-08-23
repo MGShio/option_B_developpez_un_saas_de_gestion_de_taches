@@ -21,7 +21,7 @@ export interface ModalCreateProjectData {
 
 interface CreateProjectModalProps {
   onClose: () => void;
-  onSubmit: (data: ModalCreateProjectData) => void;
+  onSubmit: (data: ModalCreateProjectData) => Promise<void>;
   users: { id: string; name: string; role?: string }[];
 }
 
@@ -63,13 +63,13 @@ export default function CreateProjectModal({ onClose, onSubmit, users }: CreateP
   };
 
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(newProject);
+    await onSubmit(newProject);
     onClose();
   };
 
-  const isFormValid = newProject.name.trim() && newProject.description.trim();
+  const isFormValid = newProject.name.trim();
 
 
 // RENDER
@@ -177,7 +177,7 @@ export default function CreateProjectModal({ onClose, onSubmit, users }: CreateP
                 fontFamily: 'Inter',
                 fontWeight: 400,
               }}>
-                Description *
+                Description
               </label>
               <textarea
                 value={newProject.description}
@@ -196,7 +196,7 @@ export default function CreateProjectModal({ onClose, onSubmit, users }: CreateP
                   resize: 'vertical',
                   width: 'auto',
                 }}
-                required
+
               />
             </div>
 

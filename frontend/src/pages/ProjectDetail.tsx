@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth, type User } from '@/contexts/AuthContext';
 import { storage } from '@/utils/storage';
 import { getProjectById, type Project } from '@/services/projectService';
+import { getAllUsers } from '@/services/userService';
 import { getProjectTasks, updateTask, createTask, type Task, type CreateTaskData, type Comment, getTaskComments, createComment, deleteCommentService } from '@/services/taskService';
 import AITaskListModal from '@/components/AITaskListModal';
 import EditProjectModal from '@/components/EditProjectModal';
@@ -107,6 +108,7 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
   const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1440);
   
   const [project, setProject] = useState<Project | null>(initialProject || null);
+  const [allUsers, setAllUsers] = useState<{ id: string; name: string; role?: string }[]>([]);
 
   // Vérifier si l'utilisateur a accès au projet (propriétaire ou membre de l'équipe)
   const hasAccess = hasProjectAccess(user, project);
@@ -221,6 +223,10 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
       console.error('Erreur:', err);
       console.error('User ID:', user?.id, 'Project ownerId:', project?.ownerId);
     } finally {
+      // Récupérer tous les utilisateurs
+      const usersData = await getAllUsers();
+      setAllUsers(usersData);
+
       setIsLoading(false);
     }
   }, [id, router, user]);
@@ -331,6 +337,7 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
         ...newTask,
         projectId: id!,
         priority: newTask.priority as 'Faible' | 'Moyenne' | 'Haute',
+        assigneeIds: selectedAssignees,
       };
       
       const createdTask = await createTask(token, taskData);
@@ -429,7 +436,7 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
   const memberContribs = project.members?.map(m => ({ id: m.user.id, name: m.user.name, role: m.role })) || [];
   const contributors = [
     { id: project.ownerId, name: project.owner?.name || 'Propriétaire', role: 'Propriétaire' },
-    ...memberContribs
+    ...memberContribs.filter(m => m.id !== project.ownerId)
   ];
   const users = contributors;
 
@@ -1084,7 +1091,7 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
           setSelectedAssignees={setSelectedAssignees}
           selectedStatus={selectedStatus}
           setSelectedStatus={setSelectedStatus}
-          users={users}
+          users={allUsers}
           statusOptions={statusOptions}
           isMobile={isMobile}
           focusOutlineStyle={focusOutlineStyle}
@@ -1105,7 +1112,7 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
             setProject(prev => prev ? { ...prev, ...updated } : null);
             setIsEditProjectModalOpen(false);
           }}
-          users={users}
+          users={allUsers}
         />
       )}
       
@@ -1115,10 +1122,12 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
           task={editingTask}
           onClose={() => setIsEditTaskModalOpen(false)}
           onSave={(updated) => {
-            setTasks(prev => prev.map(t => t.id === editingTask!.id ? { ...t, ...updated } : t));
-            setIsEditTaskModalOpen(false);
+            try {
+              const token = storage.getToken() || "";
+              const updatedTask = await updateTask(token, id!, editingTask!.id, updated);
+              setTasks(prev => prev.map(t => t.id === editingTask!.id ? updatedTask : t));
           }}
-          users={users}
+          users={allUsers}
         />
       )}
     </div>

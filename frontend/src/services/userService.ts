@@ -3,62 +3,68 @@
 import { API_BASE_URL } from '@/config';
 import { storage } from '@/utils/storage';
 
-
 export interface User {
   id: string;
-  email: string;
   name: string;
-  createdAt?: string;
-  updatedAt?: string;
+  email: string;
 }
 
 /**
- * Rechercher des utilisateurs par nom ou email
- * @param query - Terme de recherche (minimum 2 caractères)
- * @param limit - Nombre maximum de résultats (défaut: 10)
- * @returns Promise avec la liste des utilisateurs correspondants
+ * Récupérer la liste de tous les utilisateurs
+ * @param token - Le token JWT d'authentification
+ * @returns Promise avec la liste des utilisateurs
  */
-export async function searchUsers(query: string = '', limit: number = 10): Promise<User[]> {
-  const token = storage.getToken();
-  
-  if (!token) {
-    throw new Error('Non authentifié');
-  }
-
-  const url = new URL(`${API_BASE_URL}/users/search`);
-  url.searchParams.append('query', query);
-  
-  const response = await fetch(url.toString(), {
-    method: 'GET',
+export async function getUsers(token: string): Promise<User[]> {
+  const response = await fetch(`${API_BASE_URL}/users`, {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
     },
   });
 
   if (!response.ok) {
-    const error: { message?: string; error?: string } = await response.json().catch(() => ({}));
-    throw new Error(error.message || error.error || 'Erreur lors de la recherche d\'utilisateurs');
+    const errorData = await response.json();
+    throw new Error(
+      errorData.message ||
+      errorData.error ||
+      "Erreur lors de la récupération des utilisateurs"
+    );
   }
 
   const data = await response.json();
-  return data.data?.users || [];
+  return data.data.users;
 }
 
 /**
- * Récupérer tous les utilisateurs (pour les dropdowns)
- * @returns Promise avec la liste de tous les utilisateurs
+ * Récupérer la liste de tous les utilisateurs (avec token automatique)
+ * @returns Promise avec la liste des utilisateurs
  */
 export async function getAllUsers(): Promise<User[]> {
-  return searchUsers('', 100); // Recherche vide = tous les utilisateurs
+  const token = storage.getToken() || "";
+  return getUsers(token);
 }
 
 /**
- * Récupérer un utilisateur par ID
- * @param userId - ID de l'utilisateur
- * @returns Promise avec l'utilisateur
+ * Rechercher des utilisateurs par nom ou email
+ * @param token - Le token JWT d'authentification
+ * @param query - Le terme de recherche
+ * @returns Promise avec la liste des utilisateurs correspondants
  */
-export async function getUserById(userId: string): Promise<User | null> {
-  const users = await getAllUsers();
-  return users.find(u => u.id === userId) || null;
+export async function searchUsers(token: string, query: string): Promise<User[]> {
+  const response = await fetch(`${API_BASE_URL}/users/search?query=${encodeURIComponent(query)}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(
+      errorData.message ||
+      errorData.error ||
+      "Erreur lors de la recherche des utilisateurs"
+    );
+  }
+
+  const data = await response.json();
+  return data.data.users || [];
 }

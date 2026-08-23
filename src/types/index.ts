@@ -1,6 +1,6 @@
 import { Request } from "express";
 
-// Types pour les rôles globaux
+// Types pour les rï¿½les globaux
 export enum GlobalRole {
   USER = "USER",
   ADMIN = "ADMIN",
@@ -52,7 +52,7 @@ export interface UpdatePasswordRequest {
 export interface CreateProjectRequest {
   name: string;
   description?: string;
-  contributors?: string[]; // Array d'emails des contributeurs
+  contributors?: string[]; // Array d'IDs des contributeurs
 }
 
 export interface UpdateProjectRequest {

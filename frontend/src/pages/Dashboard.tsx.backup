@@ -10,7 +10,6 @@ import { getDashboardStats, getProjectsWithTaskCounts, type DashboardStats, type
 import { getProjects, createProject, type Project } from '@/services/projectService';
 import CreateProjectModal, { type ModalCreateProjectData } from '@/components/CreateProjectModal';
 import ProjectsWithTasksView from '@/components/ProjectsWithTasksView';
-import { getUsers } from '@/services/userService';
 const checkmarkIcon = '/images/checkmark.svg';
 const calendarIcon = '/images/calendaricon.svg';
 const folderIconGrey = '/images/foldericongrey.svg';
@@ -105,7 +104,7 @@ export default function Dashboard() {
     return map;
   }, [tasks]);
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
-  const [users, setUsers] = useState<{ id: string; name: string; role?: string }[]>([]);
+  const [users] = useState<{ id: string; name: string; role?: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -164,8 +163,6 @@ export default function Dashboard() {
       // Récupérer les statistiques du dashboard
       const statsData = await getDashboardStats(token);
       setDashboardStats(statsData);
-      const usersData = await getUsers(token);
-      setUsers(usersData);
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement des données');
@@ -202,21 +199,22 @@ export default function Dashboard() {
   }, [fetchData]);
 
   // Gérer la création d'un projet
-  const handleCreateProject = async (data: ModalCreateProjectData): Promise<void> => {
-    if (!data.name.trim()) {
+  const handleCreateProject = async () => {
+    if (!newProject.name.trim()) {
       setError('Le nom du projet est requis');
       return;
     }
-
+    
     setError(null);
-
+    
     try {
       const token = storage.getToken() || "";
-
-      const createdProject = await createProject(token, data);
+      
+      const createdProject = await createProject(token, newProject);
       setProjects(prev => [...prev, createdProject]);
-      await fetchData();
-
+      setIsCreateModalOpen(false);
+      setNewProject({ name: '', description: '', contributorIds: [] });
+      
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la création du projet');
     }
