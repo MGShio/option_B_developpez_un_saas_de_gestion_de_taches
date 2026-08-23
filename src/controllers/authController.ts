@@ -376,7 +376,6 @@ export const updateProfile = async (
         email: true,
         name: true,
         createdAt: true,
-        updatedAt: true,
       },
     });
 
@@ -418,7 +417,7 @@ export const updatePassword = async (
       return;
     }
 
-    // Récupérer l'utilisateur avec son mot de passe actuel
+    // Récupérer l'utilisateur complet (avec mot de passe)
     const user = await prisma.user.findUnique({
       where: { id: authReq.user.id },
     });
@@ -428,7 +427,7 @@ export const updatePassword = async (
       return;
     }
 
-    // Vérifier le mot de passe actuel
+    // Vérifier l'ancien mot de passe
     const isCurrentPasswordValid = await bcrypt.compare(
       currentPassword,
       user.password
@@ -455,9 +454,10 @@ export const updatePassword = async (
 
     sendSuccess(res, "Mot de passe mis à jour avec succès");
   } catch (error) {
-    console.error("Erreur lors de la mise à jour du mot de passe:", error);
+    console.error(
+      "Erreur lors de la mise à jour du mot de passe:",
+      error
+    );
     sendServerError(res, "Erreur lors de la mise à jour du mot de passe");
   }
 };
-
-

@@ -138,6 +138,24 @@ export const canModifyProject = async (
 };
 
 /**
+ * Vérifie si un utilisateur a un rôle global ADMIN
+ * @param userId - ID de l'utilisateur
+ * @returns true si l'utilisateur est admin global, false sinon
+ */
+export const isGlobalAdmin = async (userId: string): Promise<boolean> => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+    return user?.role === "ADMIN";
+  } catch (error) {
+    console.error("Erreur lors de la vérification du rôle global:", error);
+    return false;
+  }
+};
+
+/**
  * Vérifie si un utilisateur peut supprimer un projet
  * @param userId - ID de l'utilisateur
  * @param projectId - ID du projet
@@ -147,6 +165,8 @@ export const canDeleteProject = async (
   userId: string,
   projectId: string
 ): Promise<boolean> => {
+  const isAdmin = await isGlobalAdmin(userId);
+  if (isAdmin) return true;
   return await isProjectAdmin(userId, projectId);
 };
 

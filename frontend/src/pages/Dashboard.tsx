@@ -450,6 +450,17 @@ export default function Dashboard() {
           isMobile={isMobile} 
           isTablet={isTablet} 
         />
+
+      ) : activeView === 'projects' ? (
+        /* Vue Projets */
+        <ProjectsWithTasksView
+          projects={projectsWithStats}
+          tasksByProject={tasksByProject}
+          isLoading={isLoading}
+          error={error}
+          onProjectClick={handleProjectClick}
+          isMobile={isMobile}
+        />
       ) : (
         /* Vue Liste */
         <div style={{
@@ -682,10 +693,10 @@ function TaskCard({
               fontWeight: '400',
               marginLeft: '0.5rem',
             }}>
-              {new Date(task.dueDate).toLocaleDateString('fr-FR', {
+              {task.dueDate ? new Date(task.dueDate).toLocaleDateString('fr-FR', {
                 day: 'numeric',
                 month: 'long',
-              })}
+              }) : 'Non définie'}
             </span>
           </div>
 
@@ -1051,10 +1062,10 @@ function KanbanView({
                             fontWeight: '400',
                             marginLeft: '0.5rem',
                           }}>
-                            {new Date(task.dueDate).toLocaleDateString('fr-FR', {
+                            {task.dueDate ? new Date(task.dueDate).toLocaleDateString('fr-FR', {
                               day: 'numeric',
                               month: 'short',
-                            })}
+                            }) : 'Non définie'}
                           </span>
                         </div>
 

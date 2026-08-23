@@ -31,6 +31,7 @@ export const authenticateToken = async (
       where: { id: decoded.userId },
       select: {
         id: true,
+        role: true,
         email: true,
         name: true,
       },
@@ -44,6 +45,7 @@ export const authenticateToken = async (
     // Ajouter les informations de l'utilisateur à la requête
     req.user = {
       id: user.id,
+      role: user.role,
       email: user.email,
       name: user.name || undefined,
     };
@@ -83,6 +85,7 @@ export const optionalAuth = async (
       where: { id: decoded.userId },
       select: {
         id: true,
+        role: true,
         email: true,
         name: true,
       },
@@ -91,6 +94,7 @@ export const optionalAuth = async (
     if (user) {
       req.user = {
         id: user.id,
+        role: user.role,
         email: user.email,
         name: user.name || undefined,
       };

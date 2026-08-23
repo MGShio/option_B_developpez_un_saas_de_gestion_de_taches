@@ -1,9 +1,16 @@
 import { Request } from "express";
 
+// Types pour les rôles globaux
+export enum GlobalRole {
+  USER = "USER",
+  ADMIN = "ADMIN",
+}
+
 // Types pour l'authentification
 export interface AuthRequest extends Request {
   user?: {
     id: string;
+    role: string;
     email: string;
     name?: string;
   };
