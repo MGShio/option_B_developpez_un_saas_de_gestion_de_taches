@@ -245,10 +245,10 @@ export async function createProject(token: string, projectData: CreateProjectDat
 }
 
 // Mettre à jour un projet
-// PATCH /projects/{projectId}
+// PUT /projects/{projectId}
 export async function updateProject(token: string, projectId: string, projectData: UpdateProjectData): Promise<Project> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
-    method: 'PATCH',
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,

@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth, type User } from '@/contexts/AuthContext';
 import { storage } from '@/utils/storage';
-import { getProjectById, type Project } from '@/services/projectService';
+import { getProjectById, updateProject, type Project } from '@/services/projectService';
 import { getAllUsers } from '@/services/userService';
 import { getProjectTasks, updateTask, createTask, type Task, type CreateTaskData, type Comment, getTaskComments, createComment, deleteCommentService } from '@/services/taskService';
 import AITaskListModal from '@/components/AITaskListModal';
@@ -1108,24 +1108,34 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
         <EditProjectModal
           project={editingProject}
           onClose={() => setIsEditProjectModalOpen(false)}
-          onSave={(updated) => {
-            setProject(prev => prev ? { ...prev, ...updated } : null);
-            setIsEditProjectModalOpen(false);
+          onSave={async (updated) => {
+            try {
+              const token = storage.getToken() || "";
+              const updatedProject = await updateProject(token, id!, updated);
+              setProject(updatedProject);
+              setIsEditProjectModalOpen(false);
+            } catch (err) {
+              setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour du projet');
+            }
           }}
           users={allUsers}
         />
       )}
-      
+
       {/* Modale Modifier Tâche */}
       {isEditTaskModalOpen && editingTask && (
         <EditTaskModal
           task={editingTask}
           onClose={() => setIsEditTaskModalOpen(false)}
-          onSave={(updated) => {
+          onSave={async (updated) => {
             try {
               const token = storage.getToken() || "";
               const updatedTask = await updateTask(token, id!, editingTask!.id, updated);
               setTasks(prev => prev.map(t => t.id === editingTask!.id ? updatedTask : t));
+              setIsEditTaskModalOpen(false);
+            } catch (err) {
+              setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour de la tâche');
+            }
           }}
           users={allUsers}
         />

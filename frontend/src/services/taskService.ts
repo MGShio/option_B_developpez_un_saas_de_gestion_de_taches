@@ -321,11 +321,11 @@ export async function createTask(token: string, taskData: CreateTaskData): Promi
 }
 
 // Mettre à jour une tâche
-// PATCH /projects/{projectId}/tasks/{taskId}
+// PUT /projects/{projectId}/tasks/{taskId}
 
 export async function updateTask(token: string, projectId: string, taskId: string, taskData: UpdateTaskData): Promise<Task> {
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}`, {
-    method: 'PATCH',
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
