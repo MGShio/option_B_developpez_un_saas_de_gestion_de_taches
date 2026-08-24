@@ -198,8 +198,12 @@ export default function Dashboard() {
 
   // Tailles adaptatives
   const welcomeSectionWidth = isMobile ? "100%" : isTablet ? "70%" : "36vw";
-  const mainContainerWidth = isMobile ? "100%" : isTablet ? "95%" : "88%";
-  const tasksContainerWidth = isMobile ? "100%" : isTablet ? "95%" : "85%";
+  const mainContainerWidth = isMobile
+    ? "100%"
+    : isTablet
+      ? "95%"
+      : "min(80.97vw, 1400px)";
+  const tasksContainerWidth = mainContainerWidth;
 
   const maxContentWidth = isMobile ? "100%" : "82vw";
   const titleSize = isMobile ? "1.5rem" : "1.75rem";
@@ -328,8 +332,6 @@ export default function Dashboard() {
           marginBottom: isMobile ? "2rem" : "clamp(3rem, 8vh, 5rem)",
           marginLeft: "auto",
           marginRight: "auto",
-          paddingLeft: containerPadding,
-          paddingRight: containerPadding,
           display: "flex",
           alignItems: isMobile ? "flex-start" : "center",
           flexDirection: isMobile ? "column" : "row",
@@ -394,8 +396,6 @@ export default function Dashboard() {
           width: mainContainerWidth,
           marginLeft: "auto",
           marginRight: "auto",
-          paddingLeft: containerPadding,
-          paddingRight: containerPadding,
           display: "flex",
           gap: isMobile ? "0.5rem" : "0.625rem",
           marginBottom: isMobile ? "2rem" : "2.5rem",
@@ -1056,9 +1056,13 @@ function KanbanView({
         gap: isMobile ? "1rem" : "1.5rem",
         overflowX: "auto",
         paddingBottom: isMobile ? "1rem" : "1.25rem",
-        paddingLeft: isMobile ? "0" : "2rem",
+        paddingLeft: "0",
         margin: isMobile ? "0" : "0 auto",
-        maxWidth: isMobile ? "100%" : "82vw",
+        maxWidth: isMobile
+          ? "100%"
+          : isTablet
+            ? "95%"
+            : "min(80.97vw, 1400px)",
       }}
       role="region"
       aria-label="Vue Kanban des tâches"

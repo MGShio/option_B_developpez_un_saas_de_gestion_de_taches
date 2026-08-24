@@ -463,7 +463,7 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
       {/* Header */}
       <div 
         style={{
-          maxWidth: '1540px',
+          maxWidth: maxContentWidth,
           margin: '0 auto',
           marginBottom: isMobile ? '1.5rem' : '2.5rem',
           position: 'relative',
@@ -473,7 +473,7 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
           onClick={() => router.push('/projects')}
           style={{
             position: 'absolute',
-            left: -23,
+            left: isMobile ? 0 : -70,
             top: 0,
             width: backButtonSize,
             height: backButtonSize,
@@ -500,8 +500,8 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
             justifyContent: 'space-between',
             alignItems: 'flex-start',
             gap: '1rem',
-            paddingLeft: 50,
             flexWrap: 'wrap',
+            paddingLeft: isMobile ? backButtonSize + 16 : 0,
           }}
         >
           <div

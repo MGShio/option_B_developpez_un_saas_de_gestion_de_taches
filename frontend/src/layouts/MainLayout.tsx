@@ -200,7 +200,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const mainStyle: React.CSSProperties = {
     flex: 1,
     width: '100%',
-    padding: `2.5rem ${mainPaddingX}`,
+    padding: `clamp(3rem, 5vh, 4rem) ${mainPaddingX}`,
     display: 'flex',
     flexDirection: 'column',
   };
