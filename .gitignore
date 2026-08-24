@@ -19,6 +19,7 @@ apply_*.ps1
 # Fichiers de documentation générés
 docs/
 *.md
+!/README.md
 CRITICAL_FIXES_README.md
 IMPLEMENTATION_GUIDE_CRITICAL_FIXES.md
 ANALYSE_CONFORMITE_REQUISITIONS.md
