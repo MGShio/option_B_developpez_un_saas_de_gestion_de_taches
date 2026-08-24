@@ -78,14 +78,15 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-        width: 598,
+        width: 'min(598px, calc(100% - 2rem))',
+        maxHeight: '90vh',
         paddingTop: 79,
         paddingBottom: 39,
         paddingLeft: 73,
         paddingRight: 73,
         position: 'relative',
         background: 'white',
-        overflow: 'hidden',
+        overflowY: 'auto',
         borderRadius: 10,
         flexDirection: 'column',
         justifyContent: 'center',
@@ -95,7 +96,8 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
       }}>
         {/* Titre */}
         <div style={{
-          height: 523,
+          height: 'auto',
+          width: '100%',
           flexDirection: 'column',
           justifyContent: 'flex-start',
           alignItems: 'flex-start',
@@ -141,7 +143,8 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
                 key={task.id}
                 data-property-1="Tâche IA"
                 style={{
-                  width: 494,
+                  width: '100%',
+                  maxWidth: '494px',
                   paddingLeft: 40,
                   paddingRight: 40,
                   paddingTop: 25,
@@ -291,7 +294,7 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
             </div>
           </button>
           <div style={{
-            width: 'calc(100% + 400px)',
+            width: 'calc(100% + 146px)',
             height: 1,
             background: '#E5E7EB',
             marginLeft: -73,
@@ -310,7 +313,8 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
               display: 'inline-flex',
             }}>
               <div style={{
-                width: 494,
+                width: '100%',
+                maxWidth: '494px',
                 paddingLeft: 32,
                 paddingRight: 32,
                 paddingTop: 18,

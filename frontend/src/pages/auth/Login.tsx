@@ -39,7 +39,7 @@ export default function Login() {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.minHeight = '100vh';
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = 'auto';
 
 // RENDER
 
@@ -91,7 +91,7 @@ export default function Login() {
 
   // Styles - Conforme WCAG 2.1 AA
   const containerStyle: React.CSSProperties = {
-    height: '100vh',
+    minHeight: '100vh',
     width: '100%',
     display: 'flex',
     alignItems: 'stretch',
@@ -102,7 +102,7 @@ export default function Login() {
     backgroundRepeat: 'no-repeat',
     margin: 0,
     padding: 0,
-    overflow: 'hidden',
+    overflowY: 'auto',
     userSelect: 'none',
   };
 
@@ -173,7 +173,7 @@ export default function Login() {
   };
 
   const inputStyle: React.CSSProperties = {
-    width: 'auto',
+    width: '100%',
     padding: inputPadding,
     border: '1px solid var(--color-border)',
     borderRadius: '0.375rem',

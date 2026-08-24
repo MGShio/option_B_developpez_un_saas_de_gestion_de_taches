@@ -48,7 +48,7 @@ export default function Register() {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.minHeight = '100vh';
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = 'auto';
 
 // RENDER
 
@@ -113,7 +113,7 @@ export default function Register() {
 
   // Styles - Conforme WCAG 2.1 AA
   const containerStyle: React.CSSProperties = {
-    height: '100vh',
+    minHeight: '100vh',
     width: '100%',
     display: 'flex',
     alignItems: 'stretch',
@@ -124,7 +124,7 @@ export default function Register() {
     backgroundRepeat: 'no-repeat',
     margin: 0,
     padding: 0,
-    overflow: 'hidden',
+    overflowY: 'auto',
     userSelect: 'none',
   };
 

@@ -501,6 +501,7 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
             alignItems: 'flex-start',
             gap: '1rem',
             paddingLeft: 50,
+            flexWrap: 'wrap',
           }}
         >
           <div
@@ -576,12 +577,15 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
                 gap: '1rem',
                 alignItems: 'flex-start',
                 marginLeft: 'auto',
+                flexWrap: 'wrap',
+                maxWidth: '100%',
               }}
             >
               <button
                 onClick={() => setIsCreateTaskModalOpen(true)}
                 style={{
                   width: isMobile ? '200px' : 'auto',
+                  maxWidth: '100%',
                   height: '50px',
                   padding: isMobile ? '13px 24px' : '13px 0.5vw',
                   background: '#1F1F1F',
@@ -603,6 +607,7 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
                 onClick={() => setIsAITaskModalOpen(true)}
                 style={{
                   width: isMobile ? '100px' : 'auto',
+                  maxWidth: '100%',
                   height: isMobile ? '50px' : '50px',
                   padding: isMobile ? '13px 24px' : '13px 0.5vw',
                   background: '#D3590B',
@@ -664,6 +669,7 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
               alignItems: 'center',
               flexWrap: 'wrap',
               gap: '1rem',
+              minWidth: 0,
             }}
           >
             <h2

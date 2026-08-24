@@ -51,7 +51,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const mainPaddingX = isMobile ? '1rem' : isTablet ? '1.5rem' : '2rem';
   
   // Padding droit pour l'avatar
-  const avatarPaddingRight = '100px';
+  const avatarPaddingRight = 'clamp(1rem, 6.95vw, 100px)';
   const footerPaddingX = isMobile ? '1rem' : isTablet ? '2rem' : '1.875rem'; // 30px
   
   // Tailles des éléments
@@ -98,7 +98,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const logoStyle: React.CSSProperties = {
     width: logoWidth,
     height: logoHeight,
-    paddingLeft: '100px',
+    paddingLeft: 'clamp(1rem, 6.95vw, 100px)',
     display: 'flex',
     alignItems: 'center',
   };
@@ -112,8 +112,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   };
 
   const navButtonStyle: React.CSSProperties = {
-    width: navButtonWidth,
-    height: navButtonHeight,
+    width: 'min(248px, 22vw)',
+    minWidth: '0',
+    height: 'clamp(56px, 5.3125vw, 76.5px)',
     padding: `${navButtonPaddingY} ${navButtonPaddingX}`,
     border: 'none',
     borderRadius: '0.625rem', // 10px
@@ -226,7 +227,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     fontSize: isMobile ? '0.875rem' : '1rem',
     fontFamily: 'Inter',
     fontWeight: 400,
-    whiteSpace: 'nowrap',
+    whiteSpace: 'normal',
   };
 
   // Focus outline style pour l'accessibilite

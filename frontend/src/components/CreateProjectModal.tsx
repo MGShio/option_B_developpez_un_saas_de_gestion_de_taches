@@ -194,7 +194,7 @@ export default function CreateProjectModal({ onClose, onSubmit, users }: CreateP
                   color: '#0F0F0F',
                   outline: 'none',
                   resize: 'vertical',
-                  width: 'auto',
+                  width: '100%',
                 }}
 
               />

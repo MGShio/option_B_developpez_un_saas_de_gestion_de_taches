@@ -77,7 +77,7 @@ export default function Projects() {
   const isTablet = windowWidth <= 1024;
   
   // Tailles adaptatives
-  const headerWidth = isMobile ? '100%' : isTablet ? '95%' : '80.97vw';
+  const headerWidth = isMobile ? '100%' : isTablet ? '95%' : 'min(80.97vw, 1400px)';
 
   const containerPadding = isMobile ? '1rem' : isTablet ? '1.5rem' : '2.5rem';
   const titleSize = isMobile ? '1.5rem' : '1.75rem';
