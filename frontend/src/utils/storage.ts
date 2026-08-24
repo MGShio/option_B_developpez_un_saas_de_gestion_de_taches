@@ -20,7 +20,6 @@ export const storage = {
       const token = sessionStorage.getItem(STORAGE_KEYS.token);
       return token || null;
     } catch (error) {
-      console.error('Erreur lors de la lecture du token:', error);
       return null;
     }
   },
@@ -36,7 +35,6 @@ export const storage = {
       }
       sessionStorage.setItem(STORAGE_KEYS.token, token);
     } catch (error) {
-      console.error('Erreur lors du stockage du token:', error);
     }
   },
 
@@ -47,7 +45,6 @@ export const storage = {
     try {
       sessionStorage.removeItem(STORAGE_KEYS.token);
     } catch (error) {
-      console.error('Erreur lors de la suppression du token:', error);
     }
   },
 
@@ -59,7 +56,6 @@ export const storage = {
     try {
       sessionStorage.setItem(STORAGE_KEYS.user, JSON.stringify(user));
     } catch (error) {
-      console.error('Erreur lors du stockage de l\'utilisateur:', error);
     }
   },
 
@@ -72,7 +68,6 @@ export const storage = {
       const user = sessionStorage.getItem(STORAGE_KEYS.user);
       return user ? JSON.parse(user) : null;
     } catch (error) {
-      console.error('Erreur lors de la lecture de l\'utilisateur:', error);
       return null;
     }
   },
@@ -84,7 +79,6 @@ export const storage = {
     try {
       sessionStorage.removeItem(STORAGE_KEYS.user);
     } catch (error) {
-      console.error('Erreur lors de la suppression de l\'utilisateur:', error);
     }
   },
 
@@ -95,7 +89,6 @@ export const storage = {
     try {
       sessionStorage.clear();
     } catch (error) {
-      console.error('Erreur lors du nettoyage du stockage:', error);
     }
   },
 
@@ -119,7 +112,6 @@ export const getTokenFromCookie = (): string | null => {
     if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
     return null;
   } catch (error) {
-    console.error('Erreur lors de la lecture du cookie:', error);
     return null;
   }
 };
@@ -131,7 +123,6 @@ export const removeTokenFromCookie = (): void => {
   try {
     document.cookie = `${STORAGE_KEYS.token}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
   } catch (error) {
-    console.error('Erreur lors de la suppression du cookie:', error);
   }
 };
 

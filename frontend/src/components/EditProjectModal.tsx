@@ -43,6 +43,15 @@ export default function EditProjectModal({ project, onClose, onSave, users }: Ed
 
   const [selectContributorIds, setSelectContributorIds] = useState<string[]>(project.contributorIds);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   // Close user dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -88,6 +97,9 @@ export default function EditProjectModal({ project, onClose, onSave, users }: Ed
         alignItems: 'center',
         zIndex: 1000,
       }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Modifier un projet"
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -107,6 +119,7 @@ export default function EditProjectModal({ project, onClose, onSave, users }: Ed
       >
         <button
           onClick={onClose}
+          aria-label="Fermer la fenêtre de modification du projet"
           style={{
             position: 'absolute',
             top: 20,

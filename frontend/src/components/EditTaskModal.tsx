@@ -50,6 +50,15 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [editedTask, setEditedTask] = useState<EditTaskData>(task);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   // Close user dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -89,7 +98,11 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
       justifyContent: 'center',
       alignItems: 'center',
       zIndex: 1000,
-    }}>
+    }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Modifier une tâche"
+    >
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
@@ -104,6 +117,7 @@ export default function EditTaskModal({ task, onClose, onSave, users }: EditTask
       }}>
         <button
           onClick={onClose}
+          aria-label="Fermer la fenêtre de modification de tâche"
           style={{
             position: 'absolute',
             top: 20,

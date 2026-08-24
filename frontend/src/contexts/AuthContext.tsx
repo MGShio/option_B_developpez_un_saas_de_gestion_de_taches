@@ -139,7 +139,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await logoutService();
     } catch (err) {
-      console.error('Erreur lors de la déconnexion:', err);
     } finally {
       storage.removeToken();
       setUser(null);

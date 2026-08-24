@@ -1,6 +1,6 @@
 // AITaskListModal.tsx - Component
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 const binIcon = '/images/bin.svg';
 const bingreyIcon = '/images/bingrey.svg';
 const pencilIcon = '/images/pencil.svg';
@@ -21,6 +21,14 @@ interface AITask {
 
 export default function AITaskListModal({ onClose }: { onClose: () => void }) {
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   const [aiTasks, setAITasks] = useState<AITask[]>([
     { id: 1, title: 'Nom de la tâche', description: 'Description de la tâche' },
@@ -39,7 +47,6 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
 
   const handleAddTasks = () => {
     // Logique pour ajouter les tâches générées par IA
-    console.log('Ajout des tâches IA:', aiTasks);
   };
 
 
@@ -74,7 +81,11 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
       justifyContent: 'center',
       alignItems: 'center',
       zIndex: 1000,
-    }}>
+    }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Générer des tâches avec l'intelligence artificielle"
+    >
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
@@ -385,6 +396,7 @@ export default function AITaskListModal({ onClose }: { onClose: () => void }) {
         {/* Bouton de fermeture */}
         <button
           onClick={onClose}
+          aria-label="Fermer la fenêtre des tâches générées par IA"
           style={{
             position: 'absolute',
             top: 20,

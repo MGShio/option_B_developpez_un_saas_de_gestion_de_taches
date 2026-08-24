@@ -102,7 +102,6 @@ export default function Projects() {
       const users = await getAllUsers();
       setAllUsers(users.map(u => ({ id: u.id, name: u.name, email: u.email })));
     } catch (err) {
-      console.error('Erreur lors de la récupération des utilisateurs:', err);
       // Ne pas bloquer l'application si la récupération des utilisateurs échoue
     } finally {
       setIsUsersLoading(false);
@@ -146,7 +145,6 @@ export default function Projects() {
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement des projets');
-      console.error('Erreur:', err);
     } finally {
       setIsLoading(false);
     }
@@ -190,7 +188,6 @@ export default function Projects() {
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la création du projet');
-      console.error('Erreur:', err);
     } finally {
       setIsLoading(false);
     }
@@ -482,7 +479,18 @@ function ProjectCard({
       flexDirection: 'column',
       gap: cardGap,
       cursor: 'pointer',
-    }} role="listitem" aria-label={`Projet : ${project.name}`} onClick={() => navigate(`/projects/${project.id}`)}>
+    }}
+      role="button"
+      tabIndex={0}
+      aria-label={`Ouvrir le projet ${project.name}`}
+      onClick={() => navigate(`/projects/${project.id}`)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          navigate(`/projects/${project.id}`);
+        }
+      }}
+    >
       {/* Contenu principal */}
       <div style={{
         display: 'flex',

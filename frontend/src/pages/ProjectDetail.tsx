@@ -191,17 +191,14 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
         projectData = await getProjectById(token, id);
         setProject(projectData);
       }
+
+      if (!projectData) {
+        setError('Projet non trouvé');
+        return;
+      }
       
       // Vérifier si l'utilisateur a accès au projet
       const userHasAccess = hasProjectAccess(user, projectData);
-      
-      console.log('Debug access:', {
-        userId: user?.id,
-        projectOwnerId: projectData.ownerId,
-        projectOwnerUserId: projectData.owner?.id,
-        members: projectData.members?.map(m => m.user.id),
-        hasAccess: userHasAccess
-      });
       
       if (!userHasAccess) {
         setError('Accès refusé: vous devez être propriétaire ou membre de ce projet');
@@ -220,8 +217,6 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
       } else {
         setError(errorMessage);
       }
-      console.error('Erreur:', err);
-      console.error('User ID:', user?.id, 'Project ownerId:', project?.ownerId);
     } finally {
       // Récupérer tous les utilisateurs
       const usersData = await getAllUsers();
@@ -246,7 +241,6 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement des commentaires';
       setCommentsError(errorMessage);
-      console.error('Error fetching comments:', err);
     } finally {
       setLoadingCommentsByTask(prev => ({ ...prev, [taskId]: false }));
     }
@@ -395,7 +389,7 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
       >
         {error}
         <button 
-          onClick={fetchData}
+          onClick={() => fetchData()}
           style={{ 
             marginLeft: 16,
             background: '#EF4444',
@@ -1536,6 +1530,15 @@ function CreateTaskModal({
   const labelSize = isMobile ? '0.875rem' : '0.9375rem';
   const inputSize = isMobile ? '0.875rem' : '0.9375rem';
   const buttonFontSize = isMobile ? '0.875rem' : '1rem';
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   // Close user dropdown when clicking outside
   useEffect(() => {

@@ -45,6 +45,15 @@ export default function CreateProjectModal({ onClose, onSubmit, users }: CreateP
 
   const [selectContributorIds, setSelectContributorIds] = useState<string[]>([]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   // Close user dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -90,6 +99,9 @@ export default function CreateProjectModal({ onClose, onSubmit, users }: CreateP
         alignItems: 'center',
         zIndex: 1000,
       }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Créer un projet"
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -109,6 +121,7 @@ export default function CreateProjectModal({ onClose, onSubmit, users }: CreateP
       >
         <button
           onClick={onClose}
+          aria-label="Fermer la fenêtre de création de projet"
           style={{
             position: 'absolute',
             top: 20,

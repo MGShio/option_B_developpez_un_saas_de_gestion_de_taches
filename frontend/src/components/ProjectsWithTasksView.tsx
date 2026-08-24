@@ -204,9 +204,16 @@ export default function ProjectsWithTasksView({
               gap: isMobile ? '1rem' : '1.5rem',
               cursor: onProjectClick ? 'pointer' : 'default',
             }}
-            role="listitem"
-            aria-label={`Projet: ${project.name} avec ${tasks.length} tâches`}
+            role="button"
+            tabIndex={onProjectClick ? 0 : -1}
+            aria-label={`Ouvrir le projet ${project.name} avec ${tasks.length} tâches`}
             onClick={() => onProjectClick?.(project.id)}
+            onKeyDown={(event) => {
+              if (onProjectClick && (event.key === 'Enter' || event.key === ' ')) {
+                event.preventDefault();
+                onProjectClick(project.id);
+              }
+            }}
           >
             {/* En-tête du projet */}
             <div

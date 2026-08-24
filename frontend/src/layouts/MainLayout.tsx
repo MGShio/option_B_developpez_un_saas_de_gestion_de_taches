@@ -33,6 +33,17 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMobileMenuOpen(false);
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
+
   // Extraire les initiales du nom de l'utilisateur
   const getInitials = (name: string) => {
     if (!name) return '';
@@ -311,7 +322,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               style={{ ...userAvatarStyle, display: isMobile ? 'none' : 'flex' }}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter') router.push('/account'); }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  router.push('/account');
+                }
+              }}
               aria-label={`Compte de ${user.name}`}
             >
               <span style={avatarTextStyle}>

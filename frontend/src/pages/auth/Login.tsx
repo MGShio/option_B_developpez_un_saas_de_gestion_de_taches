@@ -73,7 +73,6 @@ export default function Login() {
       await login({ email, password });
       router.push('/dashboard');
     } catch (err) {
-      console.error('Login failed:', err);
     }
   };
 

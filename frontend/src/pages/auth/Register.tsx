@@ -89,7 +89,6 @@ export default function Register() {
       await register({ name, email, password });
       router.push('/dashboard');
     } catch (err) {
-      console.error('Registration failed:', err);
     }
   };
 

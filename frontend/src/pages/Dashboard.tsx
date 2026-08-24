@@ -248,7 +248,6 @@ export default function Dashboard() {
           ? err.message
           : "Erreur lors du chargement des données",
       );
-      console.error("Erreur:", err);
     } finally {
       setIsLoading(false);
     }
