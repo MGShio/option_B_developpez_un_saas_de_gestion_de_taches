@@ -1,5 +1,26 @@
 "use client";
+// ============================================
 // Dashboard.tsx - Page tableau de bord
+// ============================================
+// ROLE: Page principale de l'application affichant :
+// - Les statistiques du dashboard
+// - La liste des taches assignees a l'utilisateur
+// - Une vue Kanban des taches
+// - Une vue Projets avec les taches par projet
+// - Un bouton pour creer un nouveau projet
+//
+// DEPENDANCES :
+// - react : Pour les hooks (useState, useEffect, useCallback, useMemo)
+// - next/navigation : Pour la navigation (useRouter)
+// - @/contexts/AuthContext : Pour l'utilisateur connecte
+// - @/utils/storage : Pour le token JWT
+// - @/services/taskService : Pour recuperer les taches assignees
+// - @/services/dashboardService : Pour les statistiques et projets avec comptes de taches
+// - @/services/projectService : Pour les projets et creation de projet
+// - @/services/userService : Pour la liste des utilisateurs
+// - @/components/CreateProjectModal : Modal de creation de projet
+// - @/components/ProjectsWithTasksView : Vue des projets avec leurs taches
+//
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -22,35 +43,49 @@ import {
   createProject,
   type Project,
 } from "@/services/projectService";
-import CreateProjectModal, {
-  type ModalCreateProjectData,
-} from "@/components/CreateProjectModal";
+import CreateProjectModal,
+{ type ModalCreateProjectData } from "@/components/CreateProjectModal";
 import ProjectsWithTasksView from "@/components/ProjectsWithTasksView";
 import { getUsers } from "@/services/userService";
+
+// ============================================
+// IMPORTS DES ICONES
+// ============================================
 const checkmarkIcon = "/images/checkmark.svg";
 const calendarIcon = "/images/calendaricon.svg";
 const folderIconGrey = "/images/foldericongrey.svg";
 const calendarIconGrey = "/images/calendaricongrey.svg";
 const textBubbleGrey = "/images/textbubblegrey.svg";
 
+
+// ============================================
+// CONSTANTES GLOBALES
+// ============================================
+
 // Couleurs des statuts - Conforme WCAG 2.1 AA
+// Chaque statut a : fond (bg), texte (color), bordure (border)
 const statusColors: Record<
   string,
   { bg: string; color: string; border: string }
 > = {
-  "À faire": { bg: "#FFE0E0", color: "#EF4444", border: "#FECACA" },
+  "A faire": { bg: "#FFE0E0", color: "#EF4444", border: "#FECACA" },
   "En cours": { bg: "#FFF0D7", color: "#E08D00", border: "#FED7AA" },
-  Terminé: { bg: "#D1FAE5", color: "#059669", border: "#A7F3D0" },
+  Termine: { bg: "#D1FAE5", color: "#059669", border: "#A7F3D0" },
 };
 
-// Libellés des statuts
+// Libelles des statuts pour l'accessibilite
 const TASK_STATUS_LABELS: Record<string, string> = {
-  "À faire": "À faire",
+  "A faire": "A faire",
   "En cours": "En cours",
-  Terminé: "Terminé",
+  Termine: "Termine",
 };
 
-// Composant Separator réutilisable
+
+// ============================================
+// COMPOSANTS REUTILISABLES (Icones et Separateurs)
+// ============================================
+
+// Composant Separator reutilisable - barre verticale de separation
 const Separator = () => (
   <div
     style={{
@@ -65,7 +100,7 @@ const Separator = () => (
   />
 );
 
-// Composant SearchIcon
+// Composant SearchIcon - Icone de recherche personnalisee
 const SearchIcon = ({ color = "#6B7280" }: { color?: string }) => (
   <svg
     width="0.875rem"
@@ -91,7 +126,7 @@ const SearchIcon = ({ color = "#6B7280" }: { color?: string }) => (
   </svg>
 );
 
-// Icônes pour les vues
+// Icones pour les vues
 const CheckmarkIcon = ({ isActive }: { isActive: boolean }) => (
   <img
     src={checkmarkIcon}
@@ -133,23 +168,50 @@ const TextBubbleGrey = () => (
   />
 );
 
+
+// ============================================
+// COMPOSANT PRINCIPAL - Dashboard
+// ============================================
 export default function Dashboard() {
+  // ============================================
+  // 1. HOOKS ET CONTEXTES
+  // ============================================
+
+  // Recuperation de l'utilisateur connecte depuis AuthContext
   const { user, isAuthenticated } = useAuth();
+  
+  // Router Next.js pour la navigation
   const router = useRouter();
+
+  // ============================================
+  // 2. ETATS (STATE MANAGEMENT)
+  // ============================================
+
+  // Etat pour la largeur de la fenetre (responsive)
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 1440,
   );
+
+  // Etat pour la vue active : 'list', 'kanban', ou 'projects'
   const [activeView, setActiveView] = useState<"list" | "kanban" | "projects">(
     "list",
   );
+
+  // Etat pour la recherche
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Etat pour les taches recuperees
   const [tasks, setTasks] = useState<Task[]>([]);
+
+  // Etat pour les projets
   const [projects, setProjects] = useState<Project[]>([]);
+
+  // Etat pour les projets avec statistiques (nombre de taches)
   const [projectsWithStats, setProjectsWithStats] = useState<
     ProjectWithTaskCount[]
   >([]);
 
-  // Handler for project click
+  // Handler for project click - Redirige vers la page du projet
   const handleProjectClick = useCallback(
     (projectId: string) => {
       router.push("/projects/" + projectId);
@@ -158,6 +220,7 @@ export default function Dashboard() {
   );
 
   // Compute tasks by project for ProjectsWithTasksView
+  // Memoisation pour eviter les recalculs inutiles
   const tasksByProject = useMemo(() => {
     const map = new Map<string, Task[]>();
     tasks.forEach((task) => {
@@ -168,35 +231,53 @@ export default function Dashboard() {
     });
     return map;
   }, [tasks]);
+
+  // Etat pour les statistiques du dashboard
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(
     null,
   );
+
+  // Etat pour la liste des utilisateurs
   const [users, setUsers] = useState<
     { id: string; name: string; role?: string }[]
   >([]);
+
+  // Etat de chargement
   const [isLoading, setIsLoading] = useState(true);
+
+  // Etat d'erreur
   const [error, setError] = useState<string | null>(null);
 
-  // Modale de création de projet
+  // Etat pour la modale de creation de projet
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  // Etat pour les donnees du nouveau projet
   const [newProject, setNewProject] = useState<ModalCreateProjectData>({
     name: "",
     description: "",
     contributorIds: [],
   });
 
-  // Gestion du resize pour le responsive
+  // ============================================
+  // 3. EFFETS (USE EFFECT)
+  // ============================================
+
+  // EFFET: Gestion du resize pour le responsive design
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Calcul des tailles responsives
+  // ============================================
+  // 4. VARIABLES DE STYLE RESPONSIVE
+  // ============================================
+
+  // Calcul des tailles adaptatives
   const isMobile = windowWidth <= 768;
   const isTablet = windowWidth <= 1024;
 
-  // Tailles adaptatives
+  // Tailles adaptatives pour differentes sections
   const welcomeSectionWidth = isMobile ? "100%" : isTablet ? "70%" : "36vw";
   const mainContainerWidth = isMobile
     ? "100%"
@@ -218,7 +299,16 @@ export default function Dashboard() {
   const inputHeight = isMobile ? "min(2.75rem, 6.5vh)" : "min(3.3125rem, 4vh)";
   const containerPadding = isMobile ? "1rem" : isTablet ? "1.5rem" : "2.5rem";
 
-  // Récupérer les données
+  // ============================================
+  // 5. FONCTIONS DE RECUPERATION DES DONNEES
+  // ============================================
+
+  // Fonction pour recuperer toutes les donnees du dashboard
+  // @action:
+  //   1. Recupere les taches assignees
+  //   2. Recupere les projets avec nombre de taches
+  //   3. Recupere les statistiques du dashboard
+  //   4. Recupere la liste des utilisateurs
   const fetchData = useCallback(async () => {
     if (!user) return;
 
@@ -228,38 +318,46 @@ export default function Dashboard() {
     try {
       const token = storage.getToken() || "";
 
-      // Récupérer les tâches assignées
+      // Recuperer les taches assignees
       const tasksData = await getAssignedTasks(token);
       setTasks(tasksData);
 
-      // Récupérer les projets avec statistiques
+      // Recuperer les projets avec statistiques
       const projectsWithStatsData = await getProjectsWithTaskCounts(token);
       setProjectsWithStats(projectsWithStatsData);
       setProjects(projectsWithStatsData);
 
-      // Récupérer les statistiques du dashboard
+      // Recuperer les statistiques du dashboard
       const statsData = await getDashboardStats(token);
       setDashboardStats(statsData);
+      
+      // Recuperer les utilisateurs
       const usersData = await getUsers(token);
       setUsers(usersData);
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Erreur lors du chargement des données",
+          : "Erreur lors du chargement des donnes",
       );
     } finally {
       setIsLoading(false);
     }
   }, [user, router]);
 
+  // EFFET: Charger les donnees au montage ou lors du changement d'authentification
   useEffect(() => {
     if (isAuthenticated) {
       fetchData();
     }
   }, [isAuthenticated, fetchData]);
 
-  // Rechercher des tâches
+  // ============================================
+  // 6. FONCTIONS DE GESTION
+  // ============================================
+
+  // Rechercher des taches par query
+  // @param query {string} - Terme de recherche
   const handleSearch = useCallback(
     async (query: string) => {
       setSearchQuery(query);
@@ -284,7 +382,8 @@ export default function Dashboard() {
     [fetchData],
   );
 
-  // Gérer la création d'un projet
+  // Gerer la creation d'un projet
+  // @param data {ModalCreateProjectData} - Donnees du nouveau projet
   const handleCreateProject = async (
     data: ModalCreateProjectData,
   ): Promise<void> => {
@@ -305,26 +404,34 @@ export default function Dashboard() {
       setError(
         err instanceof Error
           ? err.message
-          : "Erreur lors de la création du projet",
+          : "Erreur lors de la creation du projet",
       );
     }
   };
 
-  // Obtenir le nom du projet à partir de l'ID
+  // Obtenir le nom du projet a partir de l'ID
+  // @param projectId {string} - ID du projet
+  // @returns {string} - Nom du projet ou "Projet inconnu"
   const getProjectName = (projectId: string) => {
     const project = projects.find((p) => p.id === projectId);
     return project ? project.name : "Projet inconnu";
   };
 
-  // Focus outline style pour l'accessibilite
+  // Style de focus pour l'accessibilite
   const focusOutlineStyle: React.CSSProperties = {
     outline: "0.125rem solid var(--color-primary)",
     outlineOffset: "0.125rem",
   };
 
+  // ============================================
+  // 7. RENDU (RENDER)
+  // ============================================
+
   return (
     <div style={{ width: "100%" }}>
-      {/* Welcome Section */}
+      {/* ============================================ */}
+      {/* SECTION: Bienvenue - En-tete du dashboard */}
+      {/* ============================================ */}
       <div
         style={{
           width: mainContainerWidth,
@@ -338,6 +445,7 @@ export default function Dashboard() {
           justifyContent: "space-between",
         }}
       >
+        {/* Titre et sous-titre de bienvenue */}
         <div style={{ display: "flex", flexDirection: "column" }}>
           <h1
             style={{
@@ -362,10 +470,11 @@ export default function Dashboard() {
               overflowWrap: "anywhere",
             }}
           >
-            Bonjour {user?.name}, voici un aperçu de vos projets et tâches
+            Bonjour {user?.name}, voici un apercu de vos projets et taches
           </p>
         </div>
 
+        {/* Bouton de creation de projet */}
         <button
           onClick={() => setIsCreateModalOpen(true)}
           style={{
@@ -383,13 +492,15 @@ export default function Dashboard() {
             cursor: "pointer",
             transition: "background-color 0.2s ease",
           }}
-          aria-label="Créer un nouveau projet"
+          aria-label="Creer un nouveau projet"
         >
-          + Créer un projet
+          + Creer un projet
         </button>
       </div>
 
-      {/* View Toggle */}
+      {/* ============================================ */}
+      {/* SECTION: Toggle des vues (Liste, Kanban, Projets) */}
+      {/* ============================================ */}
       <div
         style={{
           width: mainContainerWidth,
@@ -403,6 +514,7 @@ export default function Dashboard() {
         role="radiogroup"
         aria-label="Choisir la vue"
       >
+        {/* Bouton Vue Liste */}
         <button
           onClick={() => setActiveView("list")}
           style={{
@@ -452,6 +564,8 @@ export default function Dashboard() {
             Liste
           </span>
         </button>
+
+        {/* Bouton Vue Kanban */}
         <button
           onClick={() => setActiveView("kanban")}
           style={{
@@ -504,7 +618,12 @@ export default function Dashboard() {
         </button>
       </div>
 
+      {/* ============================================ */}
+      {/* SECTION: Affichage conditionnel des vues */}
+      {/* ============================================ */}
+
       {isLoading ? (
+        /* Etat de chargement */
         <div
           style={{
             textAlign: "center",
@@ -514,9 +633,10 @@ export default function Dashboard() {
           }}
           aria-live="polite"
         >
-          Chargement des données...
+          Chargement des donnees...
         </div>
       ) : error ? (
+        /* Etat d'erreur avec bouton de rechargement */
         <div
           style={{
             textAlign: "center",
@@ -543,11 +663,11 @@ export default function Dashboard() {
               fontSize: isMobile ? "0.75rem" : "0.875rem",
             }}
           >
-            Réessayer
+            Reessayer
           </button>
         </div>
       ) : activeView === "kanban" ? (
-        /* Vue Kanban */
+        /* Vue Kanban - Affichage par colonnes de statut */
         <KanbanView
           tasks={tasks}
           getProjectName={getProjectName}
@@ -555,7 +675,7 @@ export default function Dashboard() {
           isTablet={isTablet}
         />
       ) : activeView === "projects" ? (
-        /* Vue Projets */
+        /* Vue Projets - Affichage des projets avec leurs taches */
         <ProjectsWithTasksView
           projects={projectsWithStats}
           tasksByProject={tasksByProject}
@@ -565,7 +685,7 @@ export default function Dashboard() {
           isMobile={isMobile}
         />
       ) : (
-        /* Vue Liste */
+        /* Vue Liste - Affichage des taches en liste */
         <div
           style={{
             width: tasksContainerWidth,
@@ -579,14 +699,14 @@ export default function Dashboard() {
             margin: isMobile ? "0" : "0 auto",
           }}
         >
-          {/* Section Header */}
+          {/* En-tete de la section des taches */}
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
               flexDirection: isMobile ? "column" : "row",
-                gap: isMobile ? "1.5rem" : "1rem",
+              gap: isMobile ? "1.5rem" : "1rem",
             }}
           >
             <div
@@ -603,7 +723,7 @@ export default function Dashboard() {
                   fontWeight: "600",
                 }}
               >
-                Mes tâches assignées
+                Mes taches assignees
               </h2>
               <p
                 style={{
@@ -613,11 +733,11 @@ export default function Dashboard() {
                   fontWeight: "400",
                 }}
               >
-                Par ordre de priorité
+                Par ordre de priorite
               </p>
             </div>
 
-            {/* Search Bar */}
+            {/* Barre de recherche */}
             <div
               style={{
                 width: isMobile ? "100%" : "min(22.3125rem, 25vw)",
@@ -635,7 +755,7 @@ export default function Dashboard() {
             >
               <input
                 type="text"
-                placeholder="Rechercher une tâche"
+                placeholder="Rechercher une tache"
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 style={{
@@ -649,14 +769,14 @@ export default function Dashboard() {
                   width: "100%",
                   minHeight: "63px",
                 }}
-                aria-label="Rechercher une tâche"
+                aria-label="Rechercher une tache"
                 autoComplete="off"
               />
               <SearchIcon color="#6B7280" />
             </div>
           </div>
 
-          {/* Tasks List */}
+          {/* Liste des taches */}
           <div
             style={{
               display: "flex",
@@ -665,6 +785,7 @@ export default function Dashboard() {
             }}
           >
             {tasks.length === 0 ? (
+              /* Message quand aucune tache n'est trouvee */
               <div
                 style={{
                   textAlign: "center",
@@ -674,9 +795,10 @@ export default function Dashboard() {
                 }}
                 aria-live="polite"
               >
-                Aucune tâche trouvée
+                Aucune tache trouvee
               </div>
             ) : (
+              /* Mapping des taches avec le composant TaskCard */
               tasks.map((task) => (
                 <TaskCard
                   key={task.id}
@@ -692,7 +814,9 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Modale de création de projet */}
+      {/* ============================================ */}
+      {/* SECTION: Modale de creation de projet */}
+      {/* ============================================ */}
       {isCreateModalOpen && (
         <CreateProjectModal
           onClose={() => {
@@ -708,7 +832,19 @@ export default function Dashboard() {
   );
 }
 
-// Composant TaskCard réutilisable
+// ============================================
+// COMPOSANT TaskCard - Carte de tache reutilisable
+// ============================================
+// ROLE: Affiche les informations d'une tache dans la vue Liste
+// Affiche: titre, description, projet, date, nombre d'assignes, statut, bouton Voir
+//
+// PROPS:
+// - task {Task} : La tache a afficher
+// - projectName {string} : Nom du projet associe
+// - onView {function} : Callback pour naviguer vers le projet
+// - isMobile {boolean} : Indique si l'ecran est mobile
+// - isTablet {boolean} : Indique si l'ecran est tablette
+//
 function TaskCard({
   task,
   projectName,
@@ -722,18 +858,23 @@ function TaskCard({
   isMobile: boolean;
   isTablet: boolean;
 }) {
+  // Recuperation des couleurs du statut
   const colors = statusColors[task.status] || {
     bg: "#E5E7EB",
     color: "#6B7280",
     border: "#9CA3AF",
   };
 
+  // ============================================
+  // VARIABLES DE STYLE RESPONSIVE
+  // ============================================
+
   // Tailles adaptatives pour la carte
   const cardPaddingX = isMobile ? "1rem" : isTablet ? "1.5rem" : "2.5rem";
   const cardPaddingY = isMobile ? "1rem" : isTablet ? "1.25rem" : "1.5625rem";
   const titleWidth = isMobile ? "100%" : "min(9.5625rem, 12vw)";
   const metaGap = isMobile ? "0.75rem" : "0.9375rem";
-  const taskTitleSize = isMobile ? `1rem` : `1.125rem`;
+  const taskTitleSize = isMobile ? "1rem" : "1.125rem";
   const statusButtonPadding = isMobile ? "0.25rem 0.75rem" : "0.25rem 1rem";
   const statusButtonFontSize = isMobile ? "0.75rem" : "0.875rem";
   const viewButtonWidth = isMobile ? "100%" : "min(7.5625rem, 9vw)";
@@ -754,17 +895,19 @@ function TaskCard({
         minWidth: 0,
       }}
       role="article"
-      aria-label={`Tâche : ${task.title}`}
+      aria-label={`Tache : ${task.title}`}
     >
+      {/* Contenu principal de la carte */}
       <div
         style={{
           display: "flex",
           flexDirection: "column",
           gap: isMobile ? "0.75rem" : "2rem",
-            minWidth: 0,
-            flex: 1,
+          minWidth: 0,
+          flex: 1,
         }}
       >
+        {/* Section titre et description */}
         <div
           style={{
             display: "flex",
@@ -794,6 +937,7 @@ function TaskCard({
           </p>
         </div>
 
+        {/* Section metadonnees (projet, date, assignees) */}
         <div
           style={{
             display: "flex",
@@ -804,6 +948,7 @@ function TaskCard({
             justifyContent: "left",
           }}
         >
+          {/* Projet */}
           <div
             style={{
               display: "flex",
@@ -825,8 +970,10 @@ function TaskCard({
             </span>
           </div>
 
+          {/* Separateur */}
           {!isMobile && <Separator />}
 
+          {/* Date */}
           <div
             style={{
               display: "flex",
@@ -850,12 +997,14 @@ function TaskCard({
                     day: "numeric",
                     month: "long",
                   })
-                : "Non définie"}
+                : "Non definie"}
             </span>
           </div>
 
+          {/* Separateur */}
           {!isMobile && <Separator />}
 
+          {/* Nombre d'assignes */}
           <div
             style={{
               display: "flex",
@@ -878,6 +1027,7 @@ function TaskCard({
         </div>
       </div>
 
+      {/* Boutons statut et Voir - Desktop */}
       {!isMobile && (
         <div
           style={{
@@ -888,6 +1038,7 @@ function TaskCard({
             gap: isMobile ? "0.75rem" : "2.3125rem",
           }}
         >
+          {/* Badge de statut */}
           <div
             style={{
               padding: statusButtonPadding,
@@ -913,6 +1064,7 @@ function TaskCard({
             </span>
           </div>
 
+          {/* Bouton Voir */}
           <button
             onClick={onView}
             style={{
@@ -936,6 +1088,7 @@ function TaskCard({
         </div>
       )}
 
+      {/* Boutons statut et Voir - Mobile */}
       {isMobile && (
         <div
           style={{
@@ -946,6 +1099,7 @@ function TaskCard({
             marginTop: "0.5rem",
           }}
         >
+          {/* Badge de statut */}
           <div
             style={{
               padding: statusButtonPadding,
@@ -971,6 +1125,7 @@ function TaskCard({
             </span>
           </div>
 
+          {/* Bouton Voir */}
           <button
             onClick={onView}
             style={{
@@ -997,7 +1152,18 @@ function TaskCard({
   );
 }
 
-// Composant KanbanView
+// ============================================
+// COMPOSANT KanbanView - Vue Kanban des taches
+// ============================================
+// ROLE: Affiche les taches organisees par colonnes de statut
+// Colonnes: A faire, En cours, Termine
+//
+// PROPS:
+// - tasks {Task[]} : Liste des taches a afficher
+// - getProjectName {function} : Fonction pour recuperer le nom du projet
+// - isMobile {boolean} : Indique si l'ecran est mobile
+// - isTablet {boolean} : Indique si l'ecran est tablette
+//
 function KanbanView({
   tasks,
   getProjectName,
@@ -1011,11 +1177,15 @@ function KanbanView({
 }) {
   const router = useRouter();
 
-  // Regrouper les tâches par statut
+  // ============================================
+  // GROUPEMENT DES TACHES PAR STATUT
+  // ============================================
+
+  // Regrouper les taches par statut
   const tasksByStatus: Record<string, Task[]> = {
-    "À faire": [],
+    "A faire": [],
     "En cours": [],
-    Terminé: [],
+    Termine: [],
   };
 
   tasks.forEach((task) => {
@@ -1023,6 +1193,10 @@ function KanbanView({
       tasksByStatus[task.status].push(task);
     }
   });
+
+  // ============================================
+  // VARIABLES DE STYLE RESPONSIVE POUR KANBAN
+  // ============================================
 
   // Tailles adaptatives pour Kanban
   const columnMinWidth = isMobile ? "80vw" : isTablet ? "30vw" : "24vw";
@@ -1064,9 +1238,10 @@ function KanbanView({
             : "min(80.97vw, 1400px)",
       }}
       role="region"
-      aria-label="Vue Kanban des tâches"
+      aria-label="Vue Kanban des taches"
     >
-      {(["À faire", "En cours", "Terminé"] as const).map((status) => {
+      {/* Mapping des colonnes par statut */}
+      {(["A faire", "En cours", "Termine"] as const).map((status) => {
         const colors = statusColors[status];
         const statusTasks = tasksByStatus[status];
 
@@ -1085,7 +1260,7 @@ function KanbanView({
               gap: isMobile ? "1rem" : "1.25rem",
             }}
           >
-            {/* En-tête de la colonne */}
+            {/* En-tete de la colonne avec nom et compteur */}
             <div
               style={{
                 justifyContent: "flex-start",
@@ -1104,6 +1279,7 @@ function KanbanView({
               >
                 {status}
               </h3>
+              {/* Badge de compteur de taches */}
               <div
                 style={{
                   paddingLeft: 16,
@@ -1134,7 +1310,7 @@ function KanbanView({
               </div>
             </div>
 
-            {/* Cartes des tâches */}
+            {/* Conteneur des cartes de taches */}
             <div
               style={{
                 display: "flex",
@@ -1143,6 +1319,7 @@ function KanbanView({
               }}
             >
               {statusTasks.length === 0 ? (
+                /* Message quand aucune tache dans la colonne */
                 <div
                   style={{
                     textAlign: "center",
@@ -1153,9 +1330,10 @@ function KanbanView({
                   }}
                   aria-live="polite"
                 >
-                  Aucune tâche
+                  Aucune tache
                 </div>
               ) : (
+                /* Mapping des taches dans la colonne */
                 statusTasks.map((task) => {
                   const taskColors = statusColors[task.status];
 
@@ -1172,9 +1350,9 @@ function KanbanView({
                         gap: kanbanCardGap,
                       }}
                       role="article"
-                      aria-label={`Tâche : ${task.title}, statut : ${TASK_STATUS_LABELS[task.status] || task.status}`}
+                      aria-label={`Tache : ${task.title}, statut : ${TASK_STATUS_LABELS[task.status] || task.status}`}
                     >
-                      {/* En-tête avec titre et statut */}
+                      {/* En-tete avec titre et badge de statut */}
                       <div
                         style={{
                           display: "flex",
@@ -1199,6 +1377,7 @@ function KanbanView({
                         >
                           {task.title}
                         </h4>
+                        {/* Badge de statut */}
                         <div
                           style={{
                             padding: kanbanStatusPadding,
@@ -1224,6 +1403,8 @@ function KanbanView({
                           </span>
                         </div>
                       </div>
+
+                      {/* Description de la tache */}
                       <p
                         style={{
                           color: "#6B7280",
@@ -1234,6 +1415,8 @@ function KanbanView({
                       >
                         {task.description || "Aucune description"}
                       </p>
+
+                      {/* Metadonnees (projet, date, assignees) */}
                       <div
                         style={{
                           justifyContent: "flex-start",
@@ -1243,6 +1426,7 @@ function KanbanView({
                           flexWrap: "wrap",
                         }}
                       >
+                        {/* Projet */}
                         <div
                           style={{
                             justifyContent: "flex-start",
@@ -1264,8 +1448,10 @@ function KanbanView({
                           </span>
                         </div>
 
+                        {/* Separateur */}
                         <Separator />
 
+                        {/* Date */}
                         <div
                           style={{
                             justifyContent: "space-between",
@@ -1291,12 +1477,14 @@ function KanbanView({
                                     month: "short",
                                   },
                                 )
-                              : "Non définie"}
+                              : "Non definie"}
                           </span>
                         </div>
 
+                        {/* Separateur */}
                         <Separator />
 
+                        {/* Nombre d'assignes */}
                         <div
                           style={{
                             justifyContent: "flex-start",
@@ -1319,7 +1507,7 @@ function KanbanView({
                         </div>
                       </div>
 
-                      {/* Bouton Voir - toujours en dessous des métadonnées */}
+                      {/* Bouton Voir - toujours en dessous des metadonnees */}
                       <div
                         style={{
                           alignSelf: "flex-start",

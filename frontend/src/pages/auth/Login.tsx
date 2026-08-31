@@ -1,11 +1,28 @@
 'use client';
-
-// Login.tsx - Page connexion
+// ============================================
+// Login.tsx - Page de connexion
+// ============================================
+// ROLE: Page d'authentification permettant a l'utilisateur de :
+// - Se connecter avec email et mot de passe
+// - Acceder a la page de reinitialisation de mot de passe
+// - Creer un nouveau compte
+//
+// DEPENDANCES :
+// - react : Pour les hooks (useState, useEffect)
+// - next/navigation : Pour la navigation (useRouter, Link)
+// - next/link : Pour les liens de navigation
+// - @/contexts/AuthContext : Pour la fonction login() et la gestion des erreurs
+//
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+
+
+// ============================================
+// IMPORTS LOCAUX
+// ============================================
 
 // Import de l'image de fond locale
 const loginBackground = '/images/Loginbackground.svg';
@@ -14,35 +31,45 @@ const loginBackground = '/images/Loginbackground.svg';
 const logoOrange = '/images/logoorange.svg';
 
 
-
-
+// ============================================
+// COMPOSANT PRINCIPAL
+// ============================================
 export default function Login() {
 
+  // ============================================
+  // 1. ETATS (STATE MANAGEMENT)
+  // ============================================
 
-  const [email, setEmail] = useState('');
+  // Etat pour le formulaire de connexion
+  const [email, setEmail] = useState('');     // Adresse email de l'utilisateur
+  const [password, setPassword] = useState(''); // Mot de passe de l'utilisateur
 
-
-  const [password, setPassword] = useState('');
-
-
+  // Etat pour la largeur de la fenetre - utilise pour le responsive design
   const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1440);
 
-
-
+  // Recuperation du contexte d'authentification
+  // - login : Fonction async pour connecter l'utilisateur (email, password) -> appel API POST /auth/login
+  // - isLoading : Booleen indiquant si une requete de connexion est en cours
+  // - error : Message d'erreur global (ex: credentials invalides)
+  // - clearError : Fonction pour effacer les erreurs
   const { login, isLoading, error, clearError } = useAuth();
 
+  // Router Next.js pour la redirection après connexion
   const router = useRouter();
 
-  // Reset body margin pour éviter les bordures blanches
+  // ============================================
+  // 2. EFFETS (USE EFFECT)
+  // ============================================
 
+  // EFFET: Reset des marges du body pour eviter les bordures blanches
+  // Ce useEffect s'execute une fois au montage pour nettoyer le style du body
   useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.minHeight = '100vh';
     document.body.style.overflow = 'auto';
 
-// RENDER
-
+    // Nettoyage: Restore les styles par defaut lors du demontage
     return () => {
       document.body.style.margin = '';
       document.body.style.padding = '';
@@ -51,20 +78,27 @@ export default function Login() {
     };
   }, []);
 
-  // Gestion du resize pour le responsive
-
+  // EFFET: Gestion du resize pour le responsive design
+  // Met a jour windowWidth a chaque redimensionnement de la fenetre
   useEffect(() => {
-
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
 
-// RENDER
-
+    // Nettoyage: Suppression de l'ecouteur lors du demontage
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // ============================================
+  // 3. GESTIONNAIRES D'EVENEMENTS
+  // ============================================
 
-
+  // Gestion de la soumission du formulaire de connexion
+  // @param e {React.FormEvent} - Evenement de soumission du formulaire
+  // @action:
+  //   1. Empeche le comportement par defaut du formulaire
+  //   2. Efface les erreurs precedentes
+  //   3. Appelle la fonction login() du contexte avec email et password
+  //   4. Redirige vers /dashboard en cas de succes
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
@@ -73,14 +107,19 @@ export default function Login() {
       await login({ email, password });
       router.push('/dashboard');
     } catch (err) {
+      // L'erreur est geree par AuthContext et affichee via le state 'error'
+      // Pas de traitement supplementaire necessaire ici
     }
   };
 
-  // Calcul des tailles responsives
+  // ============================================
+  // 4. VARIABLES DE STYLE RESPONSIVE
+  // ============================================
 
-  const isMobile = windowWidth <= 768;
-  const isTablet = windowWidth <= 1024;
-  
+  // Determination du type d'appareil en fonction de la largeur
+  const isMobile = windowWidth <= 768;    // <= 768px = Mobile
+  const isTablet = windowWidth <= 1024;   // <= 1024px = Tablette
+
   // Largeur du card : 90% sur mobile, 45% sur tablette, 39% sur desktop (562px/1440px)
   const cardWidth = isMobile ? '90%' : isTablet ? '45%' : '39%';
   const padding = isMobile ? '1.5rem' : isTablet ? '2rem' : 'clamp(1.5rem, 4vw, 4rem)';
@@ -88,7 +127,11 @@ export default function Login() {
   const inputPadding = isMobile ? '0.75rem 1rem' : '0.875rem 1.25rem';
   const logoHeight = isMobile ? '28px' : '36px';
 
-  // Styles - Conforme WCAG 2.1 AA
+  // ============================================
+  // 5. STYLES DES COMPOSANTS (WCAG 2.1 AA compliant)
+  // ============================================
+
+  // Style du conteneur principal (pleine page)
   const containerStyle: React.CSSProperties = {
     minHeight: '100vh',
     width: '100%',
@@ -105,6 +148,7 @@ export default function Login() {
     userSelect: 'none',
   };
 
+  // Style de la carte de connexion (conteneur blanc)
   const cardStyle: React.CSSProperties = {
     backgroundColor: 'var(--color-white)',
     padding: padding,
@@ -116,6 +160,7 @@ export default function Login() {
     userSelect: 'none',
   };
 
+  // Style du conteneur du logo
   const logoContainerStyle: React.CSSProperties = {
     display: 'flex',
     justifyContent: 'center',
@@ -124,6 +169,7 @@ export default function Login() {
     userSelect: 'none',
   };
 
+  // Style du titre "Connexion"
   const titleStyle: React.CSSProperties = {
     fontSize: titleSize,
     fontWeight: '700',
@@ -136,6 +182,7 @@ export default function Login() {
     userSelect: 'none',
   };
 
+  // Style des messages d'erreur
   const errorStyle: React.CSSProperties = {
     backgroundColor: '#FEF2F2',
     color: '#991B1B',
@@ -147,6 +194,7 @@ export default function Login() {
     userSelect: 'none',
   };
 
+  // Style du formulaire de connexion
   const formStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
@@ -161,6 +209,7 @@ export default function Login() {
     userSelect: 'none',
   };
 
+  // Style des labels
   const labelStyle: React.CSSProperties = {
     display: 'block',
     fontSize: 'clamp(0.875rem, 2vw, 1rem)',
@@ -171,6 +220,7 @@ export default function Login() {
     userSelect: 'none',
   };
 
+  // Style des inputs
   const inputStyle: React.CSSProperties = {
     width: '100%',
     padding: inputPadding,
@@ -183,16 +233,19 @@ export default function Login() {
     boxShadow: 'none',
   };
 
+  // Style des inputs au focus
   const inputFocusStyle: React.CSSProperties = {
     borderColor: 'transparent',
     boxShadow: '0 0 0 3px rgba(211, 89, 11, 0.3)',
   };
 
+  // Style du conteneur "Mot de passe oublie"
   const forgotPasswordStyle: React.CSSProperties = {
     textAlign: 'center',
     userSelect: 'none',
   };
 
+  // Style des liens
   const linkStyle: React.CSSProperties = {
     color: 'var(--color-primary)',
     fontSize: 'clamp(0.875rem, 1.8vw, 0.95rem)',
@@ -202,10 +255,12 @@ export default function Login() {
     userSelect: 'none',
   };
 
+  // Style des liens au survol
   const linkHoverStyle: React.CSSProperties = {
     textDecoration: 'underline',
   };
 
+  // Style du bouton de connexion
   const buttonStyle: React.CSSProperties = {
     width: '80%',
     backgroundColor: 'var(--color-secondary)',
@@ -223,10 +278,12 @@ export default function Login() {
     userSelect: 'none',
   };
 
+  // Style du bouton de connexion au survol
   const buttonHoverStyle: React.CSSProperties = {
     backgroundColor: '#373737',
   };
 
+  // Style du footer (Cree un compte)
   const footerStyle: React.CSSProperties = {
     textAlign: 'center',
     marginTop: 'auto',
@@ -238,16 +295,16 @@ export default function Login() {
     userSelect: 'none',
   };
 
-  // Focus outline style
+  // Style de focus pour l'accessibilite WCAG 2.1 AA
+  // Applique dynamiquement via onFocus sur les elements interactifs
   const focusOutlineStyle: React.CSSProperties = {
     outline: '2px solid var(--color-primary)',
     outlineOffset: '2px',
   };
 
-
-// RENDER
-
-
+  // ============================================
+  // 6. RENDU (RENDER)
+  // ============================================
 
   return (
     <div style={containerStyle} role="main" aria-label="Page de connexion">
@@ -256,7 +313,7 @@ export default function Login() {
         aria-labelledby="login-title"
         aria-describedby="login-form"
       >
-        {/* Logo de l'application */}
+        {/* LOGO - Logo de l'application */}
         <div style={logoContainerStyle}>
           <img
             src={logoOrange}
@@ -265,8 +322,10 @@ export default function Login() {
           />
         </div>
         
+        {/* TITRE - Titre de la page */}
         <h1 id="login-title" style={titleStyle}>Connexion</h1>
 
+        {/* MESSAGE D'ERREUR - Affichage des erreurs de connexion */}
         {error && (
           <div 
             style={errorStyle}
@@ -277,12 +336,14 @@ export default function Login() {
           </div>
         )}
 
+        {/* FORMULAIRE DE CONNEXION */}
         <form 
           onSubmit={handleSubmit} 
           style={formStyle}
           id="login-form"
           aria-label="Formulaire de connexion"
         >
+          {/* CHAMP EMAIL */}
           <div>
             <label htmlFor="email" style={labelStyle}>
               Adresse email
@@ -303,6 +364,7 @@ export default function Login() {
             />
           </div>
 
+          {/* CHAMP MOT DE PASSE */}
           <div>
             <label htmlFor="password" style={labelStyle}>
               Mot de passe
@@ -323,6 +385,7 @@ export default function Login() {
             />
           </div>
 
+          {/* BOUTON DE CONNEXION */}
           <button
             type="submit"
             disabled={isLoading}
@@ -336,6 +399,7 @@ export default function Login() {
             {isLoading ? 'Connexion...' : 'Se connecter'}
           </button>
 
+          {/* LIEN MOT DE PASSE OUBLIE */}
           <div style={forgotPasswordStyle}>
             <Link 
               href="/forgot-password" 
@@ -346,11 +410,12 @@ export default function Login() {
               onBlur={(e) => Object.assign(e.currentTarget.style, linkStyle)}
               aria-label="Mot de passe oublie, cliquez pour reinitialiser"
             >
-              Mot de passe oublié ?
+              Mot de passe oublie ?
             </Link>
           </div>
         </form>
 
+        {/* FOOTER - Lien vers la page d'inscription */}
         <p style={footerStyle}>
           Pas encore de compte ?{' '}
           <Link 
