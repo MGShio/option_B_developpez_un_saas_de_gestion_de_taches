@@ -891,7 +891,7 @@ function TaskCard({
         justifyContent: "space-between",
         alignItems: "center",
         flexDirection: isMobile ? "column" : "row",
-        gap: isMobile ? "1rem" : "1.5rem",
+        gap: isMobile ? "1rem" : "1rem",
         minWidth: 0,
       }}
       role="article"
@@ -1199,20 +1199,20 @@ function KanbanView({
   // ============================================
 
   // Tailles adaptatives pour Kanban
-  const columnMinWidth = isMobile ? "80vw" : isTablet ? "30vw" : "24vw";
-  const columnPadding = isMobile ? "1rem" : isTablet ? "1.25rem" : "1.5rem";
+  const columnMinWidth = isMobile ? "80vw" : isTablet ? "28vw" : "18vw";
+  const columnPadding = isMobile ? "1rem" : isTablet ? "1rem" : "1rem";
   const statusIndicatorSize = isMobile ? "0.75rem" : "0.875rem";
   const statusTitleSize = isMobile ? "1rem" : "1.125rem";
   const countSize = isMobile ? "0.75rem" : "0.875rem";
 
   // Tailles adaptatives pour les cartes Kanban
-  const kanbanCardPaddingX = isMobile ? "1.5rem" : isTablet ? "2rem" : "2.5rem";
+  const kanbanCardPaddingX = isMobile ? "1rem" : isTablet ? "1.5rem" : "1.5rem";
   const kanbanCardPaddingY = isMobile
     ? "1rem"
     : isTablet
       ? "1.25rem"
       : "1.5625rem";
-  const kanbanCardGap = isMobile ? "1.25rem" : "2rem";
+  const kanbanCardGap = isMobile ? "1rem" : "1.5rem";
   const kanbanHeaderGap = isMobile ? "0.5rem" : "2rem";
   const kanbanTitleSize = isMobile ? "1rem" : "1.125rem";
   const kanbanDescriptionSize = isMobile ? "0.875rem" : "0.9375rem";
@@ -1226,16 +1226,12 @@ function KanbanView({
       style={{
         width: "100%",
         display: "flex",
-        gap: isMobile ? "1rem" : "1.5rem",
-        overflowX: "auto",
+        gap: isMobile ? "1rem" : "1rem",
+        
         paddingBottom: isMobile ? "1rem" : "1.25rem",
         paddingLeft: "0",
         margin: isMobile ? "0" : "0 auto",
-        maxWidth: isMobile
-          ? "100%"
-          : isTablet
-            ? "95%"
-            : "min(80.97vw, 1400px)",
+        maxWidth: isMobile ? "100%" : isTablet ? "95%" : "min(80.97vw, 1400px)",
       }}
       role="region"
       aria-label="Vue Kanban des taches"
@@ -1249,8 +1245,8 @@ function KanbanView({
           <div
             key={status}
             style={{
-              minWidth: columnMinWidth,
-              maxWidth: isMobile ? "100%" : columnMinWidth,
+              flex: 1,
+              minWidth: isMobile ? "80vw" : isTablet ? "28vw" : "250px",
               background: "white",
               borderRadius: "0.75rem",
               border: "0.0625rem solid var(--color-border)",
