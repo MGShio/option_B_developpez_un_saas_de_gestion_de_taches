@@ -3,7 +3,6 @@
 import { API_BASE_URL } from '@/config';
 
 
-
 export interface User {
   id: string;
   email: string;
@@ -13,7 +12,6 @@ export interface User {
 }
 
 
-
 export interface TaskAssignee {
   id: string;
   userId: string;
@@ -21,7 +19,6 @@ export interface TaskAssignee {
   user: User;
   assignedAt?: string;
 }
-
 
 
 export interface Comment {
@@ -35,7 +32,6 @@ export interface Comment {
 }
 
 
-
 export interface ProjectSummary {
   id: string;
   title: string;
@@ -46,6 +42,7 @@ const STATUS_MAP: Record<string, string> = {
   'À faire': 'TODO',
   'En cours': 'IN_PROGRESS',
   'Terminé': 'DONE',
+  'Annulé': 'CANCELLED',
   TODO: 'À faire',
   IN_PROGRESS: 'En cours',
   DONE: 'Terminé',
@@ -56,6 +53,7 @@ const PRIORITY_MAP: Record<string, string> = {
   'Faible': 'LOW',
   'Moyenne': 'MEDIUM',
   'Haute': 'HIGH',
+  'Urgente': 'URGENT',
   LOW: 'Faible',
   MEDIUM: 'Moyenne',
   HIGH: 'Haute',
@@ -70,7 +68,6 @@ export function toBackendStatus(status: string): string {
 }
 
 
-
 export function toBackendPriority(priority: string): string {
   return PRIORITY_MAP[priority] || priority;
 }
@@ -81,7 +78,6 @@ export function toBackendPriority(priority: string): string {
 export function toFrontendStatus(status: string): string {
   return STATUS_MAP[status] || status;
 }
-
 
 
 export function toFrontendPriority(priority: string): string {
@@ -104,7 +100,6 @@ interface BackendTaskAssignee {
   };
   assignedAt?: string;
 }
-
 
 
 interface BackendTask {
@@ -164,21 +159,66 @@ export function formatTaskFromBackend(backendTask: BackendTask): Task {
 
 export function formatTaskToBackend(frontendTask: Partial<CreateTaskData>): any {
   const result: any = { ...frontendTask };
-  
+
   if (result.status) {
     result.status = toBackendStatus(result.status);
+  } else {
+    delete result.status;
   }
-  
+
   if (result.priority) {
     result.priority = toBackendPriority(result.priority);
+  } else {
+    delete result.priority;
   }
-  
-  // Remove id if present (backend generates its own)
+
+  if (result.dueDate) {
+    result.dueDate = String(result.dueDate);
+  } else {
+    delete result.dueDate;
+  }
+
+  if (result.description) {
+    result.description = result.description.trim();
+  } else {
+    delete result.description;
+  }
+
+  // Gérer à la fois assigneeIds et assignees
+  let assigneeIds: string[] = [];
+
+  if (result.assigneeIds && Array.isArray(result.assigneeIds)) {
+    assigneeIds = [...result.assigneeIds];
+  }
+
+  if (result.assignees && Array.isArray(result.assignees)) {
+    assigneeIds = result.assignees.map((a: any) => a.userId || a.id);
+  }
+
+  // Filtrer les IDs invalides (vide, undefined, "undefined")
+  const filteredIds = assigneeIds.filter(
+    (id: string) => id && id.trim() && id !== "undefined"
+  );
+  if (filteredIds.length > 0) {
+    result.assigneeIds = filteredIds;
+  } else {
+    delete result.assigneeIds;
+  }
+
+  // Supprimer les champs inutiles pour le backend
+  delete result.assignees;
   delete result.id;
-  
+  delete result.projectId;
+
+  // Nettoyer les champs null/undefined/vide
+  Object.keys(result).forEach(key => {
+    if (result[key] === undefined || result[key] === null || result[key] === '') {
+      delete result[key];
+    }
+  });
+
   return result;
 }
-
 
 
 
@@ -197,7 +237,6 @@ export interface Task {
 }
 
 
-
 export interface CreateTaskData {
   title: string;
   description?: string;
@@ -208,11 +247,9 @@ export interface CreateTaskData {
 }
 
 
-
 export interface UpdateTaskData extends Partial<CreateTaskData> {
   status?: 'À faire' | 'En cours' | 'Terminé';
 }
-
 
 
 export interface ApiError {
@@ -271,6 +308,7 @@ export async function getAssignedTasks(token: string): Promise<Task[]> {
 
 // Alias for getAssignedTasks
 
+
 export async function getTasks(token: string): Promise<Task[]> {
   return getAssignedTasks(token);
 }
@@ -324,18 +362,22 @@ export async function createTask(token: string, taskData: CreateTaskData): Promi
 // PUT /projects/{projectId}/tasks/{taskId}
 
 export async function updateTask(token: string, projectId: string, taskId: string, taskData: UpdateTaskData): Promise<Task> {
+  const backendData = formatTaskToBackend(taskData);
+  console.log("Données envoyées au backend:", JSON.stringify(backendData, null, 2));
+
   const response = await fetch(`${API_BASE_URL}/projects/${projectId}/tasks/${taskId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     },
-    body: JSON.stringify(formatTaskToBackend(taskData)),
+    body: JSON.stringify(backendData),
   });
 
   if (!response.ok) {
-    const error: { message?: string; error?: string } = await response.json();
-    throw new Error(error.message || error.error || 'Erreur lors de la mise à jour de la tâche');
+    const errorData = await response.json();
+    console.log("ERREUR BACKEND:", JSON.stringify(errorData, null, 2));
+    throw new Error(errorData.message || errorData.error || JSON.stringify(errorData));
   }
 
   const data = await response.json();

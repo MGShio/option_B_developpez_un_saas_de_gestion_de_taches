@@ -5,6 +5,7 @@ import {
   getProfile,
   updateProfile,
   updatePassword,
+  logout,
 } from "../controllers/authController";
 import { authenticateToken } from "../middleware/auth";
 
@@ -25,6 +26,14 @@ router.post("/register", register);
  * @body    { email: string, password: string }
  */
 router.post("/login", login);
+
+/**
+ * @route   POST /auth/logout
+ * @desc    Déconnexion d'un utilisateur
+ * @access  Private (nécessite un token JWT valide)
+ * @header  Authorization: Bearer <token>
+ */
+router.post("/logout", authenticateToken, logout);
 
 /**
  * @route   GET /auth/profile

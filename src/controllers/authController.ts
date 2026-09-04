@@ -461,3 +461,13 @@ export const updatePassword = async (
     sendServerError(res, "Erreur lors de la mise à jour du mot de passe");
   }
 };
+
+/**
+ * Déconnecter l'utilisateur
+ * POST /auth/logout
+ */
+export const logout = async (req: Request, res: Response): Promise<void> => {
+  // Pour JWT stateless, le frontend gère la suppression du token localement
+  // On retourne simplement un succès
+  sendSuccess(res, "Déconnexion réussie");
+};
