@@ -68,16 +68,16 @@ const statusColors: Record<
   string,
   { bg: string; color: string; border: string }
 > = {
-  "A faire": { bg: "#FFE0E0", color: "#EF4444", border: "#FECACA" },
+  "À faire": { bg: "#FFE0E0", color: "#EF4444", border: "#FECACA" },
   "En cours": { bg: "#FFF0D7", color: "#E08D00", border: "#FED7AA" },
-  Termine: { bg: "#D1FAE5", color: "#059669", border: "#A7F3D0" },
+  Terminé: { bg: "#D1FAE5", color: "#059669", border: "#A7F3D0" },
 };
 
 // Libelles des statuts pour l'accessibilite
 const TASK_STATUS_LABELS: Record<string, string> = {
-  "A faire": "A faire",
+  "À faire": "À faire",
   "En cours": "En cours",
-  Termine: "Termine",
+  Terminé: "Terminé",
 };
 
 
@@ -1156,7 +1156,7 @@ function TaskCard({
 // COMPOSANT KanbanView - Vue Kanban des taches
 // ============================================
 // ROLE: Affiche les taches organisees par colonnes de statut
-// Colonnes: A faire, En cours, Termine
+// Colonnes: À faire, En cours, Terminé
 //
 // PROPS:
 // - tasks {Task[]} : Liste des taches a afficher
@@ -1183,9 +1183,9 @@ function KanbanView({
 
   // Regrouper les taches par statut
   const tasksByStatus: Record<string, Task[]> = {
-    "A faire": [],
+    "À faire": [],
     "En cours": [],
-    Termine: [],
+    Terminé: [],
   };
 
   tasks.forEach((task) => {
@@ -1241,7 +1241,7 @@ function KanbanView({
       aria-label="Vue Kanban des taches"
     >
       {/* Mapping des colonnes par statut */}
-      {(["A faire", "En cours", "Termine"] as const).map((status) => {
+      {(["À faire", "En cours", "Terminé"] as const).map((status) => {
         const colors = statusColors[status];
         const statusTasks = tasksByStatus[status];
 

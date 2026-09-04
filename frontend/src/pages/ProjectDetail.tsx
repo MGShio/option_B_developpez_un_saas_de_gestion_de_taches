@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth, type User } from '@/contexts/AuthContext';
 import { storage } from '@/utils/storage';
-import { getProjectById, updateProject, type Project } from '@/services/projectService';
+import { getProjectById, updateProject, addContributor, removeContributor, type Project } from '@/services/projectService';
 import { getAllUsers } from '@/services/userService';
 import { getProjectTasks, updateTask, createTask, type Task, type CreateTaskData, type Comment, getTaskComments, createComment, deleteCommentService } from '@/services/taskService';
 import AITaskListModal from '@/components/AITaskListModal';
@@ -318,33 +318,38 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
   };
 
   // Créer une nouvelle tâche
-  const handleCreateTask = async () => {
-    if (!newTask.title.trim() || !newTask.dueDate) {
-      setError('Le titre et la date d\'échéance sont requis');
-      return;
-    }
-    
-    try {
-      const token = storage.getToken() || "";
-      
-      const taskData: CreateTaskData = {
-        ...newTask,
-        projectId: id!,
-        priority: newTask.priority as 'Faible' | 'Moyenne' | 'Haute',
-        assigneeIds: selectedAssignees,
-      };
-      
-      const createdTask = await createTask(token, taskData);
-      setTasks(prev => [...prev, createdTask]);
-      setIsCreateTaskModalOpen(false);
-      setNewTask({ title: '', description: '', dueDate: '', priority: 'Moyenne' });
-      setSelectedAssignees([]);
-      setSelectedStatus('À faire');
-      
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors de la création de la tâche');
-    }
-  };
+ const handleCreateTask = async () => {
+  if (!newTask.title.trim() || !newTask.dueDate) {
+    setError('Le titre et la date d\'échéance sont requis');
+    return;
+  }
+
+  try {
+    const token = storage.getToken() || "";
+    const taskData: CreateTaskData = {
+      ...newTask,
+      projectId: id!,
+      priority: newTask.priority as 'Faible' | 'Moyenne' | 'Haute',
+      assigneeIds: selectedAssignees,
+    };
+
+    await createTask(token, taskData);
+    // ✅ Recharger projet ET tâches pour avoir tout à jour
+    const [refreshedProject, updatedTasks] = await Promise.all([
+      getProjectById(token, id!),
+      getProjectTasks(token, id!)
+    ]);
+    setProject(refreshedProject);
+    setTasks(updatedTasks);
+    setIsCreateTaskModalOpen(false);
+    setNewTask({ title: '', description: '', dueDate: '', priority: 'Moyenne' });
+    setSelectedAssignees([]);
+    setSelectedStatus('À faire');
+
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Erreur lors de la création de la tâche');
+  }
+};
 
   // Statuts disponibles
   const statusOptions = [
@@ -426,11 +431,15 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
     );
   }
 
-  // Mock des contributeurs
-  const memberContribs = project.members?.map(m => ({ id: m.user.id, name: m.user.name, role: m.role })) || [];
+  // Contributeurs (tout en string pour éviter les conflits de type)
+  const memberContribs = project.members?.map(m => ({ 
+    id: String(m.user.id), 
+    name: m.user.name, 
+    role: m.role 
+  })) || [];
   const contributors = [
-    { id: project.ownerId, name: project.owner?.name || 'Propriétaire', role: 'Propriétaire' },
-    ...memberContribs.filter(m => m.id !== project.ownerId)
+    { id: String(project?.ownerId), name: project?.owner?.name || 'Propriétaire', role: 'Propriétaire' },
+    ...memberContribs.filter(m => m.id !== String(project?.ownerId))
   ];
   const users = contributors;
 
@@ -1059,14 +1068,17 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
                   showBorder={index < filteredTasks.length - 1}
                   getInitials={getInitials}
                   onEdit={() => {
+                    const taskAssigneeIds = (task.assignees || []).map(a => String(a.userId));
                     setEditingTask({
                       id: task.id,
                       title: task.title,
                       description: task.description || '',
                       dueDate: task.dueDate,
-                      assigneeIds: task.assignees.map(a => String(a.userId)),
+                      assigneeIds: taskAssigneeIds,
                       status: task.status
                     });
+                    setSelectedAssignees(taskAssigneeIds);
+                    setSelectedStatus(task.status);
                     setIsEditTaskModalOpen(true);
                   }}
                   isMobile={isMobile}
@@ -1080,7 +1092,7 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
       </div>
 
       {/* Modal de confirmation de suppression */}
-{/* Modale de création de tâche */}
+ {/* Modale de création de tâche */}
       {isCreateTaskModalOpen && (
         <CreateTaskModal
           onClose={() => setIsCreateTaskModalOpen(false)}
@@ -1091,13 +1103,13 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
           setSelectedAssignees={setSelectedAssignees}
           selectedStatus={selectedStatus}
           setSelectedStatus={setSelectedStatus}
-          users={allUsers}
+          users={contributors}
           statusOptions={statusOptions}
           isMobile={isMobile}
           focusOutlineStyle={focusOutlineStyle}
         />
       )}
-  
+
       {/* Modale liste de tâches IA */}
       {isAITaskModalOpen && (
         <AITaskListModal onClose={() => setIsAITaskModalOpen(false)} />
@@ -1111,8 +1123,35 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
           onSave={async (updated) => {
             try {
               const token = storage.getToken() || "";
-              const updatedProject = await updateProject(token, id!, updated);
-              setProject(updatedProject);
+
+              // 1. Mettre à jour le projet (nom/description)
+              await updateProject(token, id!, {
+                name: updated.name,
+                description: updated.description
+              });
+
+              // 2. Gérer les contributeurs un par un (tout en string pour éviter les conflits de type)
+              const currentMemberIds = project?.members?.map(m => String(m.user.id)) || [];
+              const newMemberIds = updated.contributorIds || [];
+              const ownerId = String(project?.ownerId);
+
+              // Ajouter les nouveaux
+              for (const userId of newMemberIds) {
+                if (!currentMemberIds.includes(userId) && userId !== ownerId) {
+                  await addContributor(token, id!, userId);
+                }
+              }
+
+              // Retirer ceux supprimés
+              for (const userId of currentMemberIds) {
+                if (!newMemberIds.includes(userId) && userId !== ownerId) {
+                  await removeContributor(token, id!, userId);
+                }
+              }
+
+              // 3. Recharger le projet
+              const refreshedProject = await getProjectById(token, id!);
+              setProject(refreshedProject);
               setIsEditProjectModalOpen(false);
             } catch (err) {
               setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour du projet');
@@ -1124,20 +1163,26 @@ export default function ProjectDetail({ id, initialProject }: ProjectDetailProps
 
       {/* Modale Modifier Tâche */}
       {isEditTaskModalOpen && editingTask && (
-        <EditTaskModal
-          task={editingTask}
-          onClose={() => setIsEditTaskModalOpen(false)}
-          onSave={async (updated) => {
-            try {
-              const token = storage.getToken() || "";
-              const updatedTask = await updateTask(token, id!, editingTask!.id, updated);
-              setTasks(prev => prev.map(t => t.id === editingTask!.id ? updatedTask : t));
-              setIsEditTaskModalOpen(false);
-            } catch (err) {
-              setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour de la tâche');
-            }
+  <EditTaskModal
+    task={editingTask}
+    onClose={() => setIsEditTaskModalOpen(false)}
+    onSave={async (updated) => {
+      try {
+        const token = storage.getToken() || "";
+        await updateTask(token, id!, editingTask!.id, updated);
+        // ✅ Recharger projet ET tâches
+        const [refreshedProject, updatedTasks] = await Promise.all([
+          getProjectById(token, id!),
+          getProjectTasks(token, id!)
+        ]);
+        setProject(refreshedProject);
+        setTasks(updatedTasks);
+        setIsEditTaskModalOpen(false);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour de la tâche');
+      }
           }}
-          users={allUsers}
+          users={contributors}
         />
       )}
     </div>
@@ -1177,7 +1222,7 @@ function TaskCard({
   const colors = statusColors[task.status] || { bg: '#E5E7EB', color: '#6B7280' };
   
   const [showComments, setShowComments] = useState(false);
-  const assignees = task.assignees?.map(a => ({ id: a.userId, name: a.user.name })) || [];
+  const assignees = task.assignees?.map(a => ({ id: a.userId, name: a.user?.name || 'Inconnu' })) || [];
 
   const cardPadding = isMobile ? '1rem' : isTablet ? '1.5rem' : '2rem';
   const titleSize = isMobile ? '1rem' : '1.125rem';

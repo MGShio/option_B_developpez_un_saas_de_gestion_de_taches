@@ -253,7 +253,10 @@ export async function updateProject(token: string, projectId: string, projectDat
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     },
-    body: JSON.stringify(projectData),
+    body: JSON.stringify({
+      name: projectData.name,
+      description: projectData.description
+    }),
   });
 
   if (!response.ok) {

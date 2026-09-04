@@ -122,7 +122,7 @@ export async function getProjectsWithTaskCounts(token: string): Promise<ProjectW
   
   if (data?.data?.projects) {
     for (const project of data.data.projects) {
-      const tasksCount = project.tasksCount || 0;
+      const tasksCount = project._count?.tasks || project.tasksCount || 0;
       const completedTasks = project.completedTasks || 0;
       projects.push({
         id: project.id,

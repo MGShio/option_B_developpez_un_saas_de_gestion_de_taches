@@ -56,7 +56,7 @@ export async function getUsers(token: string): Promise<User[]> {
   }
 
   const data = await response.json();
-  return data.data.users;
+  return data?.data?.users || data?.users || [];
 }
 
 // ============================================
